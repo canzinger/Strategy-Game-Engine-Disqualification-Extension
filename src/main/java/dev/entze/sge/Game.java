@@ -82,6 +82,14 @@ public interface Game {
   double getUtilityValue(int player);
 
   /**
+   * Collects all possible moves and returns them in a list. The list can be translated via a
+   * GameActionTranslator
+   *
+   * @return a list of all possible moves.
+   */
+  List<Integer> getPossibleActions();
+
+  /**
    * Does a given action. Usually the value was acquired from the action table. The given value has
    * to be greater than or equal to 0. Negative values are rejected with an
    * IllegalArgumentException.

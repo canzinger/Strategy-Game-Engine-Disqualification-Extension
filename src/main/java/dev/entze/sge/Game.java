@@ -91,6 +91,14 @@ public interface Game {
   List<Integer> getPossibleActions();
 
   /**
+   * Returns a copy of the current board. Notice that only in non-canonical games some information
+   * might be hidden.
+   *
+   * @return the board
+   */
+  int[] getBoard();
+
+  /**
    * Does a given action. Usually the value was acquired from the action table. The given value has
    * to be greater than or equal to 0. Negative values are rejected with an
    * IllegalArgumentException.
@@ -126,5 +134,7 @@ public interface Game {
    * @return a copy of the game with only the information available to the player
    */
   Game getGame(int player);
+
+  String getVisualisation();
 
 }

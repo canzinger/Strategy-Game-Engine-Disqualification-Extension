@@ -29,7 +29,7 @@ dependencies {
 
 jar{
     manifest{
-        attributes 'Main-Class': 'dev.entze.sge.Engine'
+        attributes 'Main-Class': 'dev.entze.sge.engine.Engine'
     }
 }
 

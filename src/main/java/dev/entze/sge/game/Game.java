@@ -1,4 +1,4 @@
-package dev.entze.sge;
+package dev.entze.sge.game;
 
 import java.util.List;
 

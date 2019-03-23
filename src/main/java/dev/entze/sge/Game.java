@@ -41,11 +41,12 @@ public interface Game {
 
   /**
    * The weight of the utility function of a given player.
+   *
    * @param player - the player
    * @return the weight of the utlity function.
    */
-  default double getPlayerUtilityWeight(int player){
-    if(getCurrentPlayer() == player){
+  default double getPlayerUtilityWeight(int player) {
+    if (getCurrentPlayer() == player) {
       return 1;
     }
     return (-1);
@@ -94,9 +95,9 @@ public interface Game {
    * to be greater than or equal to 0. Negative values are rejected with an
    * IllegalArgumentException.
    *
-   * @throws IllegalArgumentException - In the case of a negative action.
    * @param action - the number of the actions to take
    * @return a new copy of the game with the previous action applied.
+   * @throws IllegalArgumentException - In the case of a negative action.
    */
   Game doAction(int action);
 

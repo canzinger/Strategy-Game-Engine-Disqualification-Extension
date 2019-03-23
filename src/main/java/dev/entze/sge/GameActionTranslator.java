@@ -1,9 +1,8 @@
 package dev.entze.sge;
 
-public interface GameActionTranslator<E> {
+public interface GameActionTranslator<T> {
 
-  E translate(int action);
-
-  int translate(E action);
+  T translate(int action);
+  int translate(T action);
 
 }

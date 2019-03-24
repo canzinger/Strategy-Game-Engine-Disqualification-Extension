@@ -103,9 +103,9 @@ public interface Game {
    * to be greater than or equal to 0. Negative values are rejected with an
    * IllegalArgumentException.
    *
-   * @param action - the number of the actions to take
+   * @param action - the number of the action to take
    * @return a new copy of the game with the previous action applied.
-   * @throws IllegalArgumentException - In the case of a negative action.
+   * @throws IllegalArgumentException - In the case of a non-existing action.
    */
   Game doAction(int action);
 
@@ -128,13 +128,11 @@ public interface Game {
    * The game as seen from the given player. In games with complete and perfect information or
    * non-canonical games (games where this function was already called) this method will return a
    * copy of this game as is. In other games the unknown information will be hidden and abstracted
-   * via probabilities.
+   * via placeholders.
    *
    * @param player - the player
    * @return a copy of the game with only the information available to the player
    */
   Game getGame(int player);
-
-  String getVisualisation();
 
 }

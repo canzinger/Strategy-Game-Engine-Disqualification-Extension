@@ -1,40 +1,34 @@
 package dev.entze.sge.engine;
 
-import java.io.File;
-import java.util.concurrent.Callable;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import dev.entze.sge.agent.GameAgent;
+import dev.entze.sge.game.Game;
+import dev.entze.sge.game.GameBoardTranslator;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 
-@Command(name = "Strategy Game Engine", description = "A sequential game engine.", version = "sge "
-    + Engine.version, aliases = "sge")
-public class Engine implements Callable<Void> {
+public class Engine implements Runnable {
 
-  @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
-  private boolean helpRequested = false;
+  private final Logger log;
+  private final ExecutorService pool;
 
-  @Option(names = {"-V", "--version"}, versionHelp = true, description = "print the version")
-  private boolean versionRequested = false;
+  private final Game game;
+  private final GameBoardTranslator<String> gameBoardVisualiser;
+  private final List<GameAgent<Game>> gameAgents;
 
-  @Parameters(arity = "1", paramLabel = "FILE", description = "JAR file of game")
-  private File gameJar;
-
-  @Parameters(arity = "1..*", paramLabel = "FILE", description = "JAR file(s) of agents")
-  private File[] agentJars;
-
-  public static final String version = "0.0.0";
-
-  public static void main(String[] args) {
-    CommandLine.call(new Engine(), args);
+  public Engine(Logger log, ExecutorService pool, Game game,
+      GameBoardTranslator<String> gameBoardVisualiser,
+      List<GameAgent<Game>> gameAgents) {
+    this.log = log;
+    this.pool = pool;
+    this.game = game;
+    this.gameBoardVisualiser = gameBoardVisualiser;
+    this.gameAgents = gameAgents;
   }
+
 
   @Override
-  public Void call() throws Exception {
-    System.out.println("Found: " + gameJar.getAbsolutePath());
-    for (File agentJar : agentJars) {
-      System.out.println("Found: " + agentJar.getAbsolutePath());
-    }
-    return null;
+  public void run() {
+    log.info("Starting Engine.");
   }
+
 }

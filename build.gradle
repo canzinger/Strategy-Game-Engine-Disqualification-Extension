@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'com.github.johnrengelman.shadow' version '4.0.2'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.71'
 }
 
 group 'dev.entze'
@@ -25,11 +26,12 @@ dependencies {
 
     compile 'info.picocli:picocli:3.9.5'
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
-jar{
-    manifest{
-        attributes 'Main-Class': 'dev.entze.sge.engine.Engine'
+jar {
+    manifest {
+        attributes 'Main-Class': 'dev.entze.sge.engine.CLI'
     }
 }
 
@@ -46,4 +48,15 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives sourcesJar
     archives javadocJar
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }

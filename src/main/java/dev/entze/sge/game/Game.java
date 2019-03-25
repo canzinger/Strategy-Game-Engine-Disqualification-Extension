@@ -13,7 +13,23 @@ public interface Game<A, B> {
   boolean isGameOver();
 
   /**
-   * Counts the number of involved players. This number cannot change throughout the game.
+   * Check how many players have to play to be a valid game.
+   *
+   * @return the minimum number of players
+   */
+  int getMinimumNumberOfPlayers();
+
+
+  /**
+   * Check how many players can play at most to be a valid game.
+   *
+   * @return the maximum number of players.
+   */
+  int getMaximumNumberOfPlayers();
+
+  /**
+   * Counts the number of involved players. Has to be between getMinimumNumberOfPlayers() and
+   * getMaximumNumberOfPlayers(). This number cannot change throughout the game.
    *
    * @return the number of players
    */
@@ -124,6 +140,17 @@ public interface Game<A, B> {
    * @return true if this or any parent was the result getGame.
    */
   boolean isCanonical();
+
+  /***
+   * The game as seen from the current player. In games with complete and perfect information or
+   * non-canonical games (games where this function was already called) this method will return a
+   * copy of this game as is. In other games the unknown information will be hidden and abstracted
+   * via placeholders.
+   * @return a copy of the game with only the information available to the player
+   */
+  default Game<A, B> getGame() {
+    return getGame(this.getCurrentPlayer());
+  }
 
   /**
    * The game as seen from the given player. In games with complete and perfect information or

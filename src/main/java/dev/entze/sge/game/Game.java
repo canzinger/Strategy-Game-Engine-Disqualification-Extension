@@ -1,8 +1,9 @@
 package dev.entze.sge.game;
 
+import dev.entze.sge.util.Pair;
 import java.util.List;
 
-public interface Game {
+public interface Game<A, B> {
 
   /**
    * Checks whether the game is over yet.
@@ -88,7 +89,7 @@ public interface Game {
    *
    * @return a list of all possible moves.
    */
-  List<Integer> getPossibleActions();
+  List<A> getPossibleActions();
 
   /**
    * Returns a copy of the current board. Notice that only in non-canonical games some information
@@ -96,7 +97,7 @@ public interface Game {
    *
    * @return the board
    */
-  int[] getBoard();
+  B getBoard();
 
   /**
    * Does a given action. Usually the value was acquired from the action table. The given value has
@@ -107,7 +108,7 @@ public interface Game {
    * @return a new copy of the game with the previous action applied.
    * @throws IllegalArgumentException - In the case of a non-existing action.
    */
-  Game doAction(int action);
+  Game<A, B> doAction(A action);
 
   /**
    * Returns the record of all previous moves. The first element in the array indicates the player
@@ -115,7 +116,7 @@ public interface Game {
    *
    * @return the record of all previous moves
    */
-  List<Integer[]> getPreviousActions();
+  List<Pair<Integer, A>> getPreviousActions();
 
   /**
    * Checks whether this game or a parent is a creation of getGame.
@@ -133,6 +134,6 @@ public interface Game {
    * @param player - the player
    * @return a copy of the game with only the information available to the player
    */
-  Game getGame(int player);
+  Game<A, B> getGame(int player);
 
 }

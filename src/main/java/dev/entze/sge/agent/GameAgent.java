@@ -3,11 +3,15 @@ package dev.entze.sge.agent;
 import dev.entze.sge.game.Game;
 import java.util.concurrent.TimeUnit;
 
-public interface GameAgent<G extends Game> {
+public interface GameAgent<G extends Game<? extends A, ?>, A> {
 
-  int calculateNextAction(G game, long calculationTime, TimeUnit timeUnit);
+  A calculateNextAction(G game, long calculationTime, TimeUnit timeUnit);
 
-  default void initialiseAgentForNewGame() {
+  default void setUp() {
+  }
+
+  default void tearDown() {
+
   }
 
 }

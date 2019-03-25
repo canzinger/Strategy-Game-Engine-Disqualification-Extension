@@ -1,13 +1,8 @@
 package dev.entze.sge.engine;
 
-import dev.entze.sge.agent.GameAgent;
-import dev.entze.sge.game.Game;
-import dev.entze.sge.game.GameBoardTranslator;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-
 public class Engine implements Runnable {
 
+  /*
   private final Logger log;
   private final ExecutorService pool;
 
@@ -24,11 +19,11 @@ public class Engine implements Runnable {
     this.gameBoardVisualiser = gameBoardVisualiser;
     this.gameAgents = gameAgents;
   }
-
+*/
 
   @Override
   public void run() {
-    log.info("Starting Engine.");
+  //  log.info("Starting Engine.");
   }
 
 }

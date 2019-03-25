@@ -1,18 +1,8 @@
 package dev.entze.sge.engine;
 
-import dev.entze.sge.agent.GameAgent;
-import dev.entze.sge.engine.loader.AgentLoader;
-import dev.entze.sge.engine.loader.GameLoader;
-import dev.entze.sge.game.Game;
-import dev.entze.sge.game.GameBoardTranslator;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -47,7 +37,7 @@ public class CLI implements Callable<Void> {
 
   @Override
   public Void call() throws IOException, InterruptedException {
-    Logger log = new Logger(logLevel, "[sge ", "",
+  /*  Logger log = new Logger(logLevel, "[sge ", "",
         "trace]: ", System.out, "",
         "debug]: ", System.out, "",
         "info]: ", System.out, "",
@@ -136,7 +126,7 @@ public class CLI implements Callable<Void> {
       throw e;
     }
     log.trace_("done");
-
+*/
     return null;
   }
 }

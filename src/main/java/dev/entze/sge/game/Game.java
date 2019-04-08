@@ -60,7 +60,7 @@ public interface Game<A, B> {
    * The weight of the utility function of a given player.
    *
    * @param player - the player
-   * @return the weight of the utlity function.
+   * @return the weight of the utility function.
    */
   default double getPlayerUtilityWeight(int player) {
     if (getCurrentPlayer() == player) {
@@ -70,14 +70,25 @@ public interface Game<A, B> {
   }
 
   /**
+   * The weight of the heuristic function of a given player. Per default the same as
+   * getPlayerUtilityWeight().
+   *
+   * @param player - the player
+   * @return the weight of the heuristic function.
+   */
+  default double getPlayerHeuristicWeight(int player) {
+    return getPlayerUtilityWeight(player);
+  }
+
+  /**
    * Applies the (public) utility function of each player and returns the result multiplied with
    * their weight in a sum.
    *
-   * Should no weight be supplied for a given player's utility function getPlayerUtilityWeight is
+   * Should no weight be supplied for a given player's utility function getPlayerUtilityWeight() is
    * used instead. Any number of weights can be given.
    *
    * @param weights - the optional weights
-   * @return the weighted sum of the utilty functions
+   * @return the weighted sum of the utility functions
    */
   default double getUtilityValue(double... weights) {
     double value = 0;
@@ -92,12 +103,44 @@ public interface Game<A, B> {
   }
 
   /**
+   * Applies the heuristic function of each player and returns the result multiplied with their
+   * weight in a sum.
+   *
+   * Should no weight be supplied for a given player's utility function getPlayerHeuristicWeight()
+   * is used instead. Any number of weights can be given.
+   *
+   * @param weights - the optional weights
+   * @return the weighted sum of the heuristic functions
+   */
+  default double getHeuristicValue(double... weights) {
+    double value = 0;
+    for (int p = 0; p < getNumberOfPlayers(); p++) {
+      if (p < weights.length) {
+        value += weights[p] * getHeuristicValue(p);
+      } else {
+        value += getPlayerHeuristicWeight(p) * getHeuristicValue(p);
+      }
+    }
+    return value;
+  }
+
+  /**
    * Applies the (public) utility function for the given player.
    *
    * @param player - the player
    * @return the result of the utility function for the player
    */
   double getUtilityValue(int player);
+
+  /**
+   * Applies a heuristic function for the given player. Per default the same as getUtilityValue().
+   *
+   * @param player - the player
+   * @return the result of the heuristic function for the player
+   */
+  default double getHeuristicValue(int player) {
+    return getUtilityValue(player);
+  }
 
   /**
    * Collects all possible moves and returns them in a list. The list can be translated via a
@@ -116,21 +159,18 @@ public interface Game<A, B> {
   B getBoard();
 
   /**
-   * Does a given action. Usually the value was acquired from the action table. The given value has
-   * to be greater than or equal to 0. Negative values are rejected with an
-   * IllegalArgumentException.
+   * Does a given action.
    *
-   * @param action - the number of the action to take
+   * @param action - the action to take
    * @return a new copy of the game with the previous action applied.
    * @throws IllegalArgumentException - In the case of a non-existing action.
    */
   Game<A, B> doAction(A action);
 
   /**
-   * Returns the record of all previous moves. The first element in the array indicates the player
-   * and the second element the action. Use the action table to translate to readable moves.
+   * Returns the record of all previous actions and which player has done it.
    *
-   * @return the record of all previous moves
+   * @return the record of all previous actions
    */
   List<Pair<Integer, A>> getPreviousActions();
 

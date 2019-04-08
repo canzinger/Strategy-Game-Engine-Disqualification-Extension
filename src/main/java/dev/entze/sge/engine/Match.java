@@ -92,8 +92,18 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
         return result;
       }
 
-      game.doAction(action);
+      game = game.doAction(action);
     }
+
+    for (int i = 0; i < result.length; i++) {
+      result[i] = game.getGameUtilityValue()[i];
+    }
+
+    log.info_("-----");
+    log.info("Game over.");
+    log.info_(gameASCIIVisualiser.visualise((G) game));
+    log.inf("Result: ");
+    log.info_(Arrays.toString(result));
 
     for (GameAgent<G, A> gameAgent : gameAgents) {
       gameAgent.tearDown();

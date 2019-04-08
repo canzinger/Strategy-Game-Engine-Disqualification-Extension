@@ -9,7 +9,6 @@ import dev.entze.sge.util.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -51,6 +50,22 @@ public class CLI implements Callable<Void> {
       "--agents"}, required = true, arity = "1..*", description = "JAR file(s) of the agents")
   private File[] agentFiles;
 
+  @Option(names = {"-c",
+      "--computation-time"}, defaultValue = "60", description = "Amount of computational time given for each turn.")
+  private long computationTime = 60;
+
+  @Option(names = {"-u",
+      "--time-unit"}, defaultValue = "SECONDS", description = "Time unit in which -c is.")
+  private TimeUnit timeUnit = TimeUnit.SECONDS;
+
+  @Option(names = {"-i",
+      "--interactive"}, description = "start engine in interactiveMode mode, mutually exclusive with -t")
+  private boolean interactiveMode;
+
+  @Option(names = {"-t",
+      "--tournament"}, arity = "0..1", description = "start engine in tournament mode, mutually exclusive with -i")
+  private TournamentMode tournamentMode = TournamentMode.SINGLE_ELEMINATION;
+
   public static final String version = "0.0.0";
 
   public static void main(String[] args) {
@@ -58,11 +73,14 @@ public class CLI implements Callable<Void> {
     try {
       CommandLine.call(cli, args);
     } catch (Exception e) {
+      cli.log.error_("");
       cli.log.error("Shutting down because of exception.");
+      e.printStackTrace();
     }
     try {
       cli.cleanUpPool();
     } catch (InterruptedException e) {
+      cli.log.error_("");
       cli.log.error("Interrupted.");
     }
   }
@@ -193,22 +211,12 @@ public class CLI implements Callable<Void> {
 
     log.trace("Loaded agents.");
 
-    try {
-      System.out.println(gameASCIIVisualiser.visualise(gameConstructor.newInstance()));
-    } catch (
-        InstantiationException e) {
-      e.printStackTrace();
-    } catch (
-        IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (
-        InvocationTargetException e) {
-      e.printStackTrace();
-    }
-
     log.tra("Initialising Engine");
-    Engine engine = new Engine(log, pool, gameConstructor, gameASCIIVisualiser, gameAgents);
+    Engine engine = new Engine(log, pool, gameConstructor, gameASCIIVisualiser, gameAgents,
+        computationTime, timeUnit, interactiveMode, tournamentMode);
     log.trace_(".done");
+
+    engine.run();
 
     return null;
   }

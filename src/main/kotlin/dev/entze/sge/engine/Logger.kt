@@ -101,7 +101,7 @@ class Logger(private val logLevel: Int = 0,
     }
 
     fun error(string: String) {
-        error("$string\n")
+        err("$string\n")
     }
 
     fun error_(string: String) {

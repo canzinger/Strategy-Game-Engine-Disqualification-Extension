@@ -1,11 +1,10 @@
-package dev.entze.sge.engine;
+package dev.entze.sge.engine.cli;
 
 import dev.entze.sge.agent.GameAgent;
+import dev.entze.sge.engine.Logger;
 import dev.entze.sge.engine.loader.AgentLoader;
 import dev.entze.sge.engine.loader.GameLoader;
 import dev.entze.sge.game.Game;
-import dev.entze.sge.game.GameASCIIVisualiser;
-import dev.entze.sge.util.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -15,78 +14,84 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.RunAll;
+
 
 @Command(name = "Strategy Game Engine", description = "A sequential game engine.", version = "sge "
-    + CLI.version, aliases = "sge")
-public class CLI implements Callable<Void> {
+    + SgeCommand.version, aliases = "sge", subcommands = {
+    MatchCommand.class,
+    InteractiveCommand.class,
+    TournamentCommand.class,
+    BatchCommand.class
+})
+public class SgeCommand implements Callable<Void> {
 
-  private Logger log;
-  private ExecutorService pool;
+  public static final String SGE_TYPE = "Sge-Type";
+  public static final String SGE_TYPE_GAME = "game";
+  public static final String SGE_TYPE_AGENT = "agent";
+  public static final String SGE_AGENT_CLASS = "Agent-Class";
+  public static final String SGE_AGENT_NAME = "Agent-Name";
+
+  Logger log;
+  ExecutorService pool;
+  List<Constructor<GameAgent<Game<?, ?>, ?>>> agentFactories;
+  Constructor<Game<?, ?>> gameFactory;
 
   @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
-  private boolean helpRequested = false;
+  boolean helpRequested = false;
 
   @Option(names = {"-V", "--version"}, versionHelp = true, description = "print the version")
-  private boolean versionRequested = false;
+  boolean versionRequested = false;
 
-  @Option(names = {"-L",
-      "--log"}, arity = "1", description = "the log level (from -2 (=trace) to 2 (=error))")
-  private int logLevel = 0;
+  @Option(names = {"-q",
+      "--quiet"}, description = "Found once: Log only warnings. Twice: only errors. Thrice: no output.")
+  boolean[] quiet = new boolean[0];
 
-  @Option(names = {"-g",
-      "--game"}, required = true, arity = "1", description = "the JAR file of the game")
-  private File gameFile;
-
-  @Option(names = {"-a",
-      "--agents"}, required = true, arity = "1..*", description = "JAR file(s) of the agents")
-  private File[] agentFiles;
-
-  @Option(names = {"-c",
-      "--computation-time"}, defaultValue = "60", description = "Amount of computational time given for each turn.")
-  private long computationTime = 60;
-
-  @Option(names = {"-u",
-      "--time-unit"}, defaultValue = "SECONDS", description = "Time unit in which -c is.")
-  private TimeUnit timeUnit = TimeUnit.SECONDS;
-
-  @Option(names = {"-i",
-      "--interactive"}, description = "start engine in interactiveMode mode, mutually exclusive with -t")
-  private boolean interactiveMode;
-
-  @Option(names = {"-t",
-      "--tournament"}, arity = "0..1", description = "start engine in tournament mode, mutually exclusive with -i")
-  private TournamentMode tournamentMode = TournamentMode.SINGLE_ELEMINATION;
+  @Option(names = {"-v",
+      "--verbose"}, description = "Found once: Log debug information. Twice: with trace information.")
+  boolean[] verbose = new boolean[0];
 
   public static final String version = "0.0.0";
 
   public static void main(String[] args) {
-    CLI cli = new CLI();
+
+    SgeCommand sge = new SgeCommand();
+    CommandLine cli = new CommandLine(sge);
+
+    cli.setCaseInsensitiveEnumValuesAllowed(true);
+
+    List<Object> ran = cli.parseWithHandler(new RunAll(), args);
+
+    try {
+      sge.cleanUpPool();
+    } catch (InterruptedException e) {
+      sge.log.error_();
+      sge.log.error("Interrupted.");
+    }
+
+    /*
     try {
       CommandLine.call(cli, args);
     } catch (Exception e) {
-      cli.log.error_("");
-      cli.log.error("Shutting down because of exception.");
+      //cli.log.error_("");
+      //cli.log.error("Shutting down because of exception.");
       e.printStackTrace();
     }
-    try {
-      cli.cleanUpPool();
-    } catch (InterruptedException e) {
-      cli.log.error_("");
-      cli.log.error("Interrupted.");
-    }
+
+    */
   }
 
   @Override
   public Void call() {
+    int logLevel = quiet.length - verbose.length;
     log = new Logger(logLevel, "[sge ", "",
         "trace]: ", System.out, "",
         "debug]: ", System.out, "",
@@ -94,16 +99,16 @@ public class CLI implements Callable<Void> {
         "warn]: ", System.err, "",
         "error]: ", System.err, "");
 
+    log.tra("Initialising ThreadPool");
+    pool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 2));
+    log.trace_(".done");
+
+    /*
     log.info("Welcome to Strategy Game Engine " + version);
     log.info_("------------");
     log.debug("Got " + gameFile.getPath() + " as game file.");
     log.debug("Got " + agentFiles.length + " agents.");
 
-    log.tra("Initialising ThreadPool");
-    pool = Executors.newFixedThreadPool(
-        (Runtime.getRuntime().availableProcessors() > 2 ? Runtime.getRuntime().availableProcessors()
-            : 2));
-    log.trace_(".done");
 
     log.tra("Initialising Loaders");
 
@@ -218,7 +223,102 @@ public class CLI implements Callable<Void> {
 
     engine.run();
 
+    */
     return null;
+  }
+
+  public void loadFiles(List<File> files) {
+
+    log.tra("Processing " + files.size() + " files");
+
+    URLClassLoader classLoader = null;
+    List<URL> urlList = new ArrayList<>(files.size());
+    GameLoader gameLoader = null;
+    String gameClassName = null;
+    String gameASCIIVisualiserClassName = null;
+    List<AgentLoader> agentLoaders = new ArrayList<>(files.size() - 1);
+    List<String> agentClassNames = new ArrayList<>(files.size() - 1);
+    List<String> agentNames = new ArrayList<>(files.size() - 1);
+
+    for (File file : files) {
+
+      JarFile jarFile;
+      try {
+        jarFile = new JarFile(file);
+      } catch (IOException e) {
+        log.trace_();
+        log.warn("Could not interpret " + file.getPath() + " as jar.");
+        continue;
+      }
+
+      Attributes attributes;
+      try {
+        attributes = jarFile.getManifest().getMainAttributes();
+      } catch (IOException e) {
+        log.trace_();
+        log.warn("Could not access " + file.getPath() + "'s manifest.");
+        continue;
+      }
+
+      if (!attributes.containsKey(SGE_TYPE)) {
+        log.trace_();
+        log.warn("Could not determine whether " + file.getPath()
+            + " is a game or an agent. Is " + SGE_TYPE + " set in Main-Attributes?");
+        continue;
+      }
+
+      try {
+        urlList.add(file.toURI().toURL());
+      } catch (MalformedURLException e) {
+        log.trace_();
+        log.warn("Could not get URL of " + file.getPath() + ".");
+        continue;
+      }
+
+      String type = attributes.getValue(SGE_TYPE).toLowerCase();
+
+      if (SGE_TYPE_AGENT.toLowerCase().equals(type)) {
+        boolean error = false;
+        if (!attributes.containsKey(SGE_AGENT_CLASS)) {
+          log.trace_();
+          log.warn(
+              "Agent: " + file.getPath() + " could not determine class path. Is " + SGE_AGENT_CLASS
+                  + " set?");
+          error = true;
+        }
+
+        if (!attributes.containsKey(SGE_AGENT_NAME)) {
+          log.trace_();
+          log.warn(
+              "Agent: " + file.getPath() + " could not determine name. Is " + SGE_AGENT_NAME
+                  + " set?");
+          error = true;
+        }
+
+        if (error) {
+          continue;
+        }
+
+        agentClassNames.add(attributes.getValue(SGE_AGENT_CLASS));
+        agentNames.add(attributes.getValue(SGE_AGENT_NAME));
+      } else if (SGE_TYPE_GAME.toLowerCase().equals(type)) {
+
+        //TODO: Load Game-Class, GameASCIIVisualiser-Class
+
+      } else {
+        log.trace_();
+        log.warn("Unknown type in " + file.getPath() + ". Has to be either \"" + SGE_TYPE_GAME
+            + "\" or \"" + SGE_TYPE_AGENT + "\".");
+        continue;
+      }
+
+      log.tra_(".");
+    }
+
+    if (gameClassName == null) {
+      //TODO: no game added
+    }
+
   }
 
   private void cleanUpPool() throws InterruptedException {
@@ -230,7 +330,7 @@ public class CLI implements Callable<Void> {
     log.tra_(".");
     try {
       if (!pool.awaitTermination(5, TimeUnit.SECONDS)) {
-        log.trace_("");
+        log.trace_();
         log.info("ThreadPool did not yet shutdown. Forcing.");
         pool.shutdownNow();
       } else {
@@ -238,11 +338,12 @@ public class CLI implements Callable<Void> {
       }
     } catch (
         InterruptedException e) {
-      log.trace_("");
+      log.warn_();
       log.warn("ThreadPool termination was interrupted.");
       throw e;
     }
     log.trace_("done");
   }
+
 
 }

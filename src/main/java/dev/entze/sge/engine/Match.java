@@ -20,13 +20,13 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
   private GameASCIIVisualiser<G> gameASCIIVisualiser;
   private List<E> gameAgents;
   private final boolean withHumanPlayer;
-  private final long calculationTime;
+  private final long computationTime;
   private final TimeUnit timeUnit;
   private final Logger log;
   private final ExecutorService pool;
 
   public Match(Game<A, ?> game, GameASCIIVisualiser<G> gameASCIIVisualiser,
-      List<E> gameAgents, long calculationTime,
+      List<E> gameAgents, long computationTime,
       TimeUnit timeUnit, Logger log, ExecutorService pool) {
     this.game = game;
     this.gameASCIIVisualiser = gameASCIIVisualiser;
@@ -39,7 +39,7 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
       withHumanPlayer = withHumanPlayer || (gameAgent instanceof HumanAgent);
     }
     this.withHumanPlayer = withHumanPlayer;
-    this.calculationTime = calculationTime;
+    this.computationTime = computationTime;
     this.timeUnit = timeUnit;
     this.log = log;
     this.pool = pool;
@@ -56,34 +56,45 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
     Arrays.fill(result, 1D);
     int lastPlayer = (-1);
     int thisPlayer;
-
+    boolean isHuman = false;
     while (!game.isGameOver()) {
 
       thisPlayer = game.getCurrentPlayer();
 
       G playersGame = (G) game.getGame(thisPlayer);
+      isHuman = gameAgents.get(thisPlayer) instanceof HumanAgent;
 
       if (lastPlayer != thisPlayer) {
         log.info("Player " + game.getCurrentPlayer() + ": ");
-        if (!withHumanPlayer || (gameAgents.get(thisPlayer) instanceof HumanAgent)) {
+        if (!withHumanPlayer || isHuman) {
           log.info_(gameASCIIVisualiser.visualise(playersGame));
         }
       }
 
       final int finalThisPlayer = thisPlayer;
       Future<A> actionFuture = pool.submit(() -> gameAgents.get(finalThisPlayer)
-          .calculateNextAction(playersGame, calculationTime, timeUnit));
+          .calculateNextAction(playersGame, computationTime, timeUnit));
 
       A action = null;
 
       try {
-        action = actionFuture.get(calculationTime, timeUnit);
+        action = actionFuture.get(computationTime, timeUnit);
       } catch (InterruptedException e) {
         log.error("Interrupted.");
       } catch (ExecutionException e) {
         log.error("Exception while executing calculateNextAction().");
       } catch (TimeoutException e) {
-        log.warn("Agent timeout.");
+        if (isHuman) {
+          try {
+            action = actionFuture.get();
+          } catch (InterruptedException ex) {
+            log.error("Interrupted.");
+          } catch (ExecutionException ex) {
+            log.error("Exception while executing calculateNextAction().");
+          }
+        } else {
+          log.warn("Agent timeout.");
+        }
       }
 
       if (action == null) {
@@ -92,7 +103,22 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
         return result;
       }
 
+      if (!game.isValidAction(action)) {
+        log.warn("Illegal action given.");
+        try {
+          game.doAction(action);
+        } catch (IllegalArgumentException e) {
+          e.printStackTrace();
+        }
+        result[thisPlayer] = (-1D);
+        return result;
+      }
+
       game = game.doAction(action);
+
+      if (isHuman && !(gameAgents.get(game.getCurrentPlayer()) instanceof HumanAgent)) {
+        log.info_(gameASCIIVisualiser.visualise((G) game.getGame()));
+      }
     }
 
     for (int i = 0; i < result.length; i++) {
@@ -103,7 +129,13 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
     log.info("Game over.");
     log.info_(gameASCIIVisualiser.visualise((G) game));
     log.inf("Result: ");
-    log.info_(Arrays.toString(result));
+    for (int i = 0; i < gameAgents.size(); i++) {
+      log.inf_("Player " + i + " : " + result[i]);
+      if (i + 1 < gameAgents.size()) {
+        log.inf_(", ");
+      }
+    }
+    log.info_();
 
     for (GameAgent<G, A> gameAgent : gameAgents) {
       gameAgent.tearDown();

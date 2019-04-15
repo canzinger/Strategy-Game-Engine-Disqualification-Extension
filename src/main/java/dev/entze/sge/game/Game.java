@@ -2,6 +2,7 @@ package dev.entze.sge.game;
 
 import dev.entze.sge.util.Pair;
 import java.util.List;
+import java.util.Set;
 
 public interface Game<A, B> {
 
@@ -143,12 +144,11 @@ public interface Game<A, B> {
   }
 
   /**
-   * Collects all possible moves and returns them in a list. The list can be translated via a
-   * GameActionTranslator
+   * Collects all possible moves and returns them as a set.
    *
-   * @return a list of all possible moves.
+   * @return a set of all possible moves.
    */
-  List<A> getPossibleActions();
+  Set<A> getPossibleActions();
 
   /**
    * Returns a copy of the current board. Notice that only in non-canonical games some information
@@ -157,6 +157,14 @@ public interface Game<A, B> {
    * @return the board
    */
   B getBoard();
+
+  /**
+   * Checks whether doAction(action) would not throw an exception.
+   *
+   * @param action - the action
+   * @return true - iff the action is valid and possible.
+   */
+  boolean isValidAction(A action);
 
   /**
    * Does a given action.

@@ -16,28 +16,22 @@ import picocli.CommandLine.ParentCommand;
     "m"}, description = "Let agents play against each other in a single match.")
 public class MatchCommand implements Runnable {
 
-  @ParentCommand
-  private SgeCommand sge;
-
-  @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
-  private boolean helpRequested = false;
-
-  @Option(names = {"-q",
-      "--quiet"}, description = "Found once: Log only warnings. Twice: only errors. Thrice: no output")
-  private boolean[] quiet = new boolean[0];
-
-  @Option(names = {"-v",
-      "--verbose"}, description = "Found once: Log debug information. Twice: with trace information")
-  private boolean[] verbose = new boolean[0];
-
   @Option(names = {"-c",
       "--computation-time"}, defaultValue = "60", description = "Amount of computational time given for each action")
   long computationTime = 60;
-
   @Option(names = {"-u",
       "--time-unit"}, defaultValue = "SECONDS", description = "Time unit in which -c is. Valid values: ${COMPLETION-CANDIDATES}")
   TimeUnit timeUnit = TimeUnit.SECONDS;
-
+  @ParentCommand
+  private SgeCommand sge;
+  @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
+  private boolean helpRequested = false;
+  @Option(names = {"-q",
+      "--quiet"}, description = "Found once: Log only warnings. Twice: only errors. Thrice: no output")
+  private boolean[] quiet = new boolean[0];
+  @Option(names = {"-v",
+      "--verbose"}, description = "Found once: Log debug information. Twice: with trace information")
+  private boolean[] verbose = new boolean[0];
   @Option(names = {"-p",
       "--number-of-players"}, arity = "1", description = "Number of players. By default the minimum required to play")
   private int players = (-1);

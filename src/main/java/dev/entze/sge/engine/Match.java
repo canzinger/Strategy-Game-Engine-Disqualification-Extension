@@ -16,14 +16,14 @@ import java.util.concurrent.TimeoutException;
 public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implements
     Callable<Double[]> {
 
-  private Game<A, ?> game;
-  private GameASCIIVisualiser<G> gameASCIIVisualiser;
-  private List<E> gameAgents;
   private final boolean withHumanPlayer;
   private final long computationTime;
   private final TimeUnit timeUnit;
   private final Logger log;
   private final ExecutorService pool;
+  private Game<A, ?> game;
+  private GameASCIIVisualiser<G> gameASCIIVisualiser;
+  private List<E> gameAgents;
 
   public Match(Game<A, ?> game, GameASCIIVisualiser<G> gameASCIIVisualiser,
       List<E> gameAgents, long computationTime,
@@ -73,7 +73,7 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
 
       final int finalThisPlayer = thisPlayer;
       Future<A> actionFuture = pool.submit(() -> gameAgents.get(finalThisPlayer)
-          .calculateNextAction(playersGame, computationTime, timeUnit));
+          .computeNextAction(playersGame, computationTime, timeUnit));
 
       A action = null;
 
@@ -82,7 +82,7 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
       } catch (InterruptedException e) {
         log.error("Interrupted.");
       } catch (ExecutionException e) {
-        log.error("Exception while executing calculateNextAction().");
+        log.error("Exception while executing computeNextAction().");
       } catch (TimeoutException e) {
         if (isHuman) {
           try {
@@ -90,7 +90,7 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
           } catch (InterruptedException ex) {
             log.error("Interrupted.");
           } catch (ExecutionException ex) {
-            log.error("Exception while executing calculateNextAction().");
+            log.error("Exception while executing computeNextAction().");
           }
         } else {
           log.warn("Agent timeout.");

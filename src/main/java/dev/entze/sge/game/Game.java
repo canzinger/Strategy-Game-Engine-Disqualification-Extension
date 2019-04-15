@@ -1,6 +1,6 @@
 package dev.entze.sge.game;
 
-import dev.entze.sge.util.Pair;
+import dev.entze.sge.util.Pair.ImmutablePair;
 import java.util.List;
 import java.util.Set;
 
@@ -180,7 +180,7 @@ public interface Game<A, B> {
    *
    * @return the record of all previous actions
    */
-  List<Pair<Integer, A>> getPreviousActions();
+  List<ImmutablePair<Integer, A>> getPreviousActions();
 
   /**
    * Checks whether this game or a parent is a creation of getGame.

@@ -9,7 +9,7 @@ import dev.entze.sge.engine.loader.AgentLoader;
 import dev.entze.sge.engine.loader.GameLoader;
 import dev.entze.sge.game.Game;
 import dev.entze.sge.game.GameASCIIVisualiser;
-import dev.entze.sge.util.Pair;
+import dev.entze.sge.util.Pair.ImmutablePair;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -46,28 +46,22 @@ public class SgeCommand implements Callable<Void> {
   public static final String SGE_AGENT_NAME = "Agent-Name";
   public static final String SGE_GAME_CLASS = "Game-Class";
   public static final String SGE_GAMEASCIIVISUALISER_CLASS = "GameASCIIVisualiser-Class";
-
+  public static final String version = "0.0.0";
   Logger log;
   ExecutorService pool;
   List<AgentFactory> agentFactories = null;
   GameFactory gameFactory = null;
   GameASCIIVisualiser<Game<?, ?>> gameASCIIVisualiser = null;
-
   @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
   boolean helpRequested = false;
-
   @Option(names = {"-V", "--version"}, versionHelp = true, description = "print the version")
   boolean versionRequested = false;
-
   @Option(names = {"-q",
       "--quiet"}, description = "Found once: Log only warnings. Twice: only errors. Thrice: no output.")
   boolean[] quiet = new boolean[0];
-
   @Option(names = {"-v",
       "--verbose"}, description = "Found once: Log debug information. Twice: with trace information.")
   boolean[] verbose = new boolean[0];
-
-  public static final String version = "0.0.0";
 
   public static void main(String[] args) {
 
@@ -242,7 +236,7 @@ public class SgeCommand implements Callable<Void> {
     log.tra("Loading " + files.size() + " files");
 
     try {
-      Pair<GameFactory, GameASCIIVisualiser<Game<?, ?>>> loadedGame = gameLoader.call();
+      ImmutablePair<GameFactory, GameASCIIVisualiser<Game<?, ?>>> loadedGame = gameLoader.call();
       gameFactory = loadedGame.getA();
       gameASCIIVisualiser = loadedGame.getB();
     } catch (ClassNotFoundException e) {

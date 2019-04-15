@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 public interface GameAgent<G extends Game<A, ?>, A> {
 
-  A calculateNextAction(G game, long calculationTime, TimeUnit timeUnit);
+  A computeNextAction(G game, long computationTime, TimeUnit timeUnit);
 
   default void setUp() {
   }

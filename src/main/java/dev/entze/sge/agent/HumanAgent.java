@@ -1,7 +1,7 @@
 package dev.entze.sge.agent;
 
 import dev.entze.sge.game.Game;
-import dev.entze.sge.util.Pair;
+import dev.entze.sge.util.Pair.ImmutablePair;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,9 +12,9 @@ import java.util.concurrent.TimeUnit;
 public final class HumanAgent<G extends Game<A, ?>, A> implements GameAgent<G, A> {
 
   @Override
-  public A calculateNextAction(G game, long calculationTime, TimeUnit timeUnit) {
+  public A computeNextAction(G game, long computationTime, TimeUnit timeUnit) {
 
-    List<Pair<Integer, A>> previousActions = game.getPreviousActions();
+    List<ImmutablePair<Integer, A>> previousActions = game.getPreviousActions();
     int lastActionOfThisPlayer = (-1);
     for (int i = previousActions.size() - 1; i >= 0 && lastActionOfThisPlayer < 0; i--) {
       if (previousActions.get(i).getA() == game.getCurrentPlayer()) {

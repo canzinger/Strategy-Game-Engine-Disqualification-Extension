@@ -1,4 +1,4 @@
-package dev.entze.sge.util;
+package dev.entze.sge.util.Pair;
 
 /**
  * A pair of values. Accessible via getA and getB
@@ -6,13 +6,13 @@ package dev.entze.sge.util;
  * @param <A> - the first
  * @param <B> - the second
  */
-public class Pair<A, B> {
+public class ImmutablePair<A, B> {
 
   private final A a;
   private final B b;
 
 
-  public Pair(A a, B b) {
+  public ImmutablePair(A a, B b) {
     this.a = a;
     this.b = b;
   }

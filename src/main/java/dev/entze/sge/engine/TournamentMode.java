@@ -1,11 +1,10 @@
 package dev.entze.sge.engine;
 
 import dev.entze.sge.agent.GameAgent;
+import dev.entze.sge.engine.factory.GameFactory;
 import dev.entze.sge.game.Game;
 import dev.entze.sge.game.GameASCIIVisualiser;
-import dev.entze.sge.util.Pair;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import dev.entze.sge.util.Pair.ImmutablePair;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,18 +18,16 @@ public enum TournamentMode implements Tournament {
 
   SINGLE_ELEMINATION {
     @Override
-    public List<Pair<List<GameAgent<Game<?, ?>, ?>>, Double[]>> playTournament(
-        Constructor<Game<?, ?>> gameConstructor,
+    public List<ImmutablePair<List<GameAgent<Game<?, ?>, ?>>, Double[]>> playTournament(
+        GameFactory gameFactory,
         GameASCIIVisualiser<Game<?, ?>> gameASCIIVisualiser,
         List<GameAgent<Game<?, ?>, ?>> gameAgents,
+        int numberOfPlayers,
         long calculationTime,
         TimeUnit timeUnit, Logger log, ExecutorService pool) {
 
       List<GameAgent<Game<?, ?>, ?>> roster = new ArrayList<>(gameAgents);
-      List<Pair<List<GameAgent<Game<?, ?>, ?>>, Double[]>> result = new ArrayList<>();
-
-      Game<?, ?> infoGame = getGame(gameConstructor);
-      int numberOfPlayers = infoGame.getNumberOfPlayers();
+      List<ImmutablePair<List<GameAgent<Game<?, ?>, ?>>, Double[]>> result = new ArrayList<>();
 
       Deque<Match<?, ?, ?>> gameDeque = new ArrayDeque<>(gameAgents.size() / numberOfPlayers);
 
@@ -46,7 +43,8 @@ public enum TournamentMode implements Tournament {
           }
 
           gameDeque
-              .add(new Match(getGame(gameConstructor), gameASCIIVisualiser, group, calculationTime,
+              .add(new Match(gameFactory.newInstance(numberOfPlayers), gameASCIIVisualiser, group,
+                  calculationTime,
                   timeUnit, log, pool));
 
         }
@@ -54,7 +52,7 @@ public enum TournamentMode implements Tournament {
         while (!gameDeque.isEmpty()) {
           Match<?, ?, ?> match = gameDeque.removeFirst();
           Double[] matchResult = match.call();
-          result.add(new Pair
+          result.add(new ImmutablePair
               (match.getGameAgents(), matchResult));
           List<GameAgent<Game<?, ?>, ?>> toRemove = (List<GameAgent<Game<?, ?>, ?>>) match
               .getGameAgents();
@@ -74,7 +72,7 @@ public enum TournamentMode implements Tournament {
 
     @Override
     public String visualiseTournament(
-        List<Pair<List<GameAgent<Game<?, ?>, ?>>, Double[]>> tournament) {
+        List<ImmutablePair<List<GameAgent<Game<?, ?>, ?>>, Double[]>> tournament) {
 
       StringBuilder stringBuilder = new StringBuilder();
 
@@ -103,15 +101,7 @@ public enum TournamentMode implements Tournament {
 
       return stringBuilder.toString();
     }
-  };
-
-
-  public static Game<?, ?> getGame(Constructor<Game<?, ?>> gameConstructor) {
-    try {
-      return gameConstructor.newInstance();
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new IllegalArgumentException("Could not use Constructor to instantiate game");
-    }
   }
+
 
 }

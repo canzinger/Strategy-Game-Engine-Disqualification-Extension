@@ -1,26 +1,32 @@
 package dev.entze.sge.engine.loader;
 
 import dev.entze.sge.agent.GameAgent;
+import dev.entze.sge.engine.Logger;
+import dev.entze.sge.engine.factory.AgentFactory;
 import dev.entze.sge.game.Game;
-import java.lang.reflect.Constructor;
 import java.util.concurrent.Callable;
 
-public class AgentLoader implements Callable<Constructor<GameAgent<Game<?, ?>, ?>>> {
+public class AgentLoader implements Callable<AgentFactory> {
 
+  private final String agentName;
   private final String agentClassName;
   private final ClassLoader classLoader;
+  private final Logger log;
 
-  public AgentLoader(String agentClassName, ClassLoader classLoader) {
+  public AgentLoader(String agentName, String agentClassName, ClassLoader classLoader,
+      Logger log) {
+    this.agentName = agentName;
     this.classLoader = classLoader;
     this.agentClassName = agentClassName;
+    this.log = log;
   }
 
   @Override
-  public Constructor<GameAgent<Game<?, ?>, ?>> call()
+  public AgentFactory call()
       throws ClassNotFoundException, NoSuchMethodException {
     Class<GameAgent<Game<?, ?>, ?>> gameAgentClass = (Class<GameAgent<Game<?, ?>, ?>>) classLoader
         .loadClass(agentClassName);
-    return gameAgentClass.getConstructor();
+    return new AgentFactory(agentName, gameAgentClass.getConstructor(), log);
   }
 
 }

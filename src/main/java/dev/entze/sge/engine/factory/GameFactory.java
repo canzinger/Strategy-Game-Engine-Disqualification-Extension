@@ -10,11 +10,18 @@ public class GameFactory implements Factory<Game<?, ?>> {
   private final Constructor<Game<?, ?>> gameConstructor;
   private final Logger log;
 
-  public GameFactory(Constructor<Game<?, ?>> gameConstructor, Logger log) {
+  private final int minimumNumberOfPlayers;
+  private final int maximumNumberOfPlayers;
+
+  private Game<?, ?> testGame = null;
+
+  public GameFactory(Constructor<Game<?, ?>> gameConstructor, int minimumNumberOfPlayers,
+      int maximumNumberOfPlayers, Logger log) {
     this.gameConstructor = gameConstructor;
+    this.minimumNumberOfPlayers = minimumNumberOfPlayers;
+    this.maximumNumberOfPlayers = maximumNumberOfPlayers;
     this.log = log;
   }
-
 
   @Override
   public Game<?, ?> newInstance(Object... initargs) {
@@ -36,4 +43,20 @@ public class GameFactory implements Factory<Game<?, ?>> {
     throw new IllegalStateException("GameFactory is faulty.");
 
   }
+
+  public int getMinimumNumberOfPlayers() {
+    return minimumNumberOfPlayers;
+  }
+
+  public int getMaximumNumberOfPlayers() {
+    return maximumNumberOfPlayers;
+  }
+
+  private Game<?, ?> getTestGame() {
+    if (testGame == null) {
+      testGame = newInstance();
+    }
+    return testGame;
+  }
+
 }

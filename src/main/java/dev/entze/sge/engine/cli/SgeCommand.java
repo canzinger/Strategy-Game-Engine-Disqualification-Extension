@@ -1,13 +1,18 @@
 package dev.entze.sge.engine.cli;
 
 import dev.entze.sge.agent.GameAgent;
+import dev.entze.sge.agent.HumanAgent;
 import dev.entze.sge.engine.Logger;
+import dev.entze.sge.engine.factory.AgentFactory;
+import dev.entze.sge.engine.factory.GameFactory;
 import dev.entze.sge.engine.loader.AgentLoader;
 import dev.entze.sge.engine.loader.GameLoader;
 import dev.entze.sge.game.Game;
+import dev.entze.sge.game.GameASCIIVisualiser;
+import dev.entze.sge.util.Pair;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -39,11 +44,14 @@ public class SgeCommand implements Callable<Void> {
   public static final String SGE_TYPE_AGENT = "agent";
   public static final String SGE_AGENT_CLASS = "Agent-Class";
   public static final String SGE_AGENT_NAME = "Agent-Name";
+  public static final String SGE_GAME_CLASS = "Game-Class";
+  public static final String SGE_GAMEASCIIVISUALISER_CLASS = "GameASCIIVisualiser-Class";
 
   Logger log;
   ExecutorService pool;
-  List<Constructor<GameAgent<Game<?, ?>, ?>>> agentFactories;
-  Constructor<Game<?, ?>> gameFactory;
+  List<AgentFactory> agentFactories = null;
+  GameFactory gameFactory = null;
+  GameASCIIVisualiser<Game<?, ?>> gameASCIIVisualiser = null;
 
   @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
   boolean helpRequested = false;
@@ -103,127 +111,6 @@ public class SgeCommand implements Callable<Void> {
     pool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 2));
     log.trace_(".done");
 
-    /*
-    log.info("Welcome to Strategy Game Engine " + version);
-    log.info_("------------");
-    log.debug("Got " + gameFile.getPath() + " as game file.");
-    log.debug("Got " + agentFiles.length + " agents.");
-
-
-    log.tra("Initialising Loaders");
-
-    JarFile gameJar = null;
-    JarFile[] agentJars = new JarFile[agentFiles.length];
-
-    try {
-      gameJar = new JarFile(gameFile);
-      log.tra_(".");
-    } catch (IOException e) {
-      log.trace_("");
-      log.error("Game file: " + gameFile.getPath() + " could not be read as a JarFile.");
-    }
-
-    for (int i = 0; i < agentFiles.length; i++) {
-      try {
-        agentJars[i] = new JarFile(agentFiles[i]);
-        log.tra_(".");
-      } catch (IOException e) {
-        log.trace_("");
-        log.error("Agent file: " + agentFiles[i].getPath() + " could not be read as a JarFile.");
-      }
-    }
-
-    URL[] urls = new URL[1 + agentFiles.length];
-    try {
-      urls[0] = gameFile.toURI().toURL();
-      log.tra_(".");
-    } catch (MalformedURLException e) {
-      log.trace_("");
-      log.error("Game file: " + gameFile.getPath() + " could not be loaded.");
-    }
-    for (int i = 1; i < urls.length; i++) {
-      try {
-        urls[i] = agentFiles[i - 1].toURI().toURL();
-        log.tra_(".");
-      } catch (MalformedURLException e) {
-        log.trace_("");
-        log.error("Agent file: " + agentFiles[i].getPath() + " could not be loaded.");
-      }
-    }
-    URLClassLoader classLoader = URLClassLoader.newInstance(urls);
-    log.tra_(".");
-
-    GameLoader gameLoader = null;
-    try {
-      gameLoader = new GameLoader(gameJar, classLoader);
-      log.tra_(".");
-    } catch (IOException e) {
-      log.trace_("");
-      log.error("Game file: " + gameFile.getPath() + " could not read manifest.");
-    }
-    log.tra_(".");
-    AgentLoader[] agentLoaders = new AgentLoader[agentFiles.length];
-    for (int i = 0; i < agentFiles.length; i++) {
-      try {
-        agentLoaders[i] = new AgentLoader(agentJars[i], classLoader);
-        log.tra_(".");
-      } catch (IOException e) {
-        log.trace_("");
-        log.error("Agent file: " + agentFiles[i].getPath() + " could not read manifest.");
-      }
-    }
-    log.trace_("done");
-
-    log.trace("Loading game");
-    Future<Pair<Constructor<Game<?, ?>>, GameASCIIVisualiser<Game<?, ?>>>> gameFuture = pool
-        .submit(gameLoader);
-    List<Future<GameAgent<Game<?, ?>, ?>>> gameAgentFutures = new ArrayList<>(agentLoaders.length);
-
-    log.trace("Loading agents");
-    for (AgentLoader agentLoader : agentLoaders) {
-      gameAgentFutures.add(pool.submit(agentLoader));
-    }
-
-    Constructor<Game<?, ?>> gameConstructor = null;
-    GameASCIIVisualiser<Game<?, ?>> gameASCIIVisualiser = null;
-    try {
-      gameConstructor = gameFuture.get().getA();
-      gameASCIIVisualiser = gameFuture.get().getB();
-    } catch (InterruptedException e) {
-      log.trace_("");
-      log.warn("Interrupted.");
-    } catch (ExecutionException e) {
-      log.trace_("");
-      log.warn("Exception while loading game.");
-    }
-
-    log.trace("Loaded game.");
-
-    List<GameAgent<Game<?, ?>, ?>> gameAgents = new ArrayList<>(agentLoaders.length);
-
-    for (
-        Future<GameAgent<Game<?, ?>, ?>> gameAgentFuture : gameAgentFutures) {
-      try {
-        gameAgents.add(gameAgentFuture.get());
-      } catch (InterruptedException e) {
-        log.trace_("");
-        log.warn("Interrupted.");
-      } catch (ExecutionException e) {
-        log.trace_("");
-        log.warn("Exception while loading agent.");
-      }
-    }
-
-    log.trace("Loaded agents.");
-
-    log.tra("Initialising Engine");
-    Engine engine = new Engine(log, pool, gameConstructor, gameASCIIVisualiser, gameAgents,
-        computationTime, timeUnit, interactiveMode, tournamentMode);
-    log.trace_(".done");
-
-    engine.run();
-
-    */
     return null;
   }
 
@@ -231,9 +118,7 @@ public class SgeCommand implements Callable<Void> {
 
     log.tra("Processing " + files.size() + " files");
 
-    URLClassLoader classLoader = null;
     List<URL> urlList = new ArrayList<>(files.size());
-    GameLoader gameLoader = null;
     String gameClassName = null;
     String gameASCIIVisualiserClassName = null;
     List<AgentLoader> agentLoaders = new ArrayList<>(files.size() - 1);
@@ -260,12 +145,16 @@ public class SgeCommand implements Callable<Void> {
         continue;
       }
 
-      if (!attributes.containsKey(SGE_TYPE)) {
+      String type = attributes.getValue(SGE_TYPE);
+
+      if (type == null) {
         log.trace_();
         log.warn("Could not determine whether " + file.getPath()
-            + " is a game or an agent. Is " + SGE_TYPE + " set in Main-Attributes?");
+            + " is a game or an agent. Is \"" + SGE_TYPE + "\" set in Main-Attributes?");
         continue;
       }
+
+      type = type.toLowerCase();
 
       try {
         urlList.add(file.toURI().toURL());
@@ -275,35 +164,54 @@ public class SgeCommand implements Callable<Void> {
         continue;
       }
 
-      String type = attributes.getValue(SGE_TYPE).toLowerCase();
-
       if (SGE_TYPE_AGENT.toLowerCase().equals(type)) {
-        boolean error = false;
-        if (!attributes.containsKey(SGE_AGENT_CLASS)) {
+        String agentClass = attributes.getValue(SGE_AGENT_CLASS);
+        if (agentClass == null) {
           log.trace_();
           log.warn(
-              "Agent: " + file.getPath() + " could not determine class path. Is " + SGE_AGENT_CLASS
-                  + " set?");
-          error = true;
+              "Agent: " + file.getPath() + " could not determine class path. Is \""
+                  + SGE_AGENT_CLASS
+                  + "\" set?");
         }
 
-        if (!attributes.containsKey(SGE_AGENT_NAME)) {
+        String agentName = attributes.getValue(SGE_AGENT_NAME);
+        if (agentName == null) {
           log.trace_();
           log.warn(
-              "Agent: " + file.getPath() + " could not determine name. Is " + SGE_AGENT_NAME
-                  + " set?");
-          error = true;
+              "Agent: " + file.getPath() + " could not determine name. Is \"" + SGE_AGENT_NAME
+                  + "\" set?");
         }
 
-        if (error) {
+        if (agentClass == null || agentName == null) {
           continue;
         }
 
-        agentClassNames.add(attributes.getValue(SGE_AGENT_CLASS));
-        agentNames.add(attributes.getValue(SGE_AGENT_NAME));
+        agentClassNames.add(agentClass);
+        agentNames.add(agentName);
       } else if (SGE_TYPE_GAME.toLowerCase().equals(type)) {
 
-        //TODO: Load Game-Class, GameASCIIVisualiser-Class
+        String gameClass = attributes.getValue(SGE_GAME_CLASS);
+        if (gameClass == null) {
+          log.trace_();
+          log.warn(
+              "Game: " + file.getPath() + " could not determine class path. Is \"" + SGE_GAME_CLASS
+                  + "\" set?");
+        }
+
+        String gameASCIIVisualiserClass = attributes.getValue(SGE_GAMEASCIIVISUALISER_CLASS);
+        if (gameASCIIVisualiserClass == null) {
+          log.trace_();
+          log.warn(
+              "Game: " + file.getPath() + " could not determine class path of visualiser. Is \""
+                  + SGE_GAMEASCIIVISUALISER_CLASS + "\" set?");
+        }
+
+        if (gameClass == null || gameASCIIVisualiserClass == null) {
+          continue;
+        }
+
+        gameClassName = gameClass;
+        gameASCIIVisualiserClassName = gameASCIIVisualiserClass;
 
       } else {
         log.trace_();
@@ -315,9 +223,122 @@ public class SgeCommand implements Callable<Void> {
       log.tra_(".");
     }
 
-    if (gameClassName == null) {
-      //TODO: no game added
+    if (gameClassName == null || gameASCIIVisualiserClassName == null) {
+      log.error("No game found.");
+      throw new IllegalArgumentException("No game was specified, or could be loaded.");
     }
+
+    log.trace_("done");
+
+    URLClassLoader classLoader = URLClassLoader.newInstance(urlList.toArray(new URL[0]));
+
+    GameLoader gameLoader = new GameLoader(gameClassName, gameASCIIVisualiserClassName,
+        classLoader, log);
+    for (int i = 0; i < agentClassNames.size(); i++) {
+      agentLoaders
+          .add(new AgentLoader(agentNames.get(i), agentClassNames.get(i), classLoader, log));
+    }
+
+    log.tra("Loading " + files.size() + " files");
+
+    try {
+      Pair<GameFactory, GameASCIIVisualiser<Game<?, ?>>> loadedGame = gameLoader.call();
+      gameFactory = loadedGame.getA();
+      gameASCIIVisualiser = loadedGame.getB();
+    } catch (ClassNotFoundException e) {
+      log.trace_();
+      log.error("Could not find class of game.");
+      e.printStackTrace();
+      throw new IllegalStateException("Could not load files correctly.");
+    } catch (NoSuchMethodException e) {
+      log.trace_();
+      log.error("Could not instantiate GameASCIIVisualiser.");
+      e.printStackTrace();
+      throw new IllegalStateException("Could not load files correctly.");
+    } catch (IllegalAccessException e) {
+      log.trace_();
+      log.error("Not allowed to access constructor(s) of game.");
+      e.printStackTrace();
+      throw new IllegalStateException("Could not load files correctly.");
+    } catch (InvocationTargetException e) {
+      log.trace_();
+      log.error("Error while invoking constructor(s) of game.");
+      e.printStackTrace();
+      throw new IllegalStateException("Could not load files correctly.");
+    } catch (InstantiationException e) {
+      log.trace_();
+      log.error("Error while instantiating game.");
+      e.printStackTrace();
+      throw new IllegalStateException("Could not load files correctly.");
+    }
+
+    log.tra_(".");
+
+    agentFactories = new ArrayList<>(agentNames.size());
+
+    for (int i = 0; i < agentLoaders.size(); i++) {
+      try {
+        agentFactories.add(agentLoaders.get(i).call());
+        log.tra_(".");
+      } catch (ClassNotFoundException e) {
+        log.trace_();
+        log.error("Could not find class of agent " + agentNames.get(i));
+        e.printStackTrace();
+        throw new IllegalStateException("Could not load files correctly.");
+      } catch (NoSuchMethodException e) {
+        log.trace_();
+        log.error("Could not load constructor of agent " + agentNames.get(i));
+        e.printStackTrace();
+        throw new IllegalStateException("Could not load files correctly.");
+      }
+    }
+
+    log.trace_("done");
+
+    assert gameFactory != null;
+    assert gameASCIIVisualiser != null;
+    assert agentFactories != null;
+
+  }
+
+  public List<GameAgent<Game<?, ?>, ?>> createAgentListFromConfiguration(int numberOfPlayers,
+      List<String> configuration) {
+    if (numberOfPlayers != configuration.size() || !(
+        gameFactory.getMinimumNumberOfPlayers() <= numberOfPlayers && numberOfPlayers <= gameFactory
+            .getMaximumNumberOfPlayers())) {
+      return null;
+    }
+
+    List<GameAgent<Game<?, ?>, ?>> agentList = new ArrayList<>(numberOfPlayers);
+    boolean everyPlayerMatches = true;
+
+    for (String player : configuration) {
+      boolean playerMatches = false;
+      if (player.toLowerCase().equals("human")) {
+        agentList.add(new HumanAgent());
+        playerMatches = true;
+      }
+      for (AgentFactory agentFactory : agentFactories) {
+        if (!playerMatches) {
+          if (agentFactory.getAgentName().toLowerCase().equals(player.toLowerCase())) {
+            agentList.add(agentFactory.newInstance());
+            playerMatches = true;
+          }
+        }
+      }
+
+      if (!playerMatches) {
+        log.warn("Could not find an agentFactory for " + player);
+      }
+
+      everyPlayerMatches = everyPlayerMatches && playerMatches;
+    }
+
+    if (!everyPlayerMatches) {
+      return null;
+    }
+
+    return agentList;
 
   }
 

@@ -22,7 +22,7 @@ public class AgentFactory implements Factory<GameAgent<Game<?, ?>, ?>> {
   @Override
   public GameAgent<Game<?, ?>, ?> newInstance(Object... initargs) {
     try {
-      return agentConstructor.newInstance(initargs);
+      return agentConstructor.newInstance();
     } catch (InstantiationException e) {
       log.error_();
       log.error("Could not instantiate new element with constructor of agent " + agentName);
@@ -36,7 +36,7 @@ public class AgentFactory implements Factory<GameAgent<Game<?, ?>, ?>> {
       log.error("Could not invoke constructor of agent " + agentName);
       e.printStackTrace();
     }
-    throw new IllegalStateException("AgentFactory is faulty.");
+    throw new IllegalStateException("AgentFactory for agent " + agentName + " is faulty.");
   }
 
   public String getAgentName() {

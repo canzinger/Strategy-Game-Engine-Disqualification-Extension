@@ -24,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -358,6 +359,30 @@ public class SgeCommand implements Callable<Void> {
     assert gameASCIIVisualiser != null;
     assert agentFactories != null;
 
+  }
+
+  public int fillAgentList(List<String> agentConfiguration, int numberOfPlayers) {
+    int added = 0;
+    List<String> agentConfigurationLowercase = agentConfiguration.stream()
+        .map(String::toLowerCase)
+        .collect(Collectors.toList());
+
+    for (int i = 0; i < agentFactories.size() && agentConfiguration.size() < numberOfPlayers;
+        i++) {
+      String agentName = agentFactories.get(i).getAgentName();
+      if (!agentConfigurationLowercase.contains(agentName.toLowerCase())) {
+        agentConfigurationLowercase.add(agentName.toLowerCase());
+        agentConfiguration.add(agentName);
+        added++;
+      }
+    }
+
+    while (agentConfiguration.size() < numberOfPlayers) {
+      agentConfiguration.add("Human");
+      added++;
+    }
+
+    return added;
   }
 
   public List<GameAgent<Game<?, ?>, ?>> createAgentListFromConfiguration(int numberOfPlayers,

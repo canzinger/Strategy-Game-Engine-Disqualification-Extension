@@ -25,7 +25,12 @@ public final class HumanAgent<G extends Game<A, ?>, A> implements GameAgent<G, A
     if (lastActionOfThisPlayer < previousActions.size() - 1) {
       System.out.println("Last moves:");
       for (int i = lastActionOfThisPlayer + 1; i < previousActions.size(); i++) {
-        System.out.print("(" + i + ") Player " + previousActions.get(i).getA() + ": ");
+        int player = previousActions.get(i).getA();
+        if (player >= 0) {
+          System.out.print("(" + i + ") Player " + player + ": ");
+        } else {
+          System.out.print("(" + i + ") World: ");
+        }
         System.out.println(previousActions.get(i).getB().toString() + '\n');
       }
     }

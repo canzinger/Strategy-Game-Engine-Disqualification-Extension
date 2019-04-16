@@ -7,7 +7,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -43,7 +42,7 @@ public class MatchCommand implements Runnable {
   private boolean[] verbose = new boolean[0];
   @Option(names = {"-p",
       "--number-of-players"}, arity = "1", paramLabel = "N", description = "Number of players. By default the minimum required to play")
-  private int players = (-1);
+  private int numberOfPlayers = (-1);
 
   @Option(names = {"-f",
       "--file"}, arity = "1..*", paramLabel = "FILE", description = "File(s) of game and agents.")
@@ -81,41 +80,23 @@ public class MatchCommand implements Runnable {
     sge.loadFiles(files);
     sge.log.debug("Successfully loaded all files.");
 
-    if (players < 0) {
-      players = sge.gameFactory.getMinimumNumberOfPlayers();
+    if (numberOfPlayers < 0) {
+      numberOfPlayers = sge.gameFactory.getMinimumNumberOfPlayers();
     }
 
-    List<String> agentConfigurationLowercase = agentConfiguration.stream()
-        .map(String::toLowerCase)
-        .collect(Collectors.toList());
-
-    for (int lastPotentiallyUnused = 0;
-        lastPotentiallyUnused < sge.agentFactories.size()
-            && agentConfigurationLowercase.size() < players;
-        lastPotentiallyUnused++) {
-      String agentName = sge.agentFactories.get(lastPotentiallyUnused).getAgentName().toLowerCase();
-      if (!agentConfigurationLowercase.contains(agentName)) {
-        agentConfigurationLowercase.add(agentName);
-        agentConfigurationLowercase
-            .add(sge.agentFactories.get(lastPotentiallyUnused).getAgentName());
-      }
-    }
-
-    while (agentConfigurationLowercase.size() < players) {
-      agentConfigurationLowercase.add("Human");
-    }
+    sge.fillAgentList(agentConfiguration, numberOfPlayers);
 
     sge.log.deb("Configuration: ");
-    for (String s : agentConfigurationLowercase) {
+    for (String s : agentConfiguration) {
       sge.log.deb_(s + " ");
     }
     sge.log.debug_();
 
     List<GameAgent<Game<?, ?>, ?>> agentList = sge
-        .createAgentListFromConfiguration(players, agentConfigurationLowercase);
+        .createAgentListFromConfiguration(numberOfPlayers, agentConfiguration);
 
     Match<Game<?, ?>, GameAgent<Game<?, ?>, ?>, ?> match = new Match(
-        sge.gameFactory.newInstance(players), sge.gameASCIIVisualiser, agentList, computationTime,
+        sge.gameFactory.newInstance(numberOfPlayers), sge.gameASCIIVisualiser, agentList, computationTime,
         timeUnit, sge.log, sge.pool);
 
     match.call();

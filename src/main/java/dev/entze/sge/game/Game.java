@@ -1,11 +1,11 @@
 package dev.entze.sge.game;
 
-import dev.entze.sge.util.pair.ImmutablePair;
 import java.util.List;
 import java.util.Set;
 
 /**
  * A game.
+ *
  * @param <A> - Action
  * @param <B> - Board
  */
@@ -203,12 +203,20 @@ public interface Game<A, B> {
   A determineNextAction();
 
   /**
-   * Returns the last action.
+   * Returns the last action and which player did the action.
    *
+   * @return the last action record.
+   */
+  default ActionRecord<A> getPreviousActionRecord() {
+    return getPreviousActionRecords().get(getNumberOfActions() - 1);
+  }
+
+  /**
+   * Returns only the last action, but not which player did the action.
    * @return the last action.
    */
-  default ImmutablePair<Integer, A> getPreviousAction() {
-    return getPreviousActions().get(getNumberOfActions() - 1);
+  default A getPreviousAction(){
+    return getPreviousActionRecord().getAction();
   }
 
   /**
@@ -216,7 +224,7 @@ public interface Game<A, B> {
    *
    * @return the record of all previous actions
    */
-  List<ImmutablePair<Integer, A>> getPreviousActions();
+  List<ActionRecord<A>> getPreviousActionRecords();
 
   /**
    * Returns how many actions were taken.
@@ -224,7 +232,7 @@ public interface Game<A, B> {
    * @return how many actions were taken.
    */
   default int getNumberOfActions() {
-    return getPreviousActions().size();
+    return getPreviousActionRecords().size();
   }
 
   /**

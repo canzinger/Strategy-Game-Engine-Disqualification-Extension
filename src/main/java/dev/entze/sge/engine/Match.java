@@ -48,8 +48,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
   @Override
   public Double[] call() {
-    for (E gameAgent : gameAgents) {
-      gameAgent.setUp(gameAgents.size());
+    for (int i = 0; i < gameAgents.size(); i++) {
+      gameAgents.get(i).setUp(gameAgents.size(), i);
     }
 
     Double[] result = new Double[gameAgents.size()];
@@ -57,7 +57,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     int lastPlayer = (-1);
     int thisPlayer;
     boolean isHuman = false;
-    while (!game.isGameOver()) {
+    while (!game.isGameOver() && Thread.currentThread().isAlive() && !Thread.currentThread().isInterrupted()) {
 
       thisPlayer = game.getCurrentPlayer();
       if (thisPlayer >= 0) {
@@ -84,6 +84,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           log.error("Interrupted.");
         } catch (ExecutionException e) {
           log.error("Exception while executing computeNextAction().");
+          e.printStackTrace();
         } catch (TimeoutException e) {
           if (isHuman) {
             try {
@@ -92,6 +93,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
               log.error("Interrupted.");
             } catch (ExecutionException ex) {
               log.error("Exception while executing computeNextAction().");
+              ex.printStackTrace();
             }
           } else {
             log.warn("Agent timeout.");
@@ -146,7 +148,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     log.info_(gameASCIIVisualiser.visualise((G) game));
     log.inf("Result: ");
     for (int i = 0; i < gameAgents.size(); i++) {
-      log.inf_("Player " + i + " : " + result[i]);
+      log.inf_("Player " + i + ": " + result[i]);
       if (i + 1 < gameAgents.size()) {
         log.inf_(", ");
       }

@@ -80,16 +80,6 @@ public class SgeCommand implements Callable<Void> {
       sge.log.error("Interrupted.");
     }
 
-    /*
-    try {
-      CommandLine.call(cli, args);
-    } catch (Exception e) {
-      //cli.log.error_("");
-      //cli.log.error("Shutting down because of exception.");
-      e.printStackTrace();
-    }
-
-    */
   }
 
   @Override

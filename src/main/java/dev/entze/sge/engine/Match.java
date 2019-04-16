@@ -13,7 +13,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implements
+public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? extends A>, A> implements
     Callable<Double[]> {
 
   private final boolean withHumanPlayer;
@@ -48,7 +48,7 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
 
   @Override
   public Double[] call() {
-    for (GameAgent<G, A> gameAgent : gameAgents) {
+    for (E gameAgent : gameAgents) {
       gameAgent.setUp(gameAgents.size());
     }
 
@@ -127,14 +127,18 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
         game = game.doAction(action);
       }
 
+      lastPlayer = thisPlayer;
+
       if (game.getCurrentPlayer() >= 0 && isHuman && !(gameAgents
           .get(game.getCurrentPlayer()) instanceof HumanAgent)) {
         log.info_(gameASCIIVisualiser.visualise((G) game.getGame()));
       }
     }
 
+    double[] utility = game.getGameUtilityValue();
+
     for (int i = 0; i < result.length; i++) {
-      result[i] = game.getGameUtilityValue()[i];
+      result[i] = utility[i];
     }
 
     log.info_("-----");
@@ -149,7 +153,7 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
     }
     log.info_();
 
-    for (GameAgent<G, A> gameAgent : gameAgents) {
+    for (E gameAgent : gameAgents) {
       gameAgent.tearDown();
     }
 

@@ -30,8 +30,8 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.RunAll;
 
 
-@Command(name = "Strategy Game Engine", description = "A sequential game engine.", version = "sge "
-    + SgeCommand.version, aliases = "sge", subcommands = {
+@Command(name = "sge", description = "A sequential game engine.", version = "sge "
+    + SgeCommand.version, subcommands = {
     MatchCommand.class,
     InteractiveCommand.class,
     TournamentCommand.class,
@@ -106,6 +106,71 @@ public class SgeCommand implements Callable<Void> {
     log.trace_(".done");
 
     return null;
+  }
+
+  public int determineArguments(List<String> arguments, List<File> files, List<File> directories,
+      List<String> agentConfiguration) {
+
+    log.tra("Interpreting " + arguments.size() + " arguments.");
+
+    int processed = 0;
+
+    for (String argument : arguments) {
+      if (argument.toLowerCase().equals("human")) {
+        agentConfiguration.add(argument);
+      } else {
+        File file = new File(argument);
+        if (file.exists()) {
+          if (file.isDirectory()) {
+            directories.add(file);
+          } else if (file.isFile()) {
+            files.add(file);
+          } else {
+            log.warn(argument + " seems to be malformed");
+            processed--;
+          }
+        } else {
+          agentConfiguration.add(argument);
+        }
+      }
+      processed++;
+      log.tra_(".");
+    }
+
+    log.trace_("done");
+    return processed;
+  }
+
+  public int loadDirectories(List<File> files, List<File> directories) {
+    if (directories.size() <= 0) {
+      return 0;
+    }
+    List<File> subdirectories = new ArrayList<>();
+    int loaded = 0;
+    log.tra("Loading " + directories.size() + " directories");
+    for (File directory : directories) {
+      File[] subFiles;
+      if (directory != null && (subFiles = directory.listFiles()) != null) {
+        for (File file : subFiles) {
+          if (file.exists()) {
+            if (file.isDirectory()) {
+              subdirectories.add(file);
+            } else if (file.isFile()) {
+              files.add(file);
+              loaded++;
+            }
+          }
+        }
+      }
+      log.tra_(".");
+    }
+    log.trace_("done");
+
+    if (subdirectories.size() > 0) {
+      loaded += loadDirectories(files, subdirectories);
+    }
+
+    return loaded;
   }
 
   public void loadFiles(List<File> files) {

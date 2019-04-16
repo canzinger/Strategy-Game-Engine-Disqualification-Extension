@@ -41,7 +41,7 @@ public final class HumanAgent<G extends Game<A, ?>, A> implements GameAgent<G, A
     String input = null;
 
     while (!(0 <= move && move < possibleActions.size())) {
-      System.out.print("\n0.." + (possibleActions.size() - 1) + " > ");
+      System.out.print('\n' + "> ");
       if (System.console() != null) {
         input = System.console().readLine();
       } else {

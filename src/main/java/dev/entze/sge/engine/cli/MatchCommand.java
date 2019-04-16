@@ -4,6 +4,7 @@ import dev.entze.sge.agent.GameAgent;
 import dev.entze.sge.engine.Match;
 import dev.entze.sge.game.Game;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -13,7 +14,15 @@ import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 @Command(name = "match", aliases = {
-    "m"}, description = "Let agents play against each other in a single match.")
+    "m"}, description = "Let agents play against each other in a single match.", customSynopsis = {
+    "sge [OPTION]... FILE... [AGENT]...",
+    "   or: sge [OPTION]... [AGENT]... FILE...",
+    "   or: sge [OPTION]... [FILE]... [DIRECTORY]... [AGENT]...",
+    "   or: sge [OPTION]... [AGENT]... [FILE]... [DIRECTORY]...",
+    "   or: sge [OPTION]... -f FILE... [ARGUMENTS]...",
+    "   or: sge [OPTION]... -d DIRECTORY... [ARGUMENTS]...",
+    "   or: sge [OPTION]... -a AGENT... [ARGUMENTS]...",
+})
 public class MatchCommand implements Runnable {
 
   @Option(names = {"-c",
@@ -33,14 +42,24 @@ public class MatchCommand implements Runnable {
       "--verbose"}, description = "Found once: Log debug information. Twice: with trace information")
   private boolean[] verbose = new boolean[0];
   @Option(names = {"-p",
-      "--number-of-players"}, arity = "1", description = "Number of players. By default the minimum required to play")
+      "--number-of-players"}, arity = "1", paramLabel = "N", description = "Number of players. By default the minimum required to play")
   private int players = (-1);
 
-  @Parameters(arity = "0..*", description = "Optional: Specifies the configuration of the agents")
-  private List<String> playerConfiguration;
+  @Option(names = {"-f",
+      "--file"}, arity = "1..*", paramLabel = "FILE", description = "File(s) of game and agents.")
+  private List<File> files = new ArrayList<>();
 
-  @Parameters(arity = "1..*", description = "Jar file(s) for game and agents")
-  private List<File> files;
+  @Option(names = {"-d",
+      "--directory"}, arity = "1..*", paramLabel = "DIRECTORY", description = "Directory(s) of game and agents. Note that all subdirectories will be considered.")
+  private List<File> directories = new ArrayList<>();
+
+  @Option(names = {"-a",
+      "--agent"}, arity = "1..*", paramLabel = "AGENT", description = "Configuration of agents.")
+  private List<String> agentConfiguration = new ArrayList<>();
+
+  @Parameters(index = "0", arity = "0..*", description = {"Other valid synopsis"})
+  private List<String> arguments = new ArrayList<>();
+
 
   @Override
   public void run() {
@@ -48,7 +67,8 @@ public class MatchCommand implements Runnable {
       sge.log.setLogLevel(quiet.length - verbose.length);
     }
 
-    files.removeIf(file -> !file.getPath().endsWith(".jar"));
+    sge.determineArguments(arguments, files, directories, agentConfiguration);
+    sge.loadDirectories(files, directories);
 
     sge.log.tra("Files: ");
 
@@ -58,8 +78,6 @@ public class MatchCommand implements Runnable {
 
     sge.log.trace_();
 
-    playerConfiguration.removeIf(s -> s.endsWith(".jar"));
-
     sge.loadFiles(files);
     sge.log.debug("Successfully loaded all files.");
 
@@ -67,33 +85,34 @@ public class MatchCommand implements Runnable {
       players = sge.gameFactory.getMinimumNumberOfPlayers();
     }
 
-    List<String> playerConfigurationLowercase = playerConfiguration.stream()
+    List<String> agentConfigurationLowercase = agentConfiguration.stream()
         .map(String::toLowerCase)
         .collect(Collectors.toList());
 
     for (int lastPotentiallyUnused = 0;
         lastPotentiallyUnused < sge.agentFactories.size()
-            && playerConfigurationLowercase.size() < players;
+            && agentConfigurationLowercase.size() < players;
         lastPotentiallyUnused++) {
       String agentName = sge.agentFactories.get(lastPotentiallyUnused).getAgentName().toLowerCase();
-      if (!playerConfiguration.contains(agentName)) {
-        playerConfigurationLowercase.add(agentName);
-        playerConfiguration.add(sge.agentFactories.get(lastPotentiallyUnused).getAgentName());
+      if (!agentConfigurationLowercase.contains(agentName)) {
+        agentConfigurationLowercase.add(agentName);
+        agentConfigurationLowercase
+            .add(sge.agentFactories.get(lastPotentiallyUnused).getAgentName());
       }
     }
 
-    while (playerConfiguration.size() < players) {
-      playerConfiguration.add("Human");
+    while (agentConfigurationLowercase.size() < players) {
+      agentConfigurationLowercase.add("Human");
     }
 
     sge.log.deb("Configuration: ");
-    for (String s : playerConfiguration) {
+    for (String s : agentConfigurationLowercase) {
       sge.log.deb_(s + " ");
     }
     sge.log.debug_();
 
     List<GameAgent<Game<?, ?>, ?>> agentList = sge
-        .createAgentListFromConfiguration(players, playerConfiguration);
+        .createAgentListFromConfiguration(players, agentConfigurationLowercase);
 
     Match<Game<?, ?>, GameAgent<Game<?, ?>, ?>, ?> match = new Match(
         sge.gameFactory.newInstance(players), sge.gameASCIIVisualiser, agentList, computationTime,

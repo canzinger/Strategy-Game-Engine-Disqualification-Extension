@@ -4,6 +4,11 @@ import dev.entze.sge.util.pair.ImmutablePair;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A game.
+ * @param <A> - Action
+ * @param <B> - Board
+ */
 public interface Game<A, B> {
 
   /**

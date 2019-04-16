@@ -37,7 +37,7 @@ public enum TournamentMode implements Tournament {
         for (int groupRound = 0; groupRound < gameAgents.size() / numberOfPlayers;
             groupRound += numberOfPlayers) {
 
-          List<GameAgent<?, ?>> group = new ArrayList<>(numberOfPlayers);
+          List<GameAgent<Game<?, ?>, ?>> group = new ArrayList<>(numberOfPlayers);
           for (int i = 0; i < numberOfPlayers; i++) {
             group.add(roster.get(groupRound + i));
           }
@@ -52,8 +52,8 @@ public enum TournamentMode implements Tournament {
         while (!gameDeque.isEmpty()) {
           Match<?, ?, ?> match = gameDeque.removeFirst();
           Double[] matchResult = match.call();
-          result.add(new ImmutablePair
-              (match.getGameAgents(), matchResult));
+          result.add(new ImmutablePair<>
+              ((List<GameAgent<Game<?, ?>, ?>>) match.getGameAgents(), matchResult));
           List<GameAgent<Game<?, ?>, ?>> toRemove = (List<GameAgent<Game<?, ?>, ?>>) match
               .getGameAgents();
           double max = Collections.max(Arrays.asList(matchResult));

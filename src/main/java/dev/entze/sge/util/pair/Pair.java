@@ -1,4 +1,4 @@
-package dev.entze.sge.util.Pair;
+package dev.entze.sge.util.pair;
 
 public interface Pair<A, B> {
 

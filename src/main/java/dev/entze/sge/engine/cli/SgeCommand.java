@@ -9,7 +9,7 @@ import dev.entze.sge.engine.loader.AgentLoader;
 import dev.entze.sge.engine.loader.GameLoader;
 import dev.entze.sge.game.Game;
 import dev.entze.sge.game.GameASCIIVisualiser;
-import dev.entze.sge.util.Pair.ImmutablePair;
+import dev.entze.sge.util.pair.ImmutablePair;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

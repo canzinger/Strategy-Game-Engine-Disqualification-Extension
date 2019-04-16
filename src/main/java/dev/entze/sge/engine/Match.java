@@ -49,7 +49,7 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
   @Override
   public Double[] call() {
     for (GameAgent<G, A> gameAgent : gameAgents) {
-      gameAgent.setUp();
+      gameAgent.setUp(gameAgents.size());
     }
 
     Double[] result = new Double[gameAgents.size()];
@@ -60,63 +60,75 @@ public class Match<G extends Game<A, ?>, E extends GameAgent<G, A>, A> implement
     while (!game.isGameOver()) {
 
       thisPlayer = game.getCurrentPlayer();
+      if (thisPlayer >= 0) {
 
-      G playersGame = (G) game.getGame(thisPlayer);
-      isHuman = gameAgents.get(thisPlayer) instanceof HumanAgent;
+        G playersGame = (G) game.getGame(thisPlayer);
+        isHuman = gameAgents.get(thisPlayer) instanceof HumanAgent;
 
-      if (lastPlayer != thisPlayer) {
-        log.info("Player " + game.getCurrentPlayer() + ": ");
-        if (!withHumanPlayer || isHuman) {
-          log.info_(gameASCIIVisualiser.visualise(playersGame));
-        }
-      }
-
-      final int finalThisPlayer = thisPlayer;
-      Future<A> actionFuture = pool.submit(() -> gameAgents.get(finalThisPlayer)
-          .computeNextAction(playersGame, computationTime, timeUnit));
-
-      A action = null;
-
-      try {
-        action = actionFuture.get(computationTime, timeUnit);
-      } catch (InterruptedException e) {
-        log.error("Interrupted.");
-      } catch (ExecutionException e) {
-        log.error("Exception while executing computeNextAction().");
-      } catch (TimeoutException e) {
-        if (isHuman) {
-          try {
-            action = actionFuture.get();
-          } catch (InterruptedException ex) {
-            log.error("Interrupted.");
-          } catch (ExecutionException ex) {
-            log.error("Exception while executing computeNextAction().");
+        if (lastPlayer != thisPlayer) {
+          log.info("Player " + game.getCurrentPlayer() + ": ");
+          if (!withHumanPlayer || isHuman) {
+            log.info_(gameASCIIVisualiser.visualise(playersGame));
           }
-        } else {
-          log.warn("Agent timeout.");
         }
-      }
 
-      if (action == null) {
-        log.warn("No action given.");
-        result[thisPlayer] = (-1D);
-        return result;
-      }
+        final int finalThisPlayer = thisPlayer;
+        Future<A> actionFuture = pool.submit(() -> gameAgents.get(finalThisPlayer)
+            .computeNextAction(playersGame, computationTime, timeUnit));
 
-      if (!game.isValidAction(action)) {
-        log.warn("Illegal action given.");
+        A action = null;
+
         try {
-          game.doAction(action);
-        } catch (IllegalArgumentException e) {
-          e.printStackTrace();
+          action = actionFuture.get(computationTime, timeUnit);
+        } catch (InterruptedException e) {
+          log.error("Interrupted.");
+        } catch (ExecutionException e) {
+          log.error("Exception while executing computeNextAction().");
+        } catch (TimeoutException e) {
+          if (isHuman) {
+            try {
+              action = actionFuture.get();
+            } catch (InterruptedException ex) {
+              log.error("Interrupted.");
+            } catch (ExecutionException ex) {
+              log.error("Exception while executing computeNextAction().");
+            }
+          } else {
+            log.warn("Agent timeout.");
+          }
         }
-        result[thisPlayer] = (-1D);
-        return result;
+
+        if (action == null) {
+          log.warn("No action given.");
+          result[thisPlayer] = (-1D);
+          return result;
+        }
+
+        if (!game.isValidAction(action)) {
+          log.warn("Illegal action given.");
+          try {
+            game.doAction(action);
+          } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+          }
+          result[thisPlayer] = (-1D);
+          return result;
+        }
+
+        game = game.doAction(action);
+      } else {
+
+        A action = game.determineNextAction();
+        if (action == null) {
+          log.error(
+              "There is a programming error in the implementation of game. Could not determine next action.");
+          throw new IllegalStateException("The current game violates the implementation contract");
+        }
+        game = game.doAction(action);
       }
 
-      game = game.doAction(action);
-
-      if (isHuman && !(gameAgents.get(game.getCurrentPlayer()) instanceof HumanAgent)) {
+      if (game.getCurrentPlayer() >= 0 && isHuman && !(gameAgents
+          .get(game.getCurrentPlayer()) instanceof HumanAgent)) {
         log.info_(gameASCIIVisualiser.visualise((G) game.getGame()));
       }
     }

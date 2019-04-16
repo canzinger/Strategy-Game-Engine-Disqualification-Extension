@@ -20,6 +20,8 @@ public interface Tree<E> extends Collection<E> {
 
   E getNode();
 
+  Tree<E> setNode(E e);
+
   Tree<E> getParent();
 
   Tree<E> getChild(int index);
@@ -76,6 +78,10 @@ public interface Tree<E> extends Collection<E> {
     return contains;
   }
 
+  /**
+   * Sort only the direct children of this branch.
+   * @param comparator - the comparator
+   */
   void sort(Comparator<E> comparator);
 
   @Override

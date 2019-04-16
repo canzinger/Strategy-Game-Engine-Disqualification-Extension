@@ -224,6 +224,12 @@ public class DoubleLinkedTree<E> extends AbstractCollection<E> implements Tree<E
   }
 
   @Override
+  public Tree<E> setNode(E e) {
+    node = e;
+    return this;
+  }
+
+  @Override
   public Tree<E> getParent() {
     return parent;
   }

@@ -1,7 +1,7 @@
 package dev.entze.sge.agent;
 
 import dev.entze.sge.game.Game;
-import dev.entze.sge.util.Pair.ImmutablePair;
+import dev.entze.sge.util.pair.ImmutablePair;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

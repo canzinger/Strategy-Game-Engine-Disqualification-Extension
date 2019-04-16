@@ -1,6 +1,6 @@
 package dev.entze.sge.game;
 
-import dev.entze.sge.util.Pair.ImmutablePair;
+import dev.entze.sge.util.pair.ImmutablePair;
 import java.util.List;
 import java.util.Set;
 
@@ -37,7 +37,8 @@ public interface Game<A, B> {
   int getNumberOfPlayers();
 
   /**
-   * Checks which player's move it is and returns the id of the player.
+   * Checks which player's move it is and returns the id of the player. A negative number indicates
+   * some indeterminacy which is resolved by the game itself.
    *
    * @return the id of the player
    */
@@ -64,6 +65,9 @@ public interface Game<A, B> {
    * @return the weight of the utility function.
    */
   default double getPlayerUtilityWeight(int player) {
+    if (player < 0) {
+      return 0;
+    }
     if (getCurrentPlayer() == player) {
       return 1;
     }
@@ -176,11 +180,47 @@ public interface Game<A, B> {
   Game<A, B> doAction(A action);
 
   /**
+   * Progresses the game if it currently is in an indeterminant state.
+   *
+   * @return a new copy of the game with an action applied.
+   */
+  default Game<A, B> doAction() {
+    return doAction(determineNextAction());
+  }
+
+  /**
+   * If the game is in a state of indeterminacy, this method will return an action according to the
+   * distribution of probabilities, or hidden information. If the game is in a definitive state null
+   * is returned.
+   *
+   * @return a possible action, which determines the game.
+   */
+  A determineNextAction();
+
+  /**
+   * Returns the last action.
+   *
+   * @return the last action.
+   */
+  default ImmutablePair<Integer, A> getPreviousAction() {
+    return getPreviousActions().get(getNumberOfActions() - 1);
+  }
+
+  /**
    * Returns the record of all previous actions and which player has done it.
    *
    * @return the record of all previous actions
    */
   List<ImmutablePair<Integer, A>> getPreviousActions();
+
+  /**
+   * Returns how many actions were taken.
+   *
+   * @return how many actions were taken.
+   */
+  default int getNumberOfActions() {
+    return getPreviousActions().size();
+  }
 
   /**
    * Checks whether this game or a parent is a creation of getGame.

@@ -7,7 +7,8 @@ public interface GameAgent<G extends Game<A, ?>, A> {
 
   A computeNextAction(G game, long computationTime, TimeUnit timeUnit);
 
-  default void setUp() {
+  default void setUp(int numberOfPlayers){
+
   }
 
   default void tearDown() {

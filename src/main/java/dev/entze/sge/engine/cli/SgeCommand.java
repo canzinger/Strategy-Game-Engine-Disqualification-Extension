@@ -64,6 +64,9 @@ public class SgeCommand implements Callable<Void> {
       "--verbose"}, description = "Found once: Log debug information. Twice: with trace information.")
   boolean[] verbose = new boolean[0];
 
+  @Option(names = "--debug", description = "Starts engine in debug mode. No timeouts and verbose is turned on once.")
+  boolean debug = false;
+
   public static void main(String[] args) {
 
     SgeCommand sge = new SgeCommand();
@@ -84,7 +87,7 @@ public class SgeCommand implements Callable<Void> {
 
   @Override
   public Void call() {
-    int logLevel = quiet.length - verbose.length;
+    int logLevel = quiet.length - (verbose.length + (debug ? 1 : 0));
     log = new Logger(logLevel, "[sge ", "",
         "trace]: ", System.out, "",
         "debug]: ", System.out, "",

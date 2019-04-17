@@ -7,7 +7,7 @@ public class ActionRecord<A> {
   private final int player;
   private final A action;
 
-  public ActionRecord(ActionRecord<A> a){
+  public ActionRecord(ActionRecord<A> a) {
     this(a.player, a.action);
   }
 
@@ -22,6 +22,11 @@ public class ActionRecord<A> {
 
   public A getAction() {
     return action;
+  }
+
+  @Override
+  public String toString() {
+    return "<" + player  + ", " + action + '>';
   }
 
   @Override

@@ -2,6 +2,7 @@ package dev.entze.sge.engine;
 
 import dev.entze.sge.agent.GameAgent;
 import dev.entze.sge.agent.HumanAgent;
+import dev.entze.sge.game.ActionRecord;
 import dev.entze.sge.game.Game;
 import dev.entze.sge.game.GameASCIIVisualiser;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     Callable<Double[]> {
 
   private final boolean withHumanPlayer;
+  private final boolean debug;
   private final long computationTime;
   private final TimeUnit timeUnit;
   private final Logger log;
@@ -27,7 +29,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
   public Match(Game<A, ?> game, GameASCIIVisualiser<G> gameASCIIVisualiser,
       List<E> gameAgents, long computationTime,
-      TimeUnit timeUnit, Logger log, ExecutorService pool) {
+      TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
     this.game = game;
     this.gameASCIIVisualiser = gameASCIIVisualiser;
     this.gameAgents = gameAgents;
@@ -39,6 +41,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       withHumanPlayer = withHumanPlayer || (gameAgent instanceof HumanAgent);
     }
     this.withHumanPlayer = withHumanPlayer;
+    this.debug = debug;
     this.computationTime = computationTime;
     this.timeUnit = timeUnit;
     this.log = log;
@@ -57,7 +60,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     int lastPlayer = (-1);
     int thisPlayer;
     boolean isHuman = false;
-    while (!game.isGameOver() && Thread.currentThread().isAlive() && !Thread.currentThread().isInterrupted()) {
+    while (!game.isGameOver() && Thread.currentThread().isAlive() && !Thread.currentThread()
+        .isInterrupted()) {
 
       thisPlayer = game.getCurrentPlayer();
       if (thisPlayer >= 0) {
@@ -66,7 +70,9 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
         isHuman = gameAgents.get(thisPlayer) instanceof HumanAgent;
 
         if (lastPlayer != thisPlayer) {
-          log.info("Player " + game.getCurrentPlayer() + ": ");
+          log.info(
+              "Player " + game.getCurrentPlayer() + " - " + gameAgents.get(thisPlayer).toString()
+                  + ":");
           if (!withHumanPlayer || isHuman) {
             log.info_(gameASCIIVisualiser.visualise(playersGame));
           }
@@ -86,7 +92,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           log.error("Exception while executing computeNextAction().");
           e.printStackTrace();
         } catch (TimeoutException e) {
-          if (isHuman) {
+          if (isHuman || debug) {
             try {
               action = actionFuture.get();
             } catch (InterruptedException ex) {
@@ -106,6 +112,10 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           return result;
         }
 
+        if(!isHuman){
+          log.info_("> " + action.toString());
+        }
+
         if (!game.isValidAction(action)) {
           log.warn("Illegal action given.");
           try {
@@ -116,6 +126,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           result[thisPlayer] = (-1D);
           return result;
         }
+
 
         game = game.doAction(action);
       } else {
@@ -146,6 +157,10 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     log.info_("-----");
     log.info("Game over.");
     log.info_(gameASCIIVisualiser.visualise((G) game));
+    for (ActionRecord<A> previousActionRecord : game.getPreviousActionRecords()) {
+      log.inf_(previousActionRecord.toString() + " ");
+    }
+    log.info_("\n");
     log.inf("Result: ");
     for (int i = 0; i < gameAgents.size(); i++) {
       log.inf_("Player " + i + ": " + result[i]);

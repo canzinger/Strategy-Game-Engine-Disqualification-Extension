@@ -16,7 +16,7 @@ public interface Tournament {
       GameASCIIVisualiser<Game<?, ?>> gameASCIIVisualiser,
       List<GameAgent<Game<?, ?>, ?>> gameAgents,
       int numberOfPlayers,
-      long calculationTime, TimeUnit timeUnit, Logger log, ExecutorService pool);
+      long calculationTime, TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool);
 
   String visualiseTournament(
       List<ImmutablePair<List<GameAgent<Game<?, ?>, ?>>, Double[]>> tournament);

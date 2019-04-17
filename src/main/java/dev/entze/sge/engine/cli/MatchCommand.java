@@ -44,6 +44,9 @@ public class MatchCommand implements Runnable {
       "--number-of-players"}, arity = "1", paramLabel = "N", description = "Number of players. By default the minimum required to play")
   private int numberOfPlayers = (-1);
 
+  @Option(names = {"--debug"}, description = "Starts engine in debug mode. No timeouts and verbose is turned on once.")
+  private boolean debug = false;
+
   @Option(names = {"-f",
       "--file"}, arity = "1..*", paramLabel = "FILE", description = "File(s) of game and agents.")
   private List<File> files = new ArrayList<>();
@@ -62,8 +65,9 @@ public class MatchCommand implements Runnable {
 
   @Override
   public void run() {
+    sge.debug = sge.debug || debug;
     if (verbose.length != 0 || quiet.length != 0) {
-      sge.log.setLogLevel(quiet.length - verbose.length);
+      sge.log.setLogLevel(quiet.length - (verbose.length + (sge.debug ? 1 : 0)));
     }
 
     sge.determineArguments(arguments, files, directories, agentConfiguration);
@@ -97,7 +101,7 @@ public class MatchCommand implements Runnable {
 
     Match<Game<?, ?>, GameAgent<Game<?, ?>, ?>, ?> match = new Match(
         sge.gameFactory.newInstance(numberOfPlayers), sge.gameASCIIVisualiser, agentList, computationTime,
-        timeUnit, sge.log, sge.pool);
+        timeUnit, sge.debug, sge.log, sge.pool);
 
     match.call();
 

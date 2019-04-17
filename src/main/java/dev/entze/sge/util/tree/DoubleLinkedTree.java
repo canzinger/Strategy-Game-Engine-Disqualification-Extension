@@ -1,25 +1,25 @@
 package dev.entze.sge.util.tree;
 
-import java.util.AbstractCollection;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-public class DoubleLinkedTree<E> extends AbstractCollection<E> implements Tree<E> {
+public class DoubleLinkedTree<E> implements Tree<E> {
 
   private DoubleLinkedTree<E> parent = null;
   private E node = null;
   private List<DoubleLinkedTree<E>> children;
 
   private int size;
-  private boolean isSizeCached;
 
   public DoubleLinkedTree() {
-    this(null);
+    parent = null;
+    node = null;
+    children = new ArrayList<>();
+    size = 0;
   }
 
   public DoubleLinkedTree(E elem) {
@@ -27,7 +27,20 @@ public class DoubleLinkedTree<E> extends AbstractCollection<E> implements Tree<E
     node = elem;
     children = new ArrayList<>();
     size = 1;
-    isSizeCached = true;
+  }
+
+  public DoubleLinkedTree(Tree<E> tree) {
+    this.setParent(tree.getParent());
+    node = tree.getNode();
+    children = new ArrayList<>();
+    for (Tree<E> child : tree.getChildren()) {
+      if (child instanceof DoubleLinkedTree) {
+        children.add((DoubleLinkedTree<E>) child);
+      } else {
+        children.add(new DoubleLinkedTree<>(child));
+      }
+    }
+    size = tree.size();
   }
 
   @Override
@@ -235,12 +248,21 @@ public class DoubleLinkedTree<E> extends AbstractCollection<E> implements Tree<E
   }
 
   @Override
+  public void setParent(Tree<E> parent) {
+    if (parent instanceof DoubleLinkedTree) {
+      this.parent = (DoubleLinkedTree<E>) parent;
+    } else {
+      this.parent = new DoubleLinkedTree<>(parent);
+    }
+  }
+
+  @Override
   public Tree<E> getChild(int index) {
     return children.get(index);
   }
 
   @Override
-  public Collection<Tree<E>> getChildren() {
+  public List<Tree<E>> getChildren() {
     return new ArrayList<>(children);
   }
 
@@ -251,22 +273,34 @@ public class DoubleLinkedTree<E> extends AbstractCollection<E> implements Tree<E
 
   @Override
   public void dropChild(int n) {
-    size--;
     children.remove(n);
   }
 
   @Override
-  public boolean add(E e) {
-    DoubleLinkedTree<E> leaf = new DoubleLinkedTree<>(e);
-    leaf.parent = this;
-    boolean changed = children.add(leaf);
-    size++;
-    return changed;
+  public void dropChildren() {
+    children.clear();
+    size = 1;
   }
 
   @Override
+  public boolean add(E e) {
+    return add(new DoubleLinkedTree<>(e));
+  }
+
+  public boolean add(Tree<E> leaf) {
+    if (leaf instanceof DoubleLinkedTree) {
+      DoubleLinkedTree<E> doubleLinkedTree = (DoubleLinkedTree<E>) leaf;
+      doubleLinkedTree.parent = this;
+      return children.add(doubleLinkedTree);
+    }
+
+    leaf.setParent(this);
+    return children.add(new DoubleLinkedTree<>(leaf));
+  }
+
+
+  @Override
   public void clear() {
-    isSizeCached = true;
     size = 0;
     parent = null;
     node = null;
@@ -298,46 +332,27 @@ public class DoubleLinkedTree<E> extends AbstractCollection<E> implements Tree<E
   }
 
   @Override
-  public boolean retainAll(Collection<?> c) {
-    boolean changed = false;
-    for (DoubleLinkedTree<E> child : children) {
-      changed = child.retainAll(c) || changed;
-    }
-    if (!c.contains(node)) {
-      removeBranch();
-      changed = true;
-    }
-
-    return changed;
-  }
-
-  @Override
   public void sort(Comparator<E> comparator) {
     children.sort((o1, o2) -> comparator.compare(o1.node, o2.node));
   }
 
   @Override
   public int size() {
-    if (!isSizeCached) {
+    if (node != null) {
       size = 1;
-      for (DoubleLinkedTree<E> child : children) {
-        size += child.size();
-      }
+    }
+    for (DoubleLinkedTree<E> child : children) {
+      size += child.size();
 
-      isSizeCached = true;
     }
     return size;
   }
-
 
   public boolean removeBranch() {
     boolean removed = false;
     for (DoubleLinkedTree<E> child : children) {
       child.parent = this.parent;
       removed = true;
-    }
-    if (this.parent != null) {
-      this.parent.size--;
     }
     return removed;
   }

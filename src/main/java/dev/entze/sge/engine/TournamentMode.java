@@ -1,20 +1,6 @@
 package dev.entze.sge.engine;
 
-import dev.entze.sge.agent.GameAgent;
-import dev.entze.sge.engine.factory.GameFactory;
-import dev.entze.sge.game.Game;
-import dev.entze.sge.game.GameASCIIVisualiser;
-import dev.entze.sge.util.pair.ImmutablePair;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-
-public enum TournamentMode implements Tournament {
+public enum TournamentMode {}/*implements Tournament {
 
   SINGLE_ELEMINATION {
     @Override
@@ -104,4 +90,4 @@ public enum TournamentMode implements Tournament {
   }
 
 
-}
+}*/

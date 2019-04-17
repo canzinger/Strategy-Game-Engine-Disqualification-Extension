@@ -3,8 +3,9 @@ package dev.entze.sge.util.tree;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
-public interface Tree<E> extends Collection<E> {
+public interface Tree<E> extends Iterable<E> {
 
   Iterator<E> preIterator();
 
@@ -24,9 +25,11 @@ public interface Tree<E> extends Collection<E> {
 
   Tree<E> getParent();
 
+  void setParent(Tree<E> parent);
+
   Tree<E> getChild(int index);
 
-  Collection<Tree<E>> getChildren();
+  List<Tree<E>> getChildren();
 
   default boolean isRoot() {
     return getParent() == null;
@@ -44,11 +47,31 @@ public interface Tree<E> extends Collection<E> {
 
   void dropChild(int n);
 
+  void dropChildren();
+
+  default void reRoot(int n) {
+    reRoot(getChild(n));
+  }
+
+  default void reRoot(Tree<E> tree) {
+    this.setNode(tree.getNode());
+    this.dropChildren();
+    this.dropParent();
+    for (Tree<E> child : tree.getChildren()) {
+      this.add(child);
+    }
+  }
+
   default boolean isLeaf() {
     return getChildren() == null || getChildren().isEmpty();
   }
 
-  @Override
+  boolean add(E e);
+
+  boolean add(Tree<E> leaf);
+
+  void clear();
+
   default boolean addAll(Collection<? extends E> c) {
     boolean addedSome = false;
 
@@ -60,7 +83,6 @@ public interface Tree<E> extends Collection<E> {
   }
 
 
-  @Override
   default boolean contains(Object o) {
     if (o == null) {
       return false;
@@ -80,11 +102,11 @@ public interface Tree<E> extends Collection<E> {
 
   /**
    * Sort only the direct children of this branch.
+   *
    * @param comparator - the comparator
    */
   void sort(Comparator<E> comparator);
 
-  @Override
   default boolean containsAll(Collection<?> c) {
     boolean containsAll = true;
 
@@ -95,7 +117,6 @@ public interface Tree<E> extends Collection<E> {
     return containsAll;
   }
 
-  @Override
   default boolean isEmpty() {
     return isRoot() && isLeaf() && getNode() == null;
   }
@@ -105,7 +126,9 @@ public interface Tree<E> extends Collection<E> {
     return preIterator();
   }
 
-  @Override
+
+  boolean remove(Object o);
+
   default boolean removeAll(Collection<?> c) {
     boolean removedSome = false;
 
@@ -116,31 +139,12 @@ public interface Tree<E> extends Collection<E> {
     return removedSome;
   }
 
-  @Override
   default int size() {
     int size = 1;
     for (Tree<E> child : getChildren()) {
       size += child.size();
     }
     return size;
-  }
-
-
-  @Override
-  default Object[] toArray() {
-    Object[] object = new Object[size()];
-
-    int i = 0;
-    for (E e : this) {
-      object[i++] = e;
-    }
-
-    return object;
-  }
-
-  static <T> Tree<T> sort(Tree<T> tree, Comparator<T> comparator) {
-    tree.postTreeIterator().forEachRemaining(t -> t.sort(comparator));
-    return tree;
   }
 
 

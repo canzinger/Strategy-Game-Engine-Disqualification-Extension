@@ -6,21 +6,21 @@ import dev.entze.sge.game.Game;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class AgentFactory implements Factory<GameAgent<Game<?, ?>, ?>> {
+public class AgentFactory implements Factory<GameAgent<Game<Object, Object>, Object>> {
 
   private final String agentName;
-  private final Constructor<GameAgent<Game<?, ?>, ?>> agentConstructor;
+  private final Constructor<GameAgent<Game<Object, Object>, Object>> agentConstructor;
   private final Logger log;
 
   public AgentFactory(String agentName,
-      Constructor<GameAgent<Game<?, ?>, ?>> agentConstructor, Logger log) {
+      Constructor<GameAgent<Game<Object, Object>, Object>> agentConstructor, Logger log) {
     this.agentName = agentName;
     this.agentConstructor = agentConstructor;
     this.log = log;
   }
 
   @Override
-  public GameAgent<Game<?, ?>, ?> newInstance(Object... initargs) {
+  public GameAgent<Game<Object, Object>, Object> newInstance(Object... initargs) {
     try {
       return agentConstructor.newInstance();
     } catch (InstantiationException e) {

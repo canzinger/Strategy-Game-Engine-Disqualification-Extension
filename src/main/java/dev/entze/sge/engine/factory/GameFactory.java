@@ -5,17 +5,17 @@ import dev.entze.sge.game.Game;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class GameFactory implements Factory<Game<?, ?>> {
+public class GameFactory implements Factory<Game<Object, Object>> {
 
-  private final Constructor<Game<?, ?>> gameConstructor;
+  private final Constructor<Game<Object, Object>> gameConstructor;
   private final Logger log;
+
 
   private final int minimumNumberOfPlayers;
   private final int maximumNumberOfPlayers;
 
-  private Game<?, ?> testGame = null;
 
-  public GameFactory(Constructor<Game<?, ?>> gameConstructor, int minimumNumberOfPlayers,
+  public GameFactory(Constructor<Game<Object, Object>> gameConstructor, int minimumNumberOfPlayers,
       int maximumNumberOfPlayers, Logger log) {
     this.gameConstructor = gameConstructor;
     this.minimumNumberOfPlayers = minimumNumberOfPlayers;
@@ -24,7 +24,7 @@ public class GameFactory implements Factory<Game<?, ?>> {
   }
 
   @Override
-  public Game<?, ?> newInstance(Object... initargs) {
+  public Game<Object, Object> newInstance(Object... initargs) {
     try {
       return gameConstructor.newInstance(initargs);
     } catch (InstantiationException e) {
@@ -50,13 +50,6 @@ public class GameFactory implements Factory<Game<?, ?>> {
 
   public int getMaximumNumberOfPlayers() {
     return maximumNumberOfPlayers;
-  }
-
-  private Game<?, ?> getTestGame() {
-    if (testGame == null) {
-      testGame = newInstance();
-    }
-    return testGame;
   }
 
 }

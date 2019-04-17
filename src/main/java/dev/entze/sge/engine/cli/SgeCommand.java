@@ -52,7 +52,7 @@ public class SgeCommand implements Callable<Void> {
   ExecutorService pool;
   List<AgentFactory> agentFactories = null;
   GameFactory gameFactory = null;
-  GameASCIIVisualiser<Game<?, ?>> gameASCIIVisualiser = null;
+  GameASCIIVisualiser<Game<Object, Object>> gameASCIIVisualiser = null;
   @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
   boolean helpRequested = false;
   @Option(names = {"-V", "--version"}, versionHelp = true, description = "print the version")
@@ -295,7 +295,8 @@ public class SgeCommand implements Callable<Void> {
     log.tra("Loading " + files.size() + " files");
 
     try {
-      ImmutablePair<GameFactory, GameASCIIVisualiser<Game<?, ?>>> loadedGame = gameLoader.call();
+      ImmutablePair<GameFactory, GameASCIIVisualiser<Game<Object, Object>>> loadedGame = gameLoader
+          .call();
       gameFactory = loadedGame.getA();
       gameASCIIVisualiser = loadedGame.getB();
     } catch (ClassNotFoundException e) {
@@ -378,7 +379,8 @@ public class SgeCommand implements Callable<Void> {
     return added;
   }
 
-  public List<GameAgent<Game<?, ?>, ?>> createAgentListFromConfiguration(int numberOfPlayers,
+  public List<GameAgent<Game<Object, Object>, Object>> createAgentListFromConfiguration(
+      int numberOfPlayers,
       List<String> configuration) {
     if (numberOfPlayers != configuration.size() || !(
         gameFactory.getMinimumNumberOfPlayers() <= numberOfPlayers && numberOfPlayers <= gameFactory
@@ -386,13 +388,13 @@ public class SgeCommand implements Callable<Void> {
       return null;
     }
 
-    List<GameAgent<Game<?, ?>, ?>> agentList = new ArrayList<>(numberOfPlayers);
+    List<GameAgent<Game<Object, Object>, Object>> agentList = new ArrayList<>(numberOfPlayers);
     boolean everyPlayerMatches = true;
 
     for (String player : configuration) {
       boolean playerMatches = false;
       if (player.toLowerCase().equals("human")) {
-        agentList.add(new HumanAgent());
+        agentList.add(new HumanAgent<>());
         playerMatches = true;
       }
       for (AgentFactory agentFactory : agentFactories) {

@@ -2,7 +2,7 @@ package dev.entze.sge.engine;
 
 public enum TournamentMode {}/*implements Tournament {
 
-  SINGLE_ELEMINATION {
+  SINGLE_ELIMINATION {
     @Override
     public List<ImmutablePair<List<GameAgent<Game<?, ?>, ?>>, Double[]>> playTournament(
         GameFactory gameFactory,

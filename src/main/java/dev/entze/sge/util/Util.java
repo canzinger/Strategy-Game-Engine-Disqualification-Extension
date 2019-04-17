@@ -11,6 +11,7 @@ import java.util.Random;
 
 public class Util {
 
+  @SuppressWarnings("unchecked")
   public static <E> E selectRandom(Collection<? extends E> coll, Random random) {
     if (coll.size() == 0) {
       return null;

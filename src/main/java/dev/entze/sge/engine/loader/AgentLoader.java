@@ -21,10 +21,11 @@ public class AgentLoader implements Callable<AgentFactory> {
     this.log = log;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public AgentFactory call()
       throws ClassNotFoundException, NoSuchMethodException {
-    Class<GameAgent<Game<?, ?>, ?>> gameAgentClass = (Class<GameAgent<Game<?, ?>, ?>>) classLoader
+    Class<GameAgent<Game<Object, Object>, Object>> gameAgentClass = (Class<GameAgent<Game<Object, Object>, Object>>) classLoader
         .loadClass(agentClassName);
     return new AgentFactory(agentName, gameAgentClass.getConstructor(), log);
   }

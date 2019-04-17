@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 
 public class GameLoader implements
-    Callable<ImmutablePair<GameFactory, GameASCIIVisualiser<Game<?, ?>>>> {
+    Callable<ImmutablePair<GameFactory, GameASCIIVisualiser<Game<Object, Object>>>> {
 
   private final String gameClassName;
   private final String gameASCIIVisualiserClassName;
@@ -27,17 +27,21 @@ public class GameLoader implements
     this.log = log;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public ImmutablePair<GameFactory, GameASCIIVisualiser<Game<?, ?>>> call()
+  public ImmutablePair<GameFactory, GameASCIIVisualiser<Game<Object, Object>>> call()
       throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-    Class<Game<?, ?>> gameClass = (Class<Game<?, ?>>) classLoader.loadClass(gameClassName);
-    Constructor<Game<?, ?>> gameConstructor = gameClass.getConstructor(int.class);
-    Constructor<Game<?, ?>> gameConstructorWithoutPlayerNumber = gameClass.getConstructor();
+    Class<Game<Object, Object>> gameClass = (Class<Game<Object, Object>>) classLoader
+        .loadClass(gameClassName);
+    Constructor<Game<Object, Object>> gameConstructor = gameClass
+        .getConstructor(String.class, int.class);
+    Constructor<Game<Object, Object>> gameConstructorWithoutPlayerNumber = gameClass
+        .getConstructor();
     Game<?, ?> testGame = gameConstructorWithoutPlayerNumber.newInstance();
 
-    Class<GameASCIIVisualiser<Game<?, ?>>> gameASCIIVisualiserClass = (Class<GameASCIIVisualiser<Game<?, ?>>>) classLoader
+    Class<GameASCIIVisualiser<Game<Object, Object>>> gameASCIIVisualiserClass = (Class<GameASCIIVisualiser<Game<Object, Object>>>) classLoader
         .loadClass(gameASCIIVisualiserClassName);
-    Constructor<GameASCIIVisualiser<Game<?, ?>>> gameASCIIVisualiserConstructor = gameASCIIVisualiserClass
+    Constructor<GameASCIIVisualiser<Game<Object, Object>>> gameASCIIVisualiserConstructor = gameASCIIVisualiserClass
         .getConstructor();
 
     return new ImmutablePair<>(

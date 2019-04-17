@@ -27,24 +27,35 @@ public class MatchCommand implements Runnable {
   @Option(names = {"-c",
       "--computation-time"}, defaultValue = "60", description = "Amount of computational time given for each action")
   long computationTime = 60;
+
   @Option(names = {"-u",
       "--time-unit"}, defaultValue = "SECONDS", description = "Time unit in which -c is. Valid values: ${COMPLETION-CANDIDATES}")
   TimeUnit timeUnit = TimeUnit.SECONDS;
+
   @ParentCommand
   private SgeCommand sge;
+
   @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
   private boolean helpRequested = false;
+
   @Option(names = {"-q",
       "--quiet"}, description = "Found once: Log only warnings. Twice: only errors. Thrice: no output")
   private boolean[] quiet = new boolean[0];
+
   @Option(names = {"-v",
       "--verbose"}, description = "Found once: Log debug information. Twice: with trace information")
   private boolean[] verbose = new boolean[0];
+
   @Option(names = {"-p",
       "--number-of-players"}, arity = "1", paramLabel = "N", description = "Number of players. By default the minimum required to play")
   private int numberOfPlayers = (-1);
 
-  @Option(names = {"--debug"}, description = "Starts engine in debug mode. No timeouts and verbose is turned on once.")
+  @Option(names = {"-b",
+      "--board"}, arity = "1", paramLabel = "BOARD", description = "Optional: Initial board position. Can either be a file or a string.")
+  private String startingPosition = null;
+
+  @Option(names = {
+      "--debug"}, description = "Starts engine in debug mode. No timeouts and verbose is turned on once.")
   private boolean debug = false;
 
   @Option(names = {"-f",
@@ -96,12 +107,12 @@ public class MatchCommand implements Runnable {
     }
     sge.log.debug_();
 
-    List<GameAgent<Game<?, ?>, ?>> agentList = sge
+    List<GameAgent<Game<Object, Object>, Object>> agentList = sge
         .createAgentListFromConfiguration(numberOfPlayers, agentConfiguration);
 
-    Match<Game<?, ?>, GameAgent<Game<?, ?>, ?>, ?> match = new Match(
-        sge.gameFactory.newInstance(numberOfPlayers), sge.gameASCIIVisualiser, agentList, computationTime,
-        timeUnit, sge.debug, sge.log, sge.pool);
+    Match<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> match = new Match<>(
+        sge.gameFactory.newInstance(startingPosition, numberOfPlayers), sge.gameASCIIVisualiser,
+        agentList, computationTime, timeUnit, sge.debug, sge.log, sge.pool);
 
     match.call();
 

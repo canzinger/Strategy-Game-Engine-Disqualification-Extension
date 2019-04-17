@@ -49,6 +49,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
   }
 
 
+  @SuppressWarnings("unchecked")
   @Override
   public Double[] call() {
     for (int i = 0; i < gameAgents.size(); i++) {

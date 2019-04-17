@@ -42,9 +42,9 @@ public class Util {
         boolean foundNextBranch = false;
         List<? extends Tree<? extends GameNode<E>>> children = tree.getChildren();
         for (int c = 0; c < children.size(); c++) {
-          if (children.get(i).getNode().getGame().getPreviousActionRecord()
+          if (children.get(c).getNode().getGame().getPreviousActionRecord()
               .equals(previousActionRecords.get(i))) {
-            tree.reRoot(i);
+            tree.reRoot(c);
             foundNextBranch = true;
             break;
           }
@@ -61,5 +61,6 @@ public class Util {
 
     tree.dropParent();
   }
+
 
 }

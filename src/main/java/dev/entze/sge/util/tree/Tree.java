@@ -1,5 +1,6 @@
 package dev.entze.sge.util.tree;
 
+import dev.entze.sge.util.node.GameNode;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -106,6 +107,7 @@ public interface Tree<E> extends Iterable<E> {
    * @param comparator - the comparator
    */
   void sort(Comparator<E> comparator);
+
 
   default boolean containsAll(Collection<?> c) {
     boolean containsAll = true;

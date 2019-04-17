@@ -2,6 +2,7 @@ package dev.entze.sge.agent;
 
 import dev.entze.sge.game.Game;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +18,10 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
   private long AT_LEAST;
 
   protected final Random random;
+
+  protected Comparator<Game<A, ?>> gameUtilityComparator;
+  protected Comparator<Game<A, ?>> gameHeuristicComparator;
+  protected Comparator<Game<A, ?>> gameComparator;
 
   protected double[] minMaxWeights;
   protected double[] evenWeights;
@@ -78,6 +83,12 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
     evenWeights[playerNumber] = 1D;
 
     this.playerNumber = playerNumber;
+
+    gameUtilityComparator = Comparator
+        .comparingDouble(o -> o.getUtilityValue(minMaxWeights));
+    gameHeuristicComparator = Comparator
+        .comparingDouble(o -> o.getHeuristicValue(minMaxWeights));
+    gameComparator = gameUtilityComparator.thenComparing(gameHeuristicComparator);
   }
 
   @Override

@@ -52,7 +52,7 @@ public class MatchCommand implements Runnable {
 
   @Option(names = {"-b",
       "--board"}, arity = "1", paramLabel = "BOARD", description = "Optional: Initial board position. Can either be a file or a string.")
-  private String startingPosition = null;
+  private String board = null;
 
   @Option(names = {
       "--debug"}, description = "Starts engine in debug mode. No timeouts and verbose is turned on once.")
@@ -107,11 +107,18 @@ public class MatchCommand implements Runnable {
     }
     sge.log.debug_();
 
+    board = sge.interpretBoardString(board);
+    if(board == null){
+      sge.log.debug("No initial board given.");
+    } else {
+      sge.log.debug("Initial board: " + board.split("\n")[0] + (board.contains("\n") ? "..." : ""));
+    }
+
     List<GameAgent<Game<Object, Object>, Object>> agentList = sge
         .createAgentListFromConfiguration(numberOfPlayers, agentConfiguration);
 
     Match<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> match = new Match<>(
-        sge.gameFactory.newInstance(startingPosition, numberOfPlayers), sge.gameASCIIVisualiser,
+        sge.gameFactory.newInstance(board, numberOfPlayers), sge.gameASCIIVisualiser,
         agentList, computationTime, timeUnit, sge.debug, sge.log, sge.pool);
 
     match.call();

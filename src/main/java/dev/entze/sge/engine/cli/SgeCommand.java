@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -419,6 +420,25 @@ public class SgeCommand implements Callable<Void> {
 
     return agentList;
 
+  }
+
+  public String interpretBoardString(String board) {
+    if (board == null || board.isEmpty()) {
+      return null;
+    }
+
+    if (!board.contains("\n")) {
+      File file = new File(board);
+      if (file.exists() && file.isFile()) {
+        try {
+          board = Files.readString(file.toPath());
+        } catch (IOException e) {
+          log.warn("Could not read board from file. Using null instead");
+          board = null;
+        }
+      }
+    }
+    return board;
   }
 
   private void cleanUpPool() throws InterruptedException {

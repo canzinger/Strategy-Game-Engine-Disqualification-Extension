@@ -1,5 +1,6 @@
 package dev.entze.sge.agent;
 
+import dev.entze.sge.engine.Logger;
 import dev.entze.sge.game.ActionRecord;
 import dev.entze.sge.game.Game;
 import java.io.BufferedReader;
@@ -10,6 +11,16 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public final class HumanAgent<G extends Game<A, ?>, A> implements GameAgent<G, A> {
+
+  private final Logger log;
+
+  public HumanAgent() {
+    this(null);
+  }
+
+  public HumanAgent(Logger log) {
+    this.log = log;
+  }
 
   @Override
   public A computeNextAction(G game, long computationTime, TimeUnit timeUnit) {
@@ -23,29 +34,57 @@ public final class HumanAgent<G extends Game<A, ?>, A> implements GameAgent<G, A
     }
 
     if (lastActionOfThisPlayer < previousActions.size() - 1) {
-      System.out.println("Last moves:");
+      System.out.print("Last moves:");
+      int lastPlayer = Integer.MIN_VALUE;
       for (int i = lastActionOfThisPlayer + 1; i < previousActions.size(); i++) {
         int player = previousActions.get(i).getPlayer();
-        if (player >= 0) {
-          System.out.print("(" + i + ") Player " + player + ": ");
+        if (player >= 0 && lastPlayer != player) {
+          System.out.print("\n(" + i + ") Player " + player + ": ");
+        } else if (lastPlayer == player) {
+          System.out.print(", ");
         } else {
           System.out.print("(" + i + ") World: ");
         }
-        System.out.println(previousActions.get(i).getAction().toString() + '\n');
+
+        System.out.print(previousActions.get(i).getAction().toString());
+        lastPlayer = player;
+
       }
+      System.out.println('\n');
     }
 
     System.out.println("Possible actions:");
     List<A> possibleActions = new ArrayList<>(game.getPossibleActions());
 
-    for (int i = 0; i < possibleActions.size(); i++) {
-      System.out.println("[" + i + "] " + possibleActions.get(i).toString());
+    boolean isInteger = false;
+
+    try {
+      Integer test = (Integer) possibleActions.get(0);
+      isInteger = true;
+    } catch (Exception ignored) {
+
+    }
+
+    if (!isInteger) {
+      for (int i = 0; i < possibleActions.size(); i++) {
+        System.out.println("[" + i + "] " + possibleActions.get(i).toString());
+      }
+    } else {
+      for (A possibleAction : possibleActions) {
+        System.out.println("[" + possibleAction.toString() + "]");
+      }
     }
 
     int move = (-1);
-    String input = null;
+    String input;
 
-    while (!(0 <= move && move < possibleActions.size())) {
+    boolean moveInvalid = true;
+
+    while (moveInvalid
+        && Thread.currentThread().isAlive()
+        && !Thread.currentThread().isInterrupted()) {
+      move = (-1);
+      input = null;
       System.out.print('\n' + "> ");
       if (System.console() != null) {
         input = System.console().readLine();
@@ -59,14 +98,30 @@ public final class HumanAgent<G extends Game<A, ?>, A> implements GameAgent<G, A
       }
 
       if (input != null) {
+        int matches = 0;
         try {
           move = Integer.parseInt(input);
         } catch (NumberFormatException ignored) {
+          for (int i = 0; i < possibleActions.size(); i++) {
+            if (possibleActions.get(i).toString().startsWith(input)) {
+              matches++;
+              move = i;
+            }
+          }
         }
 
-        if (!(0 <= move && move < possibleActions.size())) {
-          System.err.println("Not a valid number.");
+        if (isInteger) {
+          move = possibleActions.indexOf(move);
         }
+
+        //sic!
+        if (moveInvalid = !(0 <= move && move < possibleActions.size())) {
+          System.err.println("Not a valid action.");
+        } else if (matches > 1) {
+          System.err.println("Specified input is ambiguous");
+          moveInvalid = true;
+        }
+
       }
 
     }

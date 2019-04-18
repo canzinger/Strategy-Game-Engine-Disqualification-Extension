@@ -113,7 +113,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           return result;
         }
 
-        if(!isHuman){
+        if (!isHuman) {
           log.info_("> " + action.toString());
         }
 
@@ -127,7 +127,6 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           result[thisPlayer] = (-1D);
           return result;
         }
-
 
         game = game.doAction(action);
       } else {
@@ -144,7 +143,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       lastPlayer = thisPlayer;
 
       if (game.getCurrentPlayer() >= 0 && isHuman && !(gameAgents
-          .get(game.getCurrentPlayer()) instanceof HumanAgent)) {
+          .get(game.getCurrentPlayer()) instanceof HumanAgent) || lastPlayer == game
+          .getCurrentPlayer()) {
         log.info_(gameASCIIVisualiser.visualise((G) game.getGame()));
       }
     }

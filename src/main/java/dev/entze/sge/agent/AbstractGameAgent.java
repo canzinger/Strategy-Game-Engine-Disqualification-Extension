@@ -1,5 +1,6 @@
 package dev.entze.sge.agent;
 
+import dev.entze.sge.engine.Logger;
 import dev.entze.sge.game.Game;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,8 +14,8 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
   private long TIMEOUT_MULTIPLIER;
   private long TIMEOUT_DIVISOR;
 
-  private long START_TIME;
-  private long TIMEOUT;
+  protected long START_TIME;
+  protected long TIMEOUT;
   private long AT_LEAST;
 
   protected final Random random;
@@ -28,36 +29,44 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
 
   protected int playerNumber;
 
+  protected final Logger log;
+
   protected AbstractGameAgent() {
-    this(1L, 2L);
+    this(null);
   }
 
-  protected AbstractGameAgent(long timeOutMultiplier, long timeOutDivisor) {
-    this(timeOutMultiplier, timeOutDivisor, 10L, TimeUnit.SECONDS);
+  protected AbstractGameAgent(Logger log) {
+    this(1L, 2L, log);
+  }
+
+  protected AbstractGameAgent(long timeOutMultiplier, long timeOutDivisor, Logger log) {
+    this(timeOutMultiplier, timeOutDivisor, 10L, TimeUnit.SECONDS, log);
   }
 
   protected AbstractGameAgent(long timeOutMultiplier, long timeOutDivisor, long atLeast,
-      TimeUnit atLeastTimeUnit) {
+      TimeUnit atLeastTimeUnit, Logger log) {
     this.TIMEOUT_MULTIPLIER = timeOutMultiplier;
     this.TIMEOUT_DIVISOR = timeOutDivisor;
     this.AT_LEAST = atLeastTimeUnit.toNanos(atLeast);
     this.random = new Random();
+    this.log = log;
   }
 
-  protected AbstractGameAgent(double timeOutRatio) {
-    this(timeOutRatio, 10L, TimeUnit.SECONDS);
+  protected AbstractGameAgent(double timeOutRatio, Logger log) {
+    this(timeOutRatio, 10L, TimeUnit.SECONDS, log);
   }
 
-  protected AbstractGameAgent(double timeOutRatio, long precision) {
-    this(timeOutRatio, precision, 10L, TimeUnit.SECONDS);
+  protected AbstractGameAgent(double timeOutRatio, long precision, Logger log) {
+    this(timeOutRatio, precision, 10L, TimeUnit.SECONDS, log);
   }
 
-  protected AbstractGameAgent(double timeOutRatio, long atLeast, TimeUnit atLeastTimeUnit) {
-    this(timeOutRatio, TimeUnit.MILLISECONDS.toNanos(1L), 10L, TimeUnit.SECONDS);
+  protected AbstractGameAgent(double timeOutRatio, long atLeast, TimeUnit atLeastTimeUnit,
+      Logger log) {
+    this(timeOutRatio, TimeUnit.MILLISECONDS.toNanos(1L), 10L, TimeUnit.SECONDS, log);
   }
 
   protected AbstractGameAgent(double timeOutRatio, long precision, long atLeast,
-      TimeUnit atLeastTimeUnit) {
+      TimeUnit atLeastTimeUnit, Logger log) {
     long timeOutDivisor = 1;
     long timeOutMultiplier = (long) (timeOutRatio / timeOutDivisor);
 
@@ -70,6 +79,7 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
     this.TIMEOUT_MULTIPLIER = timeOutMultiplier;
     this.TIMEOUT_DIVISOR = timeOutDivisor;
     this.random = new Random();
+    this.log = log;
   }
 
   @Override

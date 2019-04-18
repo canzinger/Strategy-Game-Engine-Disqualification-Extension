@@ -415,7 +415,7 @@ public class SgeCommand implements Callable<Void> {
     }
 
     if (!everyPlayerMatches) {
-      return null;
+      throw new IllegalArgumentException("Could not create a valid agent list");
     }
 
     return agentList;

@@ -27,7 +27,7 @@ public class AgentLoader implements Callable<AgentFactory> {
       throws ClassNotFoundException, NoSuchMethodException {
     Class<GameAgent<Game<Object, Object>, Object>> gameAgentClass = (Class<GameAgent<Game<Object, Object>, Object>>) classLoader
         .loadClass(agentClassName);
-    return new AgentFactory(agentName, gameAgentClass.getConstructor(), log);
+    return new AgentFactory(agentName, gameAgentClass.getConstructor(Logger.class), log);
   }
 
 }

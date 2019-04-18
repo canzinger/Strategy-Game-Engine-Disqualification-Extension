@@ -22,7 +22,12 @@ public class AgentFactory implements Factory<GameAgent<Game<Object, Object>, Obj
   @Override
   public GameAgent<Game<Object, Object>, Object> newInstance(Object... initargs) {
     try {
-      return agentConstructor.newInstance();
+      return agentConstructor.newInstance(new Logger(log.getLogLevel(), "[" + agentName + " ", "",
+          "trace]: ", System.out, "",
+          "debug]: ", System.out, "",
+          "info]: ", System.out, "",
+          "warn]: ", System.err, "",
+          "error]: ", System.err, ""));
     } catch (InstantiationException e) {
       log.error_();
       log.error("Could not instantiate new element with constructor of agent " + agentName);

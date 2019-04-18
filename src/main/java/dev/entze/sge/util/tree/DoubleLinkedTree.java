@@ -13,20 +13,16 @@ public class DoubleLinkedTree<E> implements Tree<E> {
   private E node = null;
   private List<DoubleLinkedTree<E>> children;
 
-  private int size;
-
   public DoubleLinkedTree() {
     parent = null;
     node = null;
     children = new ArrayList<>();
-    size = 0;
   }
 
   public DoubleLinkedTree(E elem) {
     parent = null;
     node = elem;
     children = new ArrayList<>();
-    size = 1;
   }
 
   public DoubleLinkedTree(Tree<E> tree) {
@@ -40,7 +36,6 @@ public class DoubleLinkedTree<E> implements Tree<E> {
         children.add(new DoubleLinkedTree<>(child));
       }
     }
-    size = tree.size();
   }
 
   @Override
@@ -279,7 +274,6 @@ public class DoubleLinkedTree<E> implements Tree<E> {
   @Override
   public void dropChildren() {
     children.clear();
-    size = 1;
   }
 
   @Override
@@ -301,7 +295,6 @@ public class DoubleLinkedTree<E> implements Tree<E> {
 
   @Override
   public void clear() {
-    size = 0;
     parent = null;
     node = null;
     children.clear();
@@ -338,12 +331,12 @@ public class DoubleLinkedTree<E> implements Tree<E> {
 
   @Override
   public int size() {
+    int size = 0;
     if (node != null) {
       size = 1;
     }
     for (DoubleLinkedTree<E> child : children) {
       size += child.size();
-
     }
     return size;
   }

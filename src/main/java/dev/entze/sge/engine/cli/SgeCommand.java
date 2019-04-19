@@ -73,6 +73,16 @@ public class SgeCommand implements Callable<Void> {
     SgeCommand sge = new SgeCommand();
     CommandLine cli = new CommandLine(sge);
 
+    if (args.length == 0) {
+      cli.usage(System.err);
+      System.exit(1);
+    }
+
+    if (args.length == 1 && !args[0].startsWith("-")) {
+      cli.getSubcommands().getOrDefault(args[0], cli).usage(System.err);
+      System.exit(1);
+    }
+
     cli.setCaseInsensitiveEnumValuesAllowed(true);
 
     List<Object> ran = cli.parseWithHandler(new RunAll(), args);

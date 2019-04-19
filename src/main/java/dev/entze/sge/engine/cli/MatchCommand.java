@@ -14,13 +14,13 @@ import picocli.CommandLine.ParentCommand;
 
 @Command(name = "match", aliases = {
     "m"}, description = "Let agents play against each other in a single match.", customSynopsis = {
-    "sge [OPTION]... FILE... [AGENT]...",
-    "   or: sge [OPTION]... [AGENT]... FILE...",
-    "   or: sge [OPTION]... [FILE]... [DIRECTORY]... [AGENT]...",
-    "   or: sge [OPTION]... [AGENT]... [FILE]... [DIRECTORY]...",
-    "   or: sge [OPTION]... -f FILE... [ARGUMENTS]...",
-    "   or: sge [OPTION]... -d DIRECTORY... [ARGUMENTS]...",
-    "   or: sge [OPTION]... -a AGENT... [ARGUMENTS]...",
+    "sge match [OPTION]... FILE... [AGENT]...",
+    "   or: sge match [OPTION]... [AGENT]... FILE...",
+    "   or: sge match [OPTION]... [FILE]... [DIRECTORY]... [AGENT]...",
+    "   or: sge match [OPTION]... [AGENT]... [FILE]... [DIRECTORY]...",
+    "   or: sge match [OPTION]... -f FILE... [ARGUMENTS]...",
+    "   or: sge match [OPTION]... -d DIRECTORY... [ARGUMENTS]...",
+    "   or: sge match [OPTION]... -a AGENT... [ARGUMENTS]...",
 })
 public class MatchCommand implements Runnable {
 

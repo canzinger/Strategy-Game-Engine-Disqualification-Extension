@@ -120,7 +120,7 @@ public class Gib implements Game<String, String> {
   }
 
   @Override
-  public List<ActionRecord<String>> getPreviousActionRecords() {
+  public List<ActionRecord<String>> getActionRecords() {
     return Collections.unmodifiableList(actionRecords);
   }
 

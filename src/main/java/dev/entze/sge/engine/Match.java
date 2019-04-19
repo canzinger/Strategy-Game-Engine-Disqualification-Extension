@@ -158,7 +158,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     log.info_("-----");
     log.info("Game over.");
     log.info_(gameASCIIVisualiser.visualise((G) game));
-    for (ActionRecord<A> previousActionRecord : game.getPreviousActionRecords()) {
+    for (ActionRecord<A> previousActionRecord : game.getActionRecords()) {
       log.inf_(previousActionRecord.toString() + " ");
     }
     log.info_("\n");

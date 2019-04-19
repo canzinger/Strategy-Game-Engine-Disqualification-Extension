@@ -6,13 +6,13 @@ import java.util.Set;
 /**
  * A game.
  *
- * @param <A> - Action
- * @param <B> - Board
+ * @param <A> - Type of Action
+ * @param <B> - Type of Board
  */
 public interface Game<A, B> {
 
   /**
-   * Checks whether the game is over yet.
+   * Checks whether the game is over yet. Once this state is reached it can not be left.
    *
    * @return true if and only if game over
    */
@@ -64,7 +64,8 @@ public interface Game<A, B> {
   }
 
   /**
-   * The weight of the utility function of a given player.
+   * The weight of the utility function of a given player. Per default 1 iff getCurrentPlayer()
+   * equals player otherwise -1.
    *
    * @param player - the player
    * @return the weight of the utility function.
@@ -78,6 +79,23 @@ public interface Game<A, B> {
     }
     return (-1);
   }
+
+  /**
+   * Applies the heuristic function of each player and returns the result in an array where the
+   * index corresponds to the player id.
+   *
+   * @return the result of the utility function for each player
+   */
+  default double[] getGameHeuristicValue() {
+    double[] heuristicValues = new double[getNumberOfPlayers()];
+
+    for (int p = 0; p < heuristicValues.length; p++) {
+      heuristicValues[p] = getHeuristicValue(p);
+    }
+
+    return heuristicValues;
+  }
+
 
   /**
    * The weight of the heuristic function of a given player. Per default the same as
@@ -143,7 +161,8 @@ public interface Game<A, B> {
   double getUtilityValue(int player);
 
   /**
-   * Applies a heuristic function for the given player. Per default the same as getUtilityValue().
+   * Applies the heuristic function for the given player. Per default the same as
+   * getUtilityValue().
    *
    * @param player - the player
    * @return the result of the heuristic function for the player
@@ -153,9 +172,10 @@ public interface Game<A, B> {
   }
 
   /**
-   * Collects all possible moves and returns them as a set.
+   * Collects all possible moves and returns them as a set. Should the game be over an empty set is
+   * returned instead.
    *
-   * @return a set of all possible moves.
+   * @return a set of all possible moves
    */
   Set<A> getPossibleActions();
 
@@ -171,7 +191,7 @@ public interface Game<A, B> {
    * Checks whether doAction(action) would not throw an exception.
    *
    * @param action - the action
-   * @return true - iff the action is valid and possible.
+   * @return true - iff the action is valid and possible
    */
   boolean isValidAction(A action);
 
@@ -179,15 +199,16 @@ public interface Game<A, B> {
    * Does a given action.
    *
    * @param action - the action to take
-   * @return a new copy of the game with the previous action applied.
-   * @throws IllegalArgumentException - In the case of a non-existing action.
+   * @return a new copy of the game with the previous action applied
+   * @throws IllegalArgumentException - In the case of a non-existing action or null
+   * @throws IllegalStateException - If game over
    */
   Game<A, B> doAction(A action);
 
   /**
    * Progresses the game if it currently is in an indeterminant state.
    *
-   * @return a new copy of the game with an action applied.
+   * @return a new copy of the game with an action applied
    */
   default Game<A, B> doAction() {
     return doAction(determineNextAction());
@@ -198,24 +219,25 @@ public interface Game<A, B> {
    * distribution of probabilities, or hidden information. If the game is in a definitive state null
    * is returned.
    *
-   * @return a possible action, which determines the game.
+   * @return a possible action, which determines the game
    */
   A determineNextAction();
 
   /**
    * Returns the last action and which player did the action.
    *
-   * @return the last action record.
+   * @return the last action record
    */
   default ActionRecord<A> getPreviousActionRecord() {
-    return getPreviousActionRecords().get(getNumberOfActions() - 1);
+    return getActionRecords().get(getNumberOfActions() - 1);
   }
 
   /**
    * Returns only the last action, but not which player did the action.
-   * @return the last action.
+   *
+   * @return the last action
    */
-  default A getPreviousAction(){
+  default A getPreviousAction() {
     return getPreviousActionRecord().getAction();
   }
 
@@ -224,21 +246,22 @@ public interface Game<A, B> {
    *
    * @return the record of all previous actions
    */
-  List<ActionRecord<A>> getPreviousActionRecords();
+  List<ActionRecord<A>> getActionRecords();
 
   /**
    * Returns how many actions were taken.
    *
-   * @return how many actions were taken.
+   * @return how many actions were taken
    */
   default int getNumberOfActions() {
-    return getPreviousActionRecords().size();
+    return getActionRecords().size();
   }
 
   /**
-   * Checks whether this game or a parent is a creation of getGame.
+   * Checks if the game is canonical. A game is canonical if it bears all information and is not the
+   * child of a non-canonical game.
    *
-   * @return true if this or any parent was the result getGame.
+   * @return true if canonical
    */
   boolean isCanonical();
 
@@ -247,6 +270,7 @@ public interface Game<A, B> {
    * non-canonical games (games where this function was already called) this method will return a
    * copy of this game as is. In other games the unknown information will be hidden and abstracted
    * via placeholders.
+   *
    * @return a copy of the game with only the information available to the player
    */
   default Game<A, B> getGame() {

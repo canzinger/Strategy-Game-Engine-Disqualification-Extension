@@ -35,8 +35,8 @@ public class Util {
     boolean foundRoot = false;
     if (!tree.isEmpty() && tree.getNode().getGame() != null) {
 
-      List<ActionRecord<E>> previousActionRecords = game.getPreviousActionRecords();
-      List<ActionRecord<E>> oldActionRecords = tree.getNode().getGame().getPreviousActionRecords();
+      List<ActionRecord<E>> previousActionRecords = game.getActionRecords();
+      List<ActionRecord<E>> oldActionRecords = tree.getNode().getGame().getActionRecords();
 
       foundRoot = true;
       for (int i = oldActionRecords.size(); i < previousActionRecords.size() && foundRoot; i++) {

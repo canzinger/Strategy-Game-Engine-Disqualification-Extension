@@ -25,7 +25,7 @@ public final class HumanAgent<G extends Game<A, ?>, A> implements GameAgent<G, A
   @Override
   public A computeNextAction(G game, long computationTime, TimeUnit timeUnit) {
 
-    List<ActionRecord<A>> previousActions = game.getPreviousActionRecords();
+    List<ActionRecord<A>> previousActions = game.getActionRecords();
     int lastActionOfThisPlayer = (-1);
     for (int i = previousActions.size() - 1; i >= 0 && lastActionOfThisPlayer < 0; i--) {
       if (previousActions.get(i).getPlayer() == game.getCurrentPlayer()) {

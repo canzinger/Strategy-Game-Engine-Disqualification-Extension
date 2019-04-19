@@ -35,22 +35,22 @@ public class Util {
     boolean foundRoot = false;
     if (!tree.isEmpty() && tree.getNode().getGame() != null) {
 
-      List<ActionRecord<E>> previousActionRecords = game.getActionRecords();
+      List<ActionRecord<E>> actionRecords = game.getActionRecords();
       List<ActionRecord<E>> oldActionRecords = tree.getNode().getGame().getActionRecords();
 
       foundRoot = true;
-      for (int i = oldActionRecords.size(); i < previousActionRecords.size() && foundRoot; i++) {
+      for (int i = oldActionRecords.size(); i < actionRecords.size() && foundRoot; i++) {
         boolean foundNextBranch = false;
         List<? extends Tree<? extends GameNode<E>>> children = tree.getChildren();
         for (int c = 0; c < children.size(); c++) {
           if (children.get(c).getNode().getGame().getPreviousActionRecord()
-              .equals(previousActionRecords.get(i))) {
+              .equals(actionRecords.get(i))) {
             tree.reRoot(c);
             foundNextBranch = true;
             break;
           }
         }
-        foundRoot = foundRoot && foundNextBranch;
+        foundRoot = foundNextBranch;
       }
 
     }

@@ -3,7 +3,7 @@ package dev.entze.sge.util.pair;
 import java.util.Objects;
 
 /**
- * A pair of values. Accessible via getA and getB
+ * A pair of allValues. Accessible via getA and getB
  *
  * @param <A> - the first
  * @param <B> - the second

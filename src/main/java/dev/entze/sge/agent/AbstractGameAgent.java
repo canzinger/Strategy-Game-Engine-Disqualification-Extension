@@ -101,8 +101,7 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
     gameComparator = gameUtilityComparator.thenComparing(gameHeuristicComparator);
   }
 
-  @Override
-  public A computeNextAction(G game, long computationTime, TimeUnit timeUnit) {
+  protected void setTimers(long computationTime, TimeUnit timeUnit) {
     START_TIME = System.nanoTime();
     long computationTimeInNanos = timeUnit.toNanos(computationTime) - ONE_SECOND;
     if (computationTimeInNanos < 0) {
@@ -110,14 +109,11 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
     }
     TIMEOUT = (computationTimeInNanos * TIMEOUT_MULTIPLIER) / TIMEOUT_DIVISOR;
     TIMEOUT = Math.max(TIMEOUT, Math.min(computationTimeInNanos, AT_LEAST));
-
-    return null;
   }
 
   protected boolean shouldStopComputation() {
     return System.nanoTime() - START_TIME >= TIMEOUT || !Thread.currentThread().isAlive() || Thread
         .currentThread().isInterrupted();
   }
-
 
 }

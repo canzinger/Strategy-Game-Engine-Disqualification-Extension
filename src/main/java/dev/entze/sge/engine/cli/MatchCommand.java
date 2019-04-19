@@ -29,7 +29,7 @@ public class MatchCommand implements Runnable {
   long computationTime = 60;
 
   @Option(names = {"-u",
-      "--time-unit"}, defaultValue = "SECONDS", description = "Time unit in which -c is. Valid values: ${COMPLETION-CANDIDATES}")
+      "--time-unit"}, defaultValue = "SECONDS", description = "Time unit in which -c is. Valid allValues: ${COMPLETION-CANDIDATES}")
   TimeUnit timeUnit = TimeUnit.SECONDS;
 
   @ParentCommand

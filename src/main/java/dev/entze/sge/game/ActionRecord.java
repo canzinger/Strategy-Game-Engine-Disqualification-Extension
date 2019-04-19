@@ -26,7 +26,7 @@ public class ActionRecord<A> {
 
   @Override
   public String toString() {
-    return "<" + player  + ", " + action + '>';
+    return "<" + player + ", " + action + '>';
   }
 
   @Override

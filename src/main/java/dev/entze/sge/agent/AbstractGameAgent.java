@@ -10,26 +10,19 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements GameAgent<G, A> {
 
   private static final long ONE_SECOND = TimeUnit.SECONDS.toNanos(1L);
-
-  private long TIMEOUT_MULTIPLIER;
-  private long TIMEOUT_DIVISOR;
-
+  protected final Random random;
+  protected final Logger log;
   protected long START_TIME;
   protected long TIMEOUT;
-  private long AT_LEAST;
-
-  protected final Random random;
-
   protected Comparator<Game<A, ?>> gameUtilityComparator;
   protected Comparator<Game<A, ?>> gameHeuristicComparator;
   protected Comparator<Game<A, ?>> gameComparator;
-
   protected double[] minMaxWeights;
   protected double[] evenWeights;
-
   protected int playerNumber;
-
-  protected final Logger log;
+  private long TIMEOUT_MULTIPLIER;
+  private long TIMEOUT_DIVISOR;
+  private long AT_LEAST;
 
   protected AbstractGameAgent() {
     this(null);

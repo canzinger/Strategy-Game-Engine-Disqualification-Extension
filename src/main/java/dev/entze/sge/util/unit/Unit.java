@@ -2,12 +2,6 @@ package dev.entze.sge.util.unit;
 
 public interface Unit {
 
-  long convert(long sourceItem, Unit sourceUnit);
-
-  Unit[] allValues();
-
-  String toShortString();
-
   /**
    * From TimeUnit.java General conversion utility.
    *
@@ -29,5 +23,11 @@ public interface Unit {
       return d * r;
     }
   }
+
+  long convert(long sourceItem, Unit sourceUnit);
+
+  Unit[] allValues();
+
+  String toShortString();
 
 }

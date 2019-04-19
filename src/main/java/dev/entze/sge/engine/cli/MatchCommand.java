@@ -108,7 +108,7 @@ public class MatchCommand implements Runnable {
     sge.log.debug_();
 
     board = sge.interpretBoardString(board);
-    if(board == null){
+    if (board == null) {
       sge.log.debug("No initial board given.");
     } else {
       sge.log.debug("Initial board: " + board.split("\n")[0] + (board.contains("\n") ? "..." : ""));

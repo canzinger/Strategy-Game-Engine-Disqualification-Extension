@@ -27,6 +27,22 @@ public enum InformationUnit implements Unit {
 
   ;
 
+  private static final long BIT_SCALE = 1L;
+  private static final long BYTE_SCALE = 8L * BIT_SCALE;
+  private static final long KILO = 1000L;
+  private static final long KIBI = 1024L;
+  private static final long MEGA = 1000L * KILO;
+  private static final long MEBI = 1024L * KIBI;
+  private static final long GIGA = 1000L * MEGA;
+  private static final long GIBI = 1024L * MEBI;
+  private static final long TERA = 1000L * GIGA;
+  private static final long TEBI = 1024L * GIBI;
+  private static final long PETA = 1000L * TERA;
+  private static final long PEBI = 1024L * TEBI;
+  private static final long EXA = 1000L * PETA;
+  private static final long EXBI = 1024L * PEBI;
+  private final long SCALE;
+  private final String SHORT_STRING;
   InformationUnit(String shortString, long... scales) {
     SHORT_STRING = shortString;
     long theScale = 1;
@@ -59,24 +75,5 @@ public enum InformationUnit implements Unit {
   public String toShortString() {
     return SHORT_STRING;
   }
-
-  private final long SCALE;
-  private final String SHORT_STRING;
-
-  private static final long BIT_SCALE = 1L;
-  private static final long BYTE_SCALE = 8L * BIT_SCALE;
-
-  private static final long KILO = 1000L;
-  private static final long KIBI = 1024L;
-  private static final long MEGA = 1000L * KILO;
-  private static final long MEBI = 1024L * KIBI;
-  private static final long GIGA = 1000L * MEGA;
-  private static final long GIBI = 1024L * MEBI;
-  private static final long TERA = 1000L * GIGA;
-  private static final long TEBI = 1024L * GIBI;
-  private static final long PETA = 1000L * TERA;
-  private static final long PEBI = 1024L * TEBI;
-  private static final long EXA = 1000L * PETA;
-  private static final long EXBI = 1024L * PEBI;
 
 }

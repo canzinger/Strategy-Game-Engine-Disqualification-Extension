@@ -11,15 +11,13 @@ import java.util.TreeSet;
 public class Gib implements Game<String, String> {
 
 
-  private int currentPlayer;
   private final boolean canonical;
-  private List<ActionRecord<String>> actionRecords;
-  private String board;
-
   private final Set<String> targets;
-
   private final Set<String> allowedStrings;
   private final int numberOfPlayers;
+  private int currentPlayer;
+  private List<ActionRecord<String>> actionRecords;
+  private String board;
 
 
   public Gib(String initialBoard, int numberOfPlayers) {

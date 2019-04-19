@@ -20,7 +20,7 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
   protected Comparator<Game<A, ?>> gameComparator;
   protected double[] minMaxWeights;
   protected double[] evenWeights;
-  protected int playerNumber;
+  protected int playerId;
   private long TIMEOUT_MULTIPLIER;
   private long TIMEOUT_DIVISOR;
   private long AT_LEAST;
@@ -56,7 +56,7 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
 
   protected AbstractGameAgent(double timeOutRatio, long atLeast, TimeUnit atLeastTimeUnit,
       Logger log) {
-    this(timeOutRatio, TimeUnit.MILLISECONDS.toNanos(1L), 10L, TimeUnit.SECONDS, log);
+    this(timeOutRatio, TimeUnit.MILLISECONDS.toNanos(1L), atLeast, atLeastTimeUnit, log);
   }
 
   protected AbstractGameAgent(double timeOutRatio, long precision, long atLeast,
@@ -77,16 +77,16 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
   }
 
   @Override
-  public void setUp(int numberOfPlayers, int playerNumber) {
+  public void setUp(int numberOfPlayers, int playerId) {
     minMaxWeights = new double[numberOfPlayers];
     Arrays.fill(minMaxWeights, -1D);
-    minMaxWeights[playerNumber] = 1D;
+    minMaxWeights[playerId] = 1D;
 
     evenWeights = new double[numberOfPlayers];
     Arrays.fill(evenWeights, -1D / (-1D + numberOfPlayers));
-    evenWeights[playerNumber] = 1D;
+    evenWeights[playerId] = 1D;
 
-    this.playerNumber = playerNumber;
+    this.playerId = playerId;
 
     gameUtilityComparator = Comparator
         .comparingDouble(o -> o.getUtilityValue(minMaxWeights));

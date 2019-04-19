@@ -180,8 +180,9 @@ public class Util {
   /**
    * Return an array of minimal units. For example 25 hours are converted to 1 day and 1 hour.
    *
-   * @param item - the time
-   * @param unit - the timeUnit
+   * @param item - the item
+   * @param unit - the unit
+   * @param targetUnits - the targeted Units
    * @return an array of minimal timeUnits
    */
   public static long[] convertToMinimalUnits(long item, Unit unit, Unit[] targetUnits) {

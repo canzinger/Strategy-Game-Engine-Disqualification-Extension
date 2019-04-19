@@ -8,6 +8,7 @@ public interface Unit {
    * @param d duration
    * @param dst result unit scale
    * @param src source unit scale
+   * @return the converted value
    */
   static long generalConversionUtility(long d, long dst, long src) {
     long r, m;

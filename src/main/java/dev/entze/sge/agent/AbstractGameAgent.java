@@ -13,6 +13,7 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
   protected final Random random;
   protected final Logger log;
   protected long START_TIME;
+  protected long ACTUAL_TIMEOUT;
   protected long TIMEOUT;
   protected Comparator<Game<A, ?>> gameUtilityComparator;
   protected Comparator<Game<A, ?>> gameHeuristicComparator;
@@ -96,9 +97,10 @@ public abstract class AbstractGameAgent<G extends Game<A, ?>, A> implements Game
 
   protected void setTimers(long computationTime, TimeUnit timeUnit) {
     START_TIME = System.nanoTime();
-    long computationTimeInNanos = timeUnit.toNanos(computationTime) - ONE_SECOND;
+    ACTUAL_TIMEOUT = timeUnit.toNanos(computationTime);
+    long computationTimeInNanos = ACTUAL_TIMEOUT - ONE_SECOND;
     if (computationTimeInNanos < 0) {
-      computationTimeInNanos = timeUnit.toNanos(computationTime);
+      computationTimeInNanos = ACTUAL_TIMEOUT;
     }
     TIMEOUT = (computationTimeInNanos * TIMEOUT_MULTIPLIER) / TIMEOUT_DIVISOR;
     TIMEOUT = Math.max(TIMEOUT, Math.min(computationTimeInNanos, AT_LEAST));

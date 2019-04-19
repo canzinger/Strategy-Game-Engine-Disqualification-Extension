@@ -77,6 +77,12 @@ public class UtilTest {
         Util.convertUnitToReadableString(2048, InformationUnit.BIT, InformationUnit.KILOBIT));
   }
 
+  @Test
+  public void test_convertUnitToReadableString_12() {
+    assertEquals("20.12s",
+        Util.convertUnitToReadableString(20120397010L, TimeUnit.NANOSECONDS, TimeUnit.SECONDS));
+  }
+
 
   @Test
   public void test_convertUnitToApproximation() {

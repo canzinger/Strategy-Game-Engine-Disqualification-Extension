@@ -158,9 +158,29 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     log.info_("-----");
     log.info("Game over.");
     log.info_(gameASCIIVisualiser.visualise((G) game));
-    for (ActionRecord<A> previousActionRecord : game.getActionRecords()) {
-      log.inf_(previousActionRecord.toString() + " ");
+    log.inf(game.getNumberOfActions() + " plies ");
+    List<ActionRecord<A>> actionRecords = game.getActionRecords();
+    lastPlayer = game.getPreviousActionRecord().getPlayer() + 1;
+
+    boolean flushPlayer = false;
+
+    for (ActionRecord<A> actionRecord : actionRecords) {
+      if (actionRecord.getPlayer() != lastPlayer) {
+        if (flushPlayer) {
+          log.inf_("> ");
+        }
+        log.inf_("<" + actionRecord.getPlayer() + ",");
+        flushPlayer = true;
+
+      }
+
+      log.inf_(" [" + actionRecord.getAction().toString() + "]");
+      lastPlayer = actionRecord.getPlayer();
+
     }
+
+    log.inf_(">");
+
     log.info_("\n");
     log.inf("Result: ");
     for (int i = 0; i < gameAgents.size(); i++) {

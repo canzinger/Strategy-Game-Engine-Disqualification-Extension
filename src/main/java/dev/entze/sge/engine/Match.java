@@ -178,14 +178,15 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     log.inf_(">");
 
     log.info_("\n");
-    log.inf("Result: ");
+    System.out.print("Result: ");
     for (int i = 0; i < gameAgents.size(); i++) {
-      log.inf_("Player " + i + ": " + result[i]);
+      System.out.print("Player " + i + ": " + result[i]);
       if (i + 1 < gameAgents.size()) {
-        log.inf_(", ");
+        System.out.print(", ");
       }
     }
-    log.info_();
+    System.out.println();
+    ;
 
     for (E gameAgent : gameAgents) {
       gameAgent.tearDown();

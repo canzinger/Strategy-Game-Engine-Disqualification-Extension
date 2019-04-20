@@ -8,8 +8,6 @@ import dev.entze.sge.engine.factory.GameFactory;
 import dev.entze.sge.engine.loader.AgentLoader;
 import dev.entze.sge.engine.loader.GameLoader;
 import dev.entze.sge.game.Game;
-import dev.entze.sge.game.GameASCIIVisualiser;
-import dev.entze.sge.util.pair.ImmutablePair;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -41,19 +39,19 @@ import picocli.CommandLine.RunAll;
 })
 public class SgeCommand implements Callable<Void> {
 
-  public static final String SGE_TYPE = "Sge-Type";
-  public static final String SGE_TYPE_GAME = "game";
-  public static final String SGE_TYPE_AGENT = "agent";
-  public static final String SGE_AGENT_CLASS = "Agent-Class";
-  public static final String SGE_AGENT_NAME = "Agent-Name";
-  public static final String SGE_GAME_CLASS = "Game-Class";
-  public static final String SGE_GAMEASCIIVISUALISER_CLASS = "GameASCIIVisualiser-Class";
-  public static final String version = "0.0.0";
+  private static final String SGE_TYPE = "Sge-Type";
+  private static final String SGE_TYPE_GAME = "game";
+  private static final String SGE_TYPE_AGENT = "agent";
+  private static final String SGE_AGENT_CLASS = "Agent-Class";
+  private static final String SGE_AGENT_NAME = "Agent-Name";
+  private static final String SGE_GAME_CLASS = "Game-Class";
+  static final String version = "0.0.0";
+
   Logger log;
   ExecutorService pool;
   List<AgentFactory> agentFactories = null;
   GameFactory gameFactory = null;
-  GameASCIIVisualiser<Game<Object, Object>> gameASCIIVisualiser = null;
+
   @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
   boolean helpRequested = false;
   @Option(names = {"-V", "--version"}, versionHelp = true, description = "print the version")
@@ -108,7 +106,7 @@ public class SgeCommand implements Callable<Void> {
 
     log.tra("Initialising ThreadPool");
     pool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 2));
-    log.trace_(".done");
+    log.trace_(", done.");
 
     return null;
   }
@@ -116,12 +114,16 @@ public class SgeCommand implements Callable<Void> {
   public int determineArguments(List<String> arguments, List<File> files, List<File> directories,
       List<String> agentConfiguration) {
 
-    log.tra("Interpreting " + arguments.size() + " arguments.");
+    int argumentsSize = arguments.size();
+    log.traProcess("Interpreting arguments", 0, argumentsSize);
 
     int processed = 0;
 
-    for (String argument : arguments) {
-      if (argument.toLowerCase().equals("human")) {
+    for (int i = 0; i < arguments.size(); i++) {
+      log.tra_("\r");
+      log.traProcess("Interpreting arguments", i + 1, argumentsSize);
+      String argument = arguments.get(i);
+      if (argument.equalsIgnoreCase("Human")) {
         agentConfiguration.add(argument);
       } else {
         File file = new File(argument);
@@ -131,6 +133,7 @@ public class SgeCommand implements Callable<Void> {
           } else if (file.isFile()) {
             files.add(file);
           } else {
+            log.trace_();
             log.warn(argument + " seems to be malformed");
             processed--;
           }
@@ -139,57 +142,77 @@ public class SgeCommand implements Callable<Void> {
         }
       }
       processed++;
-      log.tra_(".");
     }
 
-    log.trace_("done");
+    log.trace_(", done.");
     return processed;
   }
 
-  public int loadDirectories(List<File> files, List<File> directories) {
+  public int processDirectories(List<File> files, List<File> directories) {
+    log.traEnum("Enumerating directories", 0);
     if (directories.size() <= 0) {
+      log.trace_(", done.");
       return 0;
     }
-    List<File> subdirectories = new ArrayList<>();
-    int loaded = 0;
-    log.tra("Loading " + directories.size() + " directories");
-    for (File directory : directories) {
+
+    int filesSize = files.size();
+
+    for (int i = 0; i < directories.size(); i++) {
+      log.tra_("\r");
+      log.traEnum("Enumerating directories", i + 1);
+
+      File directory = directories.get(i);
       File[] subFiles;
       if (directory != null && (subFiles = directory.listFiles()) != null) {
         for (File file : subFiles) {
-          if (file.exists()) {
-            if (file.isDirectory()) {
-              subdirectories.add(file);
-            } else if (file.isFile()) {
-              files.add(file);
-              loaded++;
-            }
+          if (file.exists() && file.isDirectory()) {
+            directories.add(file);
           }
         }
       }
-      log.tra_(".");
-    }
-    log.trace_("done");
-
-    if (subdirectories.size() > 0) {
-      loaded += loadDirectories(files, subdirectories);
     }
 
-    return loaded;
+    log.trace_(", done.");
+    int directoriesSize = directories.size();
+    log.traProcess("Processing directories", 0, directoriesSize);
+
+    for (int i = 0; i < directoriesSize; i++) {
+      File directory = directories.get(i);
+
+      log.tra_("\r");
+      log.traProcess("Processing directories", i + 1, directoriesSize);
+
+      File[] subFiles;
+      if (directory != null && (subFiles = directory.listFiles()) != null) {
+        for (File file : subFiles) {
+          if (file.exists() && file.isFile()) {
+            files.add(file);
+          }
+        }
+      }
+    }
+
+    log.trace_(", done.");
+
+    return files.size() - filesSize;
   }
 
   public void loadFiles(List<File> files) {
 
-    log.tra("Processing " + files.size() + " files");
+    int filesSize = files.size();
+    log.traProcess("Processing files", 0, filesSize);
 
     List<URL> urlList = new ArrayList<>(files.size());
     String gameClassName = null;
-    String gameASCIIVisualiserClassName = null;
-    List<AgentLoader> agentLoaders = new ArrayList<>(files.size() - 1);
-    List<String> agentClassNames = new ArrayList<>(files.size() - 1);
-    List<String> agentNames = new ArrayList<>(files.size() - 1);
+    List<AgentLoader> agentLoaders = new ArrayList<>(filesSize - 1);
+    List<String> agentClassNames = new ArrayList<>(filesSize - 1);
+    List<String> agentNames = new ArrayList<>(filesSize - 1);
 
-    for (File file : files) {
+    for (int i = 0; i < files.size(); i++) {
+      File file = files.get(i);
+
+      log.tra_("\r");
+      log.traProcess("Processing files", i + 1, filesSize);
 
       JarFile jarFile;
       try {
@@ -218,8 +241,6 @@ public class SgeCommand implements Callable<Void> {
         continue;
       }
 
-      type = type.toLowerCase();
-
       try {
         urlList.add(file.toURI().toURL());
       } catch (MalformedURLException e) {
@@ -228,14 +249,14 @@ public class SgeCommand implements Callable<Void> {
         continue;
       }
 
-      if (SGE_TYPE_AGENT.toLowerCase().equals(type)) {
+      if (SGE_TYPE_AGENT.equalsIgnoreCase(type)) {
         String agentClass = attributes.getValue(SGE_AGENT_CLASS);
         if (agentClass == null) {
           log.trace_();
           log.warn(
               "Agent: " + file.getPath() + " could not determine class path. Is \""
                   + SGE_AGENT_CLASS
-                  + "\" set?");
+                  + "\" set in Main-Attributes?");
         }
 
         String agentName = attributes.getValue(SGE_AGENT_NAME);
@@ -243,7 +264,7 @@ public class SgeCommand implements Callable<Void> {
           log.trace_();
           log.warn(
               "Agent: " + file.getPath() + " could not determine name. Is \"" + SGE_AGENT_NAME
-                  + "\" set?");
+                  + "\" set in Main-Attributes?");
         }
 
         if (agentClass == null || agentName == null) {
@@ -252,30 +273,18 @@ public class SgeCommand implements Callable<Void> {
 
         agentClassNames.add(agentClass);
         agentNames.add(agentName);
-      } else if (SGE_TYPE_GAME.toLowerCase().equals(type)) {
+      } else if (SGE_TYPE_GAME.equalsIgnoreCase(type)) {
 
         String gameClass = attributes.getValue(SGE_GAME_CLASS);
         if (gameClass == null) {
           log.trace_();
           log.warn(
               "Game: " + file.getPath() + " could not determine class path. Is \"" + SGE_GAME_CLASS
-                  + "\" set?");
-        }
-
-        String gameASCIIVisualiserClass = attributes.getValue(SGE_GAMEASCIIVISUALISER_CLASS);
-        if (gameASCIIVisualiserClass == null) {
-          log.trace_();
-          log.warn(
-              "Game: " + file.getPath() + " could not determine class path of visualiser. Is \""
-                  + SGE_GAMEASCIIVISUALISER_CLASS + "\" set?");
-        }
-
-        if (gameClass == null || gameASCIIVisualiserClass == null) {
+                  + "\" set in Main-Attributes?");
           continue;
         }
 
         gameClassName = gameClass;
-        gameASCIIVisualiserClassName = gameASCIIVisualiserClass;
 
       } else {
         log.trace_();
@@ -284,32 +293,30 @@ public class SgeCommand implements Callable<Void> {
         continue;
       }
 
-      log.tra_(".");
     }
 
-    if (gameClassName == null || gameASCIIVisualiserClassName == null) {
+    log.trace_(", done.");
+
+    if (gameClassName == null) {
       log.error("No game found.");
       throw new IllegalArgumentException("No game was specified, or could be loaded.");
     }
 
-    log.trace_("done");
-
     URLClassLoader classLoader = URLClassLoader.newInstance(urlList.toArray(new URL[0]));
 
-    GameLoader gameLoader = new GameLoader(gameClassName, gameASCIIVisualiserClassName,
+    GameLoader gameLoader = new GameLoader(gameClassName,
         classLoader, log);
     for (int i = 0; i < agentClassNames.size(); i++) {
       agentLoaders
           .add(new AgentLoader(agentNames.get(i), agentClassNames.get(i), classLoader, log));
     }
 
-    log.tra("Loading " + files.size() + " files");
+    filesSize = agentNames.size() + 1;
+
+    log.traProcess("Loading files", 1, filesSize);
 
     try {
-      ImmutablePair<GameFactory, GameASCIIVisualiser<Game<Object, Object>>> loadedGame = gameLoader
-          .call();
-      gameFactory = loadedGame.getA();
-      gameASCIIVisualiser = loadedGame.getB();
+      gameFactory = gameLoader.call();
     } catch (ClassNotFoundException e) {
       log.trace_();
       log.error("Could not find class of game.");
@@ -317,17 +324,17 @@ public class SgeCommand implements Callable<Void> {
       throw new IllegalStateException("Could not load files correctly.");
     } catch (NoSuchMethodException e) {
       log.trace_();
-      log.error("Could not instantiate GameASCIIVisualiser.");
+      log.error("Could not find required constructors of game.");
       e.printStackTrace();
       throw new IllegalStateException("Could not load files correctly.");
     } catch (IllegalAccessException e) {
       log.trace_();
-      log.error("Not allowed to access constructor(s) of game.");
+      log.error("Not allowed to access constructors of game.");
       e.printStackTrace();
       throw new IllegalStateException("Could not load files correctly.");
     } catch (InvocationTargetException e) {
       log.trace_();
-      log.error("Error while invoking constructor(s) of game.");
+      log.error("Error while invoking constructors of game.");
       e.printStackTrace();
       throw new IllegalStateException("Could not load files correctly.");
     } catch (InstantiationException e) {
@@ -337,14 +344,13 @@ public class SgeCommand implements Callable<Void> {
       throw new IllegalStateException("Could not load files correctly.");
     }
 
-    log.tra_(".");
-
     agentFactories = new ArrayList<>(agentNames.size());
 
     for (int i = 0; i < agentLoaders.size(); i++) {
       try {
+        log.tra_("\r");
+        log.traProcess("Loading files", i + 2, filesSize);
         agentFactories.add(agentLoaders.get(i).call());
-        log.tra_(".");
       } catch (ClassNotFoundException e) {
         log.trace_();
         log.error("Could not find class of agent " + agentNames.get(i));
@@ -358,10 +364,9 @@ public class SgeCommand implements Callable<Void> {
       }
     }
 
-    log.trace_("done");
+    log.trace_(", done.");
 
     assert gameFactory != null;
-    assert gameASCIIVisualiser != null;
     assert agentFactories != null;
 
   }
@@ -372,20 +377,28 @@ public class SgeCommand implements Callable<Void> {
         .map(String::toLowerCase)
         .collect(Collectors.toList());
 
+    log.traProcess("Adding agents", agentConfiguration.size(), numberOfPlayers);
+
     for (int i = 0; i < agentFactories.size() && agentConfiguration.size() < numberOfPlayers;
         i++) {
       String agentName = agentFactories.get(i).getAgentName();
       if (!agentConfigurationLowercase.contains(agentName.toLowerCase())) {
         agentConfigurationLowercase.add(agentName.toLowerCase());
         agentConfiguration.add(agentName);
+        log.tra_("\r");
+        log.traProcess("Adding agents", agentConfiguration.size(), numberOfPlayers);
         added++;
       }
     }
 
     while (agentConfiguration.size() < numberOfPlayers) {
       agentConfiguration.add("Human");
+      log.tra_("\r");
+      log.traProcess("Adding agents", agentConfiguration.size(), numberOfPlayers);
       added++;
     }
+
+    log.trace_(", done.");
 
     return added;
   }
@@ -404,13 +417,13 @@ public class SgeCommand implements Callable<Void> {
 
     for (String player : configuration) {
       boolean playerMatches = false;
-      if (player.toLowerCase().equals("human")) {
+      if (player.equalsIgnoreCase("Human")) {
         agentList.add(new HumanAgent<>());
         playerMatches = true;
       }
       for (AgentFactory agentFactory : agentFactories) {
         if (!playerMatches) {
-          if (agentFactory.getAgentName().toLowerCase().equals(player.toLowerCase())) {
+          if (agentFactory.getAgentName().equalsIgnoreCase(player)) {
             agentList.add(agentFactory.newInstance());
             playerMatches = true;
           }

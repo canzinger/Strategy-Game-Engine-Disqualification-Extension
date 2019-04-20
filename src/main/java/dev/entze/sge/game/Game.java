@@ -288,4 +288,13 @@ public interface Game<A, B> {
    */
   Game<A, B> getGame(int player);
 
+  /**
+   * A representation of the current game via text. Can be multiline. Per default toString.
+   *
+   * @return a string representing the game
+   */
+  default String toTextRepresentation() {
+    return this.toString();
+  }
+
 }

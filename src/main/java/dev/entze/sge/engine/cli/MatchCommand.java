@@ -82,7 +82,7 @@ public class MatchCommand implements Runnable {
     }
 
     sge.determineArguments(arguments, files, directories, agentConfiguration);
-    sge.loadDirectories(files, directories);
+    sge.processDirectories(files, directories);
 
     sge.log.tra("Files: ");
 
@@ -118,11 +118,10 @@ public class MatchCommand implements Runnable {
         .createAgentListFromConfiguration(numberOfPlayers, agentConfiguration);
 
     Match<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> match = new Match<>(
-        sge.gameFactory.newInstance(board, numberOfPlayers), sge.gameASCIIVisualiser,
+        sge.gameFactory.newInstance(board, numberOfPlayers),
         agentList, computationTime, timeUnit, sge.debug, sge.log, sge.pool);
 
     match.call();
-
 
   }
 }

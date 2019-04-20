@@ -4,7 +4,6 @@ import dev.entze.sge.agent.GameAgent;
 import dev.entze.sge.agent.HumanAgent;
 import dev.entze.sge.game.ActionRecord;
 import dev.entze.sge.game.Game;
-import dev.entze.sge.game.GameASCIIVisualiser;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -24,14 +23,11 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
   private final Logger log;
   private final ExecutorService pool;
   private Game<A, ?> game;
-  private GameASCIIVisualiser<G> gameASCIIVisualiser;
   private List<E> gameAgents;
 
-  public Match(Game<A, ?> game, GameASCIIVisualiser<G> gameASCIIVisualiser,
-      List<E> gameAgents, long computationTime,
+  public Match(Game<A, ?> game, List<E> gameAgents, long computationTime,
       TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
     this.game = game;
-    this.gameASCIIVisualiser = gameASCIIVisualiser;
     this.gameAgents = gameAgents;
     if (game.getNumberOfPlayers() != gameAgents.size()) {
       throw new IllegalArgumentException("Not the correct number of players");
@@ -75,7 +71,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
               "Player " + game.getCurrentPlayer() + " - " + gameAgents.get(thisPlayer).toString()
                   + ":");
           if (!withHumanPlayer || isHuman) {
-            log.info_(gameASCIIVisualiser.visualise(playersGame));
+            log.info_(playersGame.toTextRepresentation());
           }
         }
 
@@ -132,9 +128,9 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       } else {
 
         A action = game.determineNextAction();
-        if (action == null) {
+        if (action == null || !game.isValidAction(action)) {
           log.error(
-              "There is a programming error in the implementation of game. Could not determine next action.");
+              "There is a programming error in the implementation of the game. Could not determine next action.");
           throw new IllegalStateException("The current game violates the implementation contract");
         }
         game = game.doAction(action);
@@ -145,7 +141,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       if (game.getCurrentPlayer() >= 0 && isHuman && !(gameAgents
           .get(game.getCurrentPlayer()) instanceof HumanAgent) || lastPlayer == game
           .getCurrentPlayer()) {
-        log.info_(gameASCIIVisualiser.visualise((G) game.getGame()));
+        log.info_(game.getGame().toTextRepresentation());
       }
     }
 
@@ -157,7 +153,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
     log.info_("-----");
     log.info("Game over.");
-    log.info_(gameASCIIVisualiser.visualise((G) game));
+    log.info_(game.toTextRepresentation());
     log.inf(game.getNumberOfActions() + " plies ");
     List<ActionRecord<A>> actionRecords = game.getActionRecords();
     lastPlayer = game.getPreviousActionRecord().getPlayer() + 1;

@@ -6,7 +6,9 @@ import dev.entze.sge.util.node.GameNode;
 import dev.entze.sge.util.tree.Tree;
 import dev.entze.sge.util.unit.TimeUnitWrapper;
 import dev.entze.sge.util.unit.Unit;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -64,6 +66,57 @@ public class Util {
     }
 
     tree.dropParent();
+  }
+
+  public static void swap(int[] array, int indexA, int indexB) {
+    int a = array[indexA];
+    array[indexA] = array[indexB];
+    array[indexB] = a;
+  }
+
+  private static void sort2(int[] array, Comparator<Integer> comparator) {
+    if (comparator.compare(array[0], array[1]) > 0) {
+      swap(array, 0, 1);
+    }
+  }
+
+  private static void sort3(int[] array, Comparator<Integer> comparator) {
+    if (comparator.compare(array[0], array[1]) > 0) {
+      if (comparator.compare(array[1], array[2]) < 0) {
+        swap(array, 0, 1);
+      }
+      if (comparator.compare(array[0], array[2]) > 0) {
+        swap(array, 2, 0);
+      }
+    } else if (comparator.compare(array[1], array[2]) > 0) {
+      swap(array, 1, 2);
+      if (comparator.compare(array[0], array[1]) > 0) {
+        swap(array, 0, 1);
+      }
+    }
+
+
+  }
+
+  public static void reverse(int[] array){
+    for (int i = 0; i < array.length / 2; i++) {
+      swap(array, i, array.length - (i + 1));
+    }
+  }
+
+  public static void sort(int[] array, Comparator<Integer> comparator) {
+    if (array.length > 1) {
+      if (array.length == 2) {
+        sort2(array, comparator);
+      } else if (array.length == 3) {
+        sort3(array, comparator);
+      } else {
+        int[] newArray = Arrays.stream(array).boxed().sorted(comparator).mapToInt(i -> i).toArray();
+        for (int i = 0; i < array.length; i++) {
+          array[i] = newArray[i];
+        }
+      }
+    }
   }
 
   public static String convertUnitToReadableString(long item, TimeUnit unit, TimeUnit target) {
@@ -204,5 +257,6 @@ public class Util {
 
     return items;
   }
+
 
 }

@@ -6,15 +6,24 @@ import dev.entze.sge.util.node.GameNode;
 import dev.entze.sge.util.tree.Tree;
 import dev.entze.sge.util.unit.TimeUnitWrapper;
 import dev.entze.sge.util.unit.Unit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class Util {
+
+  public static <E> E selectRandom(Collection<? extends E> collection) {
+    return selectRandom(collection, ThreadLocalRandom.current());
+  }
 
   @SuppressWarnings("unchecked")
   public static <E> E selectRandom(Collection<? extends E> coll, Random random) {
@@ -114,6 +123,21 @@ public class Util {
         int[] newArray = Arrays.stream(array).boxed().sorted(comparator).mapToInt(i -> i).toArray();
         System.arraycopy(newArray, 0, array, 0, array.length);
       }
+    }
+  }
+
+  public static <E> void shuffle(Deque<E> deque) {
+    shuffle(deque, ThreadLocalRandom.current());
+  }
+
+  public static <E> void shuffle(Deque<E> deque, Random random) {
+    if (deque instanceof LinkedList) {
+      Collections.shuffle((LinkedList<E>) deque, random);
+    } else {
+      List<E> list = new ArrayList<>(deque);
+      deque.clear();
+      Collections.shuffle(list, random);
+      deque.addAll(list);
     }
   }
 

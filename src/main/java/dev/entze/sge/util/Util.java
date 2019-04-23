@@ -98,7 +98,7 @@ public class Util {
 
   }
 
-  public static void reverse(int[] array){
+  public static void reverse(int[] array) {
     for (int i = 0; i < array.length / 2; i++) {
       swap(array, i, array.length - (i + 1));
     }
@@ -112,9 +112,7 @@ public class Util {
         sort3(array, comparator);
       } else {
         int[] newArray = Arrays.stream(array).boxed().sorted(comparator).mapToInt(i -> i).toArray();
-        for (int i = 0; i < array.length; i++) {
-          array[i] = newArray[i];
-        }
+        System.arraycopy(newArray, 0, array, 0, array.length);
       }
     }
   }
@@ -150,9 +148,7 @@ public class Util {
     }
 
     Unit[] lessThanTarget = new Unit[targetIndex + 1];
-    for (int i = 0; i < lessThanTarget.length; i++) {
-      lessThanTarget[i] = allUnits[i];
-    }
+    System.arraycopy(allUnits, 0, lessThanTarget, 0, lessThanTarget.length);
 
     long[] minimalUnits = convertToMinimalUnits(item, unit, lessThanTarget);
 
@@ -186,8 +182,8 @@ public class Util {
   public static String convertUnitToMinimalString(long item, Unit unit, Unit[] targetUnits) {
     long[] minimalTimes = convertToMinimalUnits(item, unit, targetUnits);
     int nonZeros = 0;
-    for (int i = 0; i < minimalTimes.length; i++) {
-      if (minimalTimes[i] > 0) {
+    for (long minimalTime : minimalTimes) {
+      if (minimalTime > 0) {
         nonZeros++;
       }
     }

@@ -12,6 +12,15 @@ public class Dice {
   private final Random random;
   private final int[] topFaces;
 
+
+  public Dice(int numberOfDice) {
+    this(numberOfDice, 6);
+  }
+
+  public Dice(int numberOfDice, Random random) {
+    this(numberOfDice, 6, random);
+  }
+
   public Dice(int numberOfDice, int numberOfFaces) {
     this(numberOfDice, numberOfFaces, new Random());
   }
@@ -23,10 +32,28 @@ public class Dice {
     topFaces = new int[numberOfDice];
   }
 
-  public void roll() {
-    for (int i = 0; i < topFaces.length; i++) {
-      topFaces[i] = random.nextInt(numberOfFaces) + 1;
+  public void roll(int... dice) {
+    if (dice.length == 0) {
+      for (int i = 0; i < topFaces.length; i++) {
+        topFaces[i] = random.nextInt(numberOfFaces) + 1;
+      }
     }
+    for (int die : dice) {
+      topFaces[die] = random.nextInt(numberOfFaces) + 1;
+    }
+  }
+
+  public void sort() {
+    Arrays.sort(topFaces);
+  }
+
+  public void sortReverse() {
+    sort();
+    Util.reverse(topFaces);
+  }
+
+  public void sort(Comparator<Integer> comparator) {
+    Util.sort(topFaces, comparator);
   }
 
   public int getFaceOf(int die) {
@@ -38,18 +65,17 @@ public class Dice {
   }
 
   public int[] getSortedFacesOf() {
-    Arrays.sort(topFaces);
+    sort();
     return topFaces;
   }
 
   public int[] getSortedFacesOfReversed() {
-    Arrays.sort(topFaces);
-    Util.reverse(topFaces);
+    sortReverse();
     return topFaces;
   }
 
   public int[] getSortedFacesOf(Comparator<Integer> comparator) {
-    Util.sort(topFaces, comparator);
+    sort(comparator);
     return topFaces;
   }
 

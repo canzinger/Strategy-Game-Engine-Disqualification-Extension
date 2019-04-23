@@ -64,14 +64,14 @@ public interface Game<A, B> {
   }
 
   /**
-   * The weight of the utility function of a given player. Per default 1 iff getCurrentPlayer()
-   * equals player otherwise -1.
+   * The weight of the utility function of a given player. Per default 0 if player or the
+   * currentPlayer is less than 0 and 1 iff getCurrentPlayer() equals player otherwise -1.
    *
    * @param player - the player
    * @return the weight of the utility function.
    */
   default double getPlayerUtilityWeight(int player) {
-    if (player < 0) {
+    if (player < 0 || getCurrentPlayer() < 0) {
       return 0;
     }
     if (getCurrentPlayer() == player) {

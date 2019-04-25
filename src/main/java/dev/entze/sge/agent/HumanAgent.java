@@ -43,7 +43,7 @@ public final class HumanAgent<G extends Game<A, ?>, A> implements GameAgent<G, A
         } else if (lastPlayer == player) {
           System.out.print(", ");
         } else {
-          System.out.print("(" + i + ") World: ");
+          System.out.print("\n(" + i + ") World: ");
         }
 
         System.out.print(previousActions.get(i).getAction().toString());

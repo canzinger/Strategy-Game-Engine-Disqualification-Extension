@@ -15,4 +15,11 @@ public interface GameAgent<G extends Game<A, ?>, A> {
 
   }
 
+  default void ponderStart(){
+  }
+
+  default void ponderStop(){
+
+  }
+
 }

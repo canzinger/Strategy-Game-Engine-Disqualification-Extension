@@ -156,7 +156,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     log.info_(game.toTextRepresentation());
     log.inf(game.getNumberOfActions() + " plies ");
     List<ActionRecord<A>> actionRecords = game.getActionRecords();
-    lastPlayer = game.getPreviousActionRecord().getPlayer() + 1;
+    lastPlayer = actionRecords.get(0).getPlayer() + 1;
 
     boolean flushPlayer = false;
 
@@ -165,7 +165,10 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
         if (flushPlayer) {
           log.inf_("> ");
         }
-        log.inf_("<" + actionRecord.getPlayer() + ",");
+        log.inf_("<");
+        if (actionRecord.getPlayer() >= 0) {
+          log.inf_(actionRecord.getPlayer() + ",");
+        }
         flushPlayer = true;
 
       }

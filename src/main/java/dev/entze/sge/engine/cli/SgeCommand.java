@@ -133,7 +133,7 @@ public class SgeCommand implements Callable<Void> {
           } else if (file.isFile()) {
             files.add(file);
           } else {
-            log.trace_();
+            log.trace_(", failed.");
             log.warn(argument + " seems to be malformed");
             processed--;
           }
@@ -218,7 +218,7 @@ public class SgeCommand implements Callable<Void> {
       try {
         jarFile = new JarFile(file);
       } catch (IOException e) {
-        log.trace_();
+        log.trace_(", failed.");
         log.warn("Could not interpret " + file.getPath() + " as jar.");
         continue;
       }
@@ -227,7 +227,7 @@ public class SgeCommand implements Callable<Void> {
       try {
         attributes = jarFile.getManifest().getMainAttributes();
       } catch (IOException e) {
-        log.trace_();
+        log.trace_(", failed.");
         log.warn("Could not access " + file.getPath() + "'s manifest.");
         continue;
       }
@@ -235,7 +235,7 @@ public class SgeCommand implements Callable<Void> {
       String type = attributes.getValue(SGE_TYPE);
 
       if (type == null) {
-        log.trace_();
+        log.trace_(", failed.");
         log.warn("Could not determine whether " + file.getPath()
             + " is a game or an agent. Is \"" + SGE_TYPE + "\" set in Main-Attributes?");
         continue;
@@ -244,7 +244,7 @@ public class SgeCommand implements Callable<Void> {
       try {
         urlList.add(file.toURI().toURL());
       } catch (MalformedURLException e) {
-        log.trace_();
+        log.trace_(", failed.");
         log.warn("Could not get URL of " + file.getPath() + ".");
         continue;
       }
@@ -252,7 +252,7 @@ public class SgeCommand implements Callable<Void> {
       if (SGE_TYPE_AGENT.equalsIgnoreCase(type)) {
         String agentClass = attributes.getValue(SGE_AGENT_CLASS);
         if (agentClass == null) {
-          log.trace_();
+          log.trace_(", failed.");
           log.warn(
               "Agent: " + file.getPath() + " could not determine class path. Is \""
                   + SGE_AGENT_CLASS
@@ -261,7 +261,7 @@ public class SgeCommand implements Callable<Void> {
 
         String agentName = attributes.getValue(SGE_AGENT_NAME);
         if (agentName == null) {
-          log.trace_();
+          log.trace_(", failed.");
           log.warn(
               "Agent: " + file.getPath() + " could not determine name. Is \"" + SGE_AGENT_NAME
                   + "\" set in Main-Attributes?");
@@ -277,7 +277,7 @@ public class SgeCommand implements Callable<Void> {
 
         String gameClass = attributes.getValue(SGE_GAME_CLASS);
         if (gameClass == null) {
-          log.trace_();
+          log.trace_(", failed.");
           log.warn(
               "Game: " + file.getPath() + " could not determine class path. Is \"" + SGE_GAME_CLASS
                   + "\" set in Main-Attributes?");
@@ -318,27 +318,27 @@ public class SgeCommand implements Callable<Void> {
     try {
       gameFactory = gameLoader.call();
     } catch (ClassNotFoundException e) {
-      log.trace_();
+      log.trace_(", failed.");
       log.error("Could not find class of game.");
       e.printStackTrace();
       throw new IllegalStateException("Could not load files correctly.");
     } catch (NoSuchMethodException e) {
-      log.trace_();
+      log.trace_(", failed.");
       log.error("Could not find required constructors of game.");
       e.printStackTrace();
       throw new IllegalStateException("Could not load files correctly.");
     } catch (IllegalAccessException e) {
-      log.trace_();
+      log.trace_(", failed.");
       log.error("Not allowed to access constructors of game.");
       e.printStackTrace();
       throw new IllegalStateException("Could not load files correctly.");
     } catch (InvocationTargetException e) {
-      log.trace_();
+      log.trace_(", failed.");
       log.error("Error while invoking constructors of game.");
       e.printStackTrace();
       throw new IllegalStateException("Could not load files correctly.");
     } catch (InstantiationException e) {
-      log.trace_();
+      log.trace_(", failed.");
       log.error("Error while instantiating game.");
       e.printStackTrace();
       throw new IllegalStateException("Could not load files correctly.");
@@ -352,12 +352,12 @@ public class SgeCommand implements Callable<Void> {
         log.traProcess("Loading files", i + 2, filesSize);
         agentFactories.add(agentLoaders.get(i).call());
       } catch (ClassNotFoundException e) {
-        log.trace_();
+        log.trace_(", failed.");
         log.error("Could not find class of agent " + agentNames.get(i));
         e.printStackTrace();
         throw new IllegalStateException("Could not load files correctly.");
       } catch (NoSuchMethodException e) {
-        log.trace_();
+        log.trace_(", failed.");
         log.error("Could not load constructor of agent " + agentNames.get(i));
         e.printStackTrace();
         throw new IllegalStateException("Could not load files correctly.");

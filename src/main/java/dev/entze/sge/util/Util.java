@@ -43,7 +43,7 @@ public class Util {
     }
   }
 
-  public static <E> void findRoot(Tree<? extends GameNode<E>> tree,
+  public static <E> boolean findRoot(Tree<? extends GameNode<E>> tree,
       Game<E, ?> game) {
 
     boolean foundRoot = false;
@@ -75,6 +75,7 @@ public class Util {
     }
 
     tree.dropParent();
+    return foundRoot;
   }
 
   public static void swap(int[] array, int indexA, int indexB) {

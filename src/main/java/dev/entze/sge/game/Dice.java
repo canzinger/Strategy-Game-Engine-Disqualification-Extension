@@ -43,6 +43,13 @@ public class Dice {
     }
   }
 
+  public void rollN(int dice) {
+    reset();
+    for (int die = 0; die < dice; die++) {
+      topFaces[die] = random.nextInt(numberOfFaces) + 1;
+    }
+  }
+
   public void reset(int... dice) {
     if (dice.length == 0) {
       Arrays.fill(topFaces, -1);

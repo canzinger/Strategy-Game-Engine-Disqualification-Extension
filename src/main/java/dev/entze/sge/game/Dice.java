@@ -43,6 +43,15 @@ public class Dice {
     }
   }
 
+  public void reset(int... dice) {
+    if (dice.length == 0) {
+      Arrays.fill(topFaces, -1);
+    }
+    for (int die : dice) {
+      topFaces[die] = -1;
+    }
+  }
+
   public void sort() {
     Arrays.sort(topFaces);
   }

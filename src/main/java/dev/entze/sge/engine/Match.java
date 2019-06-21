@@ -189,7 +189,6 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       }
     }
     System.out.println();
-    ;
 
     for (E gameAgent : gameAgents) {
       gameAgent.tearDown();

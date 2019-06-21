@@ -41,7 +41,7 @@ public class AgentFactory implements Factory<GameAgent<Game<Object, Object>, Obj
       log.error("Could not invoke constructor of agent " + agentName);
       e.printStackTrace();
     }
-    throw new IllegalStateException("AgentFactory for agent " + agentName + " is faulty.");
+    throw new IllegalStateException("AgentFactory for agent " + agentName + " is faulty");
   }
 
   public String getAgentName() {

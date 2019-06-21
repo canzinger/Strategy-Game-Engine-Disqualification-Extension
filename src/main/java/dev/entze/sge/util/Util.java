@@ -128,7 +128,7 @@ public class Util {
   }
 
   public static <E> void shuffle(Deque<E> deque) {
-    shuffle(deque, ThreadLocalRandom.current());
+    shuffle(deque, new Random());
   }
 
   public static <E> void shuffle(Deque<E> deque, Random random) {

@@ -40,7 +40,7 @@ public class GameFactory implements Factory<Game<Object, Object>> {
       log.error("Could not invoke constructor of game");
       e.printStackTrace();
     }
-    throw new IllegalStateException("GameFactory is faulty.");
+    throw new IllegalStateException("GameFactory is faulty");
 
   }
 

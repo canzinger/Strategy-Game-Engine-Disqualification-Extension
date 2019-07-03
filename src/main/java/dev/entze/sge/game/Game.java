@@ -199,7 +199,7 @@ public interface Game<A, B> {
    * Does a given action.
    *
    * @param action - the action to take
-   * @return a new copy of the game with the previous action applied
+   * @return a new copy of the game with the given action applied
    * @throws IllegalArgumentException - In the case of a non-existing action or null
    * @throws IllegalStateException - If game over
    */
@@ -209,6 +209,8 @@ public interface Game<A, B> {
    * Progresses the game if it currently is in an indeterminant state.
    *
    * @return a new copy of the game with an action applied
+   * @throws IllegalArgumentException - If the game is not in an non-deterministic state
+   * @throws IllegalStateException - If game over
    */
   default Game<A, B> doAction() {
     return doAction(determineNextAction());
@@ -224,21 +226,28 @@ public interface Game<A, B> {
   A determineNextAction();
 
   /**
-   * Returns the last action and which player did the action.
+   * Returns the last action and which player did the action. If no action was done yet null is
+   * returned.
    *
    * @return the last action record
    */
   default ActionRecord<A> getPreviousActionRecord() {
-    return getActionRecords().get(getNumberOfActions() - 1);
+    List<ActionRecord<A>> actionRecordList = getActionRecords();
+    if (actionRecordList.isEmpty()) {
+      return null;
+    }
+    return actionRecordList.get(getNumberOfActions() - 1);
   }
 
   /**
-   * Returns only the last action, but not which player did the action.
+   * Returns only the last action, but not which player did the action. If no action was done yet
+   * given null is returned.
    *
    * @return the last action
    */
   default A getPreviousAction() {
-    return getPreviousActionRecord().getAction();
+    ActionRecord<A> previousAction = getPreviousActionRecord();
+    return previousAction == null ? null : previousAction.getAction();
   }
 
   /**

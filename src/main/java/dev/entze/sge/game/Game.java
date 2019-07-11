@@ -193,7 +193,9 @@ public interface Game<A, B> {
    * @param action - the action
    * @return true - iff the action is valid and possible
    */
-  boolean isValidAction(A action);
+  default boolean isValidAction(A action) {
+    return getPossibleActions().contains(action);
+  }
 
   /**
    * Does a given action.

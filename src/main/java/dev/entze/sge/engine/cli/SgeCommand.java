@@ -8,6 +8,7 @@ import dev.entze.sge.engine.factory.GameFactory;
 import dev.entze.sge.engine.loader.AgentLoader;
 import dev.entze.sge.engine.loader.GameLoader;
 import dev.entze.sge.game.Game;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -24,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -454,7 +457,7 @@ public class SgeCommand implements Callable<Void> {
       File file = new File(board);
       if (file.exists() && file.isFile()) {
         try {
-          board = Files.readString(file.toPath());
+          board = readString(file);
         } catch (IOException e) {
           log.warn("Could not read board from file. Using null instead");
           board = null;
@@ -488,5 +491,13 @@ public class SgeCommand implements Callable<Void> {
     log.trace_("done");
   }
 
+
+  static String readString(Path path) throws IOException {
+    return Files.readString(path);
+  }
+
+  static String readString(File file) throws IOException {
+    return readString(file.toPath());
+  }
 
 }

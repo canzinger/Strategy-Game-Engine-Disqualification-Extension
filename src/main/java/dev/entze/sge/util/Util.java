@@ -142,6 +142,45 @@ public class Util {
     }
   }
 
+  public static <E> Collection<Collection<E>> combinations(Collection<E> collection, int r) {
+    List<E> list;
+    if (collection instanceof List) {
+      list = (List<E>) collection;
+    } else {
+      list = new ArrayList<>(collection);
+    }
+    int n = collection.size();
+    int[] indices = new int[r];
+    for (int i = 0; i < r; i++) {
+      indices[i] = i;
+    }
+
+    Collection<Collection<E>> combinations = new ArrayList<>();
+    Collection<E> combination = new ArrayList<>(r);
+    do {
+      combination.clear();
+      for (int index : indices) {
+        combination.add(list.get(index));
+      }
+      combinations.add(combination);
+      indices = combinations(indices);
+    } while (indices[r - 1] < n);
+
+    return combinations;
+  }
+
+  private static int[] combinations(int[] last) {
+    int[] next = last.clone();
+    for (int i = 0; i + 1 < next.length; i++) {
+      if ((next[i] + 1) < next[i + 1]) {
+        next[i]++;
+        return next;
+      }
+    }
+    next[next.length - 1]++;
+    return next;
+  }
+
   public static String convertUnitToReadableString(long item, TimeUnit unit, TimeUnit target) {
     return convertUnitToReadableString(item, new TimeUnitWrapper(unit),
         new TimeUnitWrapper(target));
@@ -254,8 +293,8 @@ public class Util {
   /**
    * Return an array of minimal units. For example 25 hours are converted to 1 day and 1 hour.
    *
-   * @param item - the item
-   * @param unit - the unit
+   * @param item        - the item
+   * @param unit        - the unit
    * @param targetUnits - the targeted Units
    * @return an array of minimal timeUnits
    */

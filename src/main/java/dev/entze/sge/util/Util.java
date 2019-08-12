@@ -143,13 +143,19 @@ public class Util {
   }
 
   public static <E> Collection<Collection<E>> combinations(Collection<E> collection, int r) {
+    final int n = collection.size();
+    if (n == 0 || r <= 0) {
+      return Collections.emptyList();
+    }
+    if (n <= r) {
+      return List.of(List.copyOf(collection));
+    }
     List<E> list;
     if (collection instanceof List) {
       list = (List<E>) collection;
     } else {
       list = new ArrayList<>(collection);
     }
-    int n = collection.size();
     int[] indices = new int[r];
     for (int i = 0; i < r; i++) {
       indices[i] = i;
@@ -178,6 +184,26 @@ public class Util {
       }
     }
     next[next.length - 1]++;
+    return next;
+  }
+
+  public static <E> Collection<Collection<E>> permutations(Collection<E> collection, int r) {
+    return null;
+  }
+
+  private static int[] permutations(int[] last, int r) {
+    final int n = last.length;
+    int[] next = last.clone();
+
+    for (int i = 0; i < n; i++) {
+      next[i]++;
+      if (next[i] >= r) {
+        next[i] = 0;
+      } else {
+        break;
+      }
+    }
+
     return next;
   }
 

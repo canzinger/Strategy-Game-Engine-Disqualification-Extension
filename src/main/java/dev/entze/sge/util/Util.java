@@ -6,6 +6,7 @@ import dev.entze.sge.util.node.GameNode;
 import dev.entze.sge.util.tree.Tree;
 import dev.entze.sge.util.unit.TimeUnitWrapper;
 import dev.entze.sge.util.unit.Unit;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -127,6 +128,54 @@ public class Util {
     }
   }
 
+  public static boolean hasDuplicates(int[] array) {
+    for (int i = 0; i < array.length; i++) {
+      for (int j = (i + 1); j < array.length; j++) {
+        if (array[i] == array[j]) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public static boolean allEqual(int[] array) {
+    for (int i = 0; i + 1 < array.length; i++) {
+      if (array[i] != array[i + 1]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static boolean allEqualTo(int[] array, int e) {
+    for (int i = 0; i < array.length; i++) {
+      if (array[i] != e) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static int numberOfEqualTo(int[] array, int e) {
+    int c = 0;
+    for (int i = 0; i < array.length; i++) {
+      if (array[i] == e) {
+        c++;
+      }
+    }
+    return c;
+  }
+
+  public static boolean contains(int[] array, int e) {
+    for (int i = 0; i < array.length; i++) {
+      if (array[i] == e) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static <E> void shuffle(Deque<E> deque) {
     shuffle(deque, new Random());
   }
@@ -168,14 +217,14 @@ public class Util {
       for (int index : indices) {
         combination.add(list.get(index));
       }
-      combinations.add(combination);
+      combinations.add(List.copyOf(combination));
       indices = combinations(indices);
     } while (indices[r - 1] < n);
 
     return combinations;
   }
 
-  private static int[] combinations(int[] last) {
+  public static int[] combinations(int[] last) {
     int[] next = last.clone();
     for (int i = 0; i + 1 < next.length; i++) {
       if ((next[i] + 1) < next[i + 1]) {
@@ -187,11 +236,44 @@ public class Util {
     return next;
   }
 
-  public static <E> Collection<Collection<E>> permutations(Collection<E> collection, int r) {
-    return null;
+  public static <E> Collection<List<E>> permutations(Collection<E> collection, int r) {
+    final int n = collection.size();
+    if (n == 0 || r <= 0) {
+      return Collections.emptyList();
+    }
+    if (n <= r) {
+      return List.of(List.copyOf(collection));
+    }
+    List<E> list;
+    if (collection instanceof List) {
+      list = (List<E>) collection;
+    } else {
+      list = new ArrayList<>(collection);
+    }
+
+    int[] indices = new int[r];
+    for (int i = 0; i < r; i++) {
+      indices[i] = i;
+    }
+
+    Collection<List<E>> permutations = new ArrayList<>();
+    List<E> permutation = new ArrayList<>(r);
+
+    do {
+      permutation.clear();
+      for (int index : indices) {
+        permutation.add(list.get(index));
+      }
+      permutations.add(List.copyOf(permutation));
+      do {
+        indices = permutations(indices, r);
+      } while (hasDuplicates(indices) && !allEqualTo(indices, 0));
+    } while (!allEqualTo(indices, 0));
+
+    return permutations;
   }
 
-  private static int[] permutations(int[] last, int r) {
+  public static int[] permutations(int[] last, int r) {
     final int n = last.length;
     int[] next = last.clone();
 
@@ -205,6 +287,16 @@ public class Util {
     }
 
     return next;
+  }
+
+  public static <E> List<E> asList(Collection<E> collection) {
+    if (collection.isEmpty()) {
+      return Collections.emptyList();
+    }
+    if (collection instanceof List) {
+      return (List<E>) collection;
+    }
+    return List.copyOf(collection);
   }
 
   public static String convertUnitToReadableString(long item, TimeUnit unit, TimeUnit target) {
@@ -319,8 +411,8 @@ public class Util {
   /**
    * Return an array of minimal units. For example 25 hours are converted to 1 day and 1 hour.
    *
-   * @param item        - the item
-   * @param unit        - the unit
+   * @param item - the item
+   * @param unit - the unit
    * @param targetUnits - the targeted Units
    * @return an array of minimal timeUnits
    */

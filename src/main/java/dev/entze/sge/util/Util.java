@@ -435,5 +435,22 @@ public class Util {
     return items;
   }
 
+  public static double percentage(double f, double t) {
+    return 100D * f / t;
+  }
+
+  public static double percentage(int f, int t) {
+    if (t == 0 && f == t) {
+      return 0D;
+    }
+    return 100D * ((double) f) / ((double) t);
+  }
+
+  public static double percentage(long f, long t) {
+    if (t == 0 && f == t) {
+      return 0D;
+    }
+    return 100D * ((double) f) / ((double) t);
+  }
 
 }

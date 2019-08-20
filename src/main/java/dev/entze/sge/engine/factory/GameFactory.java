@@ -30,15 +30,15 @@ public class GameFactory implements Factory<Game<Object, Object>> {
     } catch (InstantiationException e) {
       log.error_();
       log.error("Could not instantiate new element with constructor of game");
-      e.printStackTrace();
+      log.printStackTrace(e);
     } catch (IllegalAccessException e) {
       log.error_();
       log.error("Could not access constructor of game");
-      e.printStackTrace();
+      log.printStackTrace(e);
     } catch (InvocationTargetException e) {
       log.error_();
       log.error("Could not invoke constructor of game");
-      e.printStackTrace();
+      log.printStackTrace(e);
     }
     throw new IllegalStateException("GameFactory is faulty");
 

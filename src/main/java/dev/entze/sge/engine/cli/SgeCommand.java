@@ -323,27 +323,27 @@ public class SgeCommand implements Callable<Void> {
     } catch (ClassNotFoundException e) {
       log.trace_(", failed.");
       log.error("Could not find class of game.");
-      e.printStackTrace();
+      log.printStackTrace(e);
       throw new IllegalStateException("Could not load files correctly.");
     } catch (NoSuchMethodException e) {
       log.trace_(", failed.");
       log.error("Could not find required constructors of game.");
-      e.printStackTrace();
+      log.printStackTrace(e);
       throw new IllegalStateException("Could not load files correctly.");
     } catch (IllegalAccessException e) {
       log.trace_(", failed.");
       log.error("Not allowed to access constructors of game.");
-      e.printStackTrace();
+      log.printStackTrace(e);
       throw new IllegalStateException("Could not load files correctly.");
     } catch (InvocationTargetException e) {
       log.trace_(", failed.");
       log.error("Error while invoking constructors of game.");
-      e.printStackTrace();
+      log.printStackTrace(e);
       throw new IllegalStateException("Could not load files correctly.");
     } catch (InstantiationException e) {
       log.trace_(", failed.");
       log.error("Error while instantiating game.");
-      e.printStackTrace();
+      log.printStackTrace(e);
       throw new IllegalStateException("Could not load files correctly.");
     }
 
@@ -357,12 +357,12 @@ public class SgeCommand implements Callable<Void> {
       } catch (ClassNotFoundException e) {
         log.trace_(", failed.");
         log.error("Could not find class of agent " + agentNames.get(i));
-        e.printStackTrace();
+        log.printStackTrace(e);
         throw new IllegalStateException("Could not load files correctly.");
       } catch (NoSuchMethodException e) {
         log.trace_(", failed.");
         log.error("Could not load constructor of agent " + agentNames.get(i));
-        e.printStackTrace();
+        log.printStackTrace(e);
         throw new IllegalStateException("Could not load files correctly.");
       }
     }

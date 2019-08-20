@@ -87,7 +87,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           log.error("Interrupted.");
         } catch (ExecutionException e) {
           log.error("Exception while executing computeNextAction().");
-          e.printStackTrace();
+          log.printStackTrace(e);
         } catch (TimeoutException e) {
           if (isHuman || debug) {
             try {
@@ -96,7 +96,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
               log.error("Interrupted.");
             } catch (ExecutionException ex) {
               log.error("Exception while executing computeNextAction().");
-              ex.printStackTrace();
+              log.printStackTrace(ex);
             }
           } else {
             log.warn("Agent timeout.");
@@ -118,7 +118,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           try {
             game.doAction(action);
           } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            log.printStackTrace(e);
           }
           result[thisPlayer] = (-1D);
           return result;
@@ -158,29 +158,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     List<ActionRecord<A>> actionRecords = game.getActionRecords();
     lastPlayer = actionRecords.get(0).getPlayer() + 1;
 
-    boolean flushPlayer = false;
+    log.info_(ActionRecord.iterableToString(actionRecords, lastPlayer));
 
-    for (ActionRecord<A> actionRecord : actionRecords) {
-      if (actionRecord.getPlayer() != lastPlayer) {
-        if (flushPlayer) {
-          log.inf_("> ");
-        }
-        log.inf_("<");
-        if (actionRecord.getPlayer() >= 0) {
-          log.inf_(actionRecord.getPlayer() + ",");
-        }
-        flushPlayer = true;
-
-      }
-
-      log.inf_(" [" + actionRecord.getAction().toString() + "]");
-      lastPlayer = actionRecord.getPlayer();
-
-    }
-
-    log.inf_(">");
-
-    log.info_("\n");
     System.out.print("Result: ");
     for (int i = 0; i < gameAgents.size(); i++) {
       System.out.print("Player " + i + ": " + result[i]);
@@ -189,7 +168,6 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       }
     }
     System.out.println();
-
     for (E gameAgent : gameAgents) {
       gameAgent.tearDown();
     }

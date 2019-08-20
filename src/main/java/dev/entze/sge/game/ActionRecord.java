@@ -1,5 +1,6 @@
 package dev.entze.sge.game;
 
+import java.util.List;
 import java.util.Objects;
 
 public class ActionRecord<A> {
@@ -46,4 +47,39 @@ public class ActionRecord<A> {
   public int hashCode() {
     return Objects.hash(player, action);
   }
+
+
+  public static <A> String iterableToString(Iterable<ActionRecord<A>> actionRecords,
+      int lastPlayer) {
+    StringBuilder builder = new StringBuilder();
+
+    boolean flushPlayer = false;
+
+    for (ActionRecord<A> actionRecord : actionRecords) {
+      if (actionRecord.getPlayer() != lastPlayer) {
+        if (flushPlayer) {
+          builder.append("> ");
+        }
+        builder.append('<');
+        if (actionRecord.getPlayer() >= 0) {
+          builder.append(actionRecord.getPlayer()).append(',');
+        }
+        flushPlayer = true;
+
+      }
+
+      builder.append(" [").append(actionRecord.getAction().toString()).append(']');
+      lastPlayer = actionRecord.getPlayer();
+
+    }
+
+    builder.append('>');
+
+    return builder.toString();
+  }
+
+  public static <A> String iterableToString(List<ActionRecord<A>> actionRecords) {
+    return iterableToString(actionRecords, actionRecords.get(actionRecords.size() - 1).getPlayer());
+  }
+
 }

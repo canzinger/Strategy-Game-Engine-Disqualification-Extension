@@ -77,6 +77,12 @@ public class Logger {
     }
   }
 
+  public void printStackTrace(Exception e) {
+    if (-1 >= logLevel) {
+      e.printStackTrace();
+    }
+  }
+
   //-------------------------------
 
   public void traEnum(String string, int enumerator) {

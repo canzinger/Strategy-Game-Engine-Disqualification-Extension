@@ -1,7 +1,7 @@
 package dev.entze.sge.engine.cli;
 
 import dev.entze.sge.agent.GameAgent;
-import dev.entze.sge.engine.Match;
+import dev.entze.sge.engine.game.Match;
 import dev.entze.sge.game.Game;
 import java.io.File;
 import java.util.ArrayList;

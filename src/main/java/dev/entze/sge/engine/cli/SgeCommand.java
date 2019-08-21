@@ -8,7 +8,6 @@ import dev.entze.sge.engine.factory.GameFactory;
 import dev.entze.sge.engine.loader.AgentLoader;
 import dev.entze.sge.engine.loader.GameLoader;
 import dev.entze.sge.game.Game;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
-
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -53,7 +51,7 @@ public class SgeCommand implements Callable<Void> {
   Logger log;
   ExecutorService pool;
   List<AgentFactory> agentFactories = null;
-  GameFactory gameFactory = null;
+  GameFactory<Game<Object, Object>> gameFactory = null;
 
   @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
   boolean helpRequested = false;
@@ -293,7 +291,6 @@ public class SgeCommand implements Callable<Void> {
         log.trace_();
         log.warn("Unknown type in " + file.getPath() + ". Has to be either \"" + SGE_TYPE_GAME
             + "\" or \"" + SGE_TYPE_AGENT + "\".");
-        continue;
       }
 
     }
@@ -307,7 +304,7 @@ public class SgeCommand implements Callable<Void> {
 
     URLClassLoader classLoader = URLClassLoader.newInstance(urlList.toArray(new URL[0]));
 
-    GameLoader gameLoader = new GameLoader(gameClassName,
+    GameLoader<Game<Object, Object>> gameLoader = new GameLoader<>(gameClassName,
         classLoader, log);
     for (int i = 0; i < agentClassNames.size(); i++) {
       agentLoaders

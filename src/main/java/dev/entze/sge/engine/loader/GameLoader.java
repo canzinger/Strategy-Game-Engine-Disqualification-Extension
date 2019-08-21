@@ -7,8 +7,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 
-public class GameLoader implements
-    Callable<GameFactory> {
+public class GameLoader<G extends Game<?, ?>> implements
+    Callable<GameFactory<G>> {
 
   private final String gameClassName;
 
@@ -24,7 +24,7 @@ public class GameLoader implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public GameFactory call()
+  public GameFactory<G> call()
       throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
     Class<Game<Object, Object>> gameClass = (Class<Game<Object, Object>>) classLoader
         .loadClass(gameClassName);

@@ -1,7 +1,8 @@
-package dev.entze.sge.engine;
+package dev.entze.sge.engine.game;
 
 import dev.entze.sge.agent.GameAgent;
 import dev.entze.sge.agent.HumanAgent;
+import dev.entze.sge.engine.Logger;
 import dev.entze.sge.game.ActionRecord;
 import dev.entze.sge.game.Game;
 import java.util.Arrays;
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? extends A>, A> implements
-    Callable<Double[]> {
+    Callable<MatchResult<G, E>> {
 
   private final boolean withHumanPlayer;
   private final boolean debug;
@@ -22,6 +23,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
   private final TimeUnit timeUnit;
   private final Logger log;
   private final ExecutorService pool;
+  private MatchResult<G, E> matchResult;
   private Game<A, ?> game;
   private List<E> gameAgents;
 
@@ -42,17 +44,22 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     this.timeUnit = timeUnit;
     this.log = log;
     this.pool = pool;
+    this.matchResult = null;
   }
 
 
   @SuppressWarnings("unchecked")
   @Override
-  public Double[] call() {
+  public MatchResult<G, E> call() {
+    if (matchResult != null) {
+      return matchResult;
+    }
+    long startTime = System.nanoTime();
     for (int i = 0; i < gameAgents.size(); i++) {
       gameAgents.get(i).setUp(gameAgents.size(), i);
     }
 
-    Double[] result = new Double[gameAgents.size()];
+    double[] result = new double[gameAgents.size()];
     Arrays.fill(result, 1D);
     int lastPlayer = (-1);
     int thisPlayer;
@@ -106,7 +113,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
         if (action == null) {
           log.warn("No action given.");
           result[thisPlayer] = (-1D);
-          return result;
+          matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
+          return matchResult;
         }
 
         if (!isHuman) {
@@ -121,7 +129,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
             log.printStackTrace(e);
           }
           result[thisPlayer] = (-1D);
-          return result;
+          matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
+          return matchResult;
         }
 
         game = game.doAction(action);
@@ -144,6 +153,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
         log.info_(game.getGame().toTextRepresentation());
       }
     }
+    long endTime = System.nanoTime();
 
     double[] utility = game.getGameUtilityValue();
 
@@ -172,7 +182,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       gameAgent.tearDown();
     }
 
-    return result;
+    matchResult = new MatchResult<>(gameAgents, startTime, endTime, result);
+    return matchResult;
   }
 
   public List<E> getGameAgents() {

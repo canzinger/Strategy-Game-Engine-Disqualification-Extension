@@ -6,6 +6,8 @@ import dev.entze.sge.util.node.GameNode;
 import dev.entze.sge.util.tree.Tree;
 import dev.entze.sge.util.unit.TimeUnitWrapper;
 import dev.entze.sge.util.unit.Unit;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,6 +22,98 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class Util {
+
+  /**
+   * Taken from <a href=https://floating-point-gui.de/errors/comparison/>https://floating-point-gui.de/errors/comparison/</a>
+   *
+   * @param a - a float
+   * @param b - a float
+   * @param epsilon - relative error
+   * @return if the two numbers are within the relative epsilon of one another
+   */
+  public static boolean nearlyEqual(float a, float b, float epsilon) {
+    final float absA = Math.abs(a);
+    final float absB = Math.abs(b);
+    final float diff = Math.abs(a - b);
+
+    if (a == b) { // shortcut, handles infinities
+      return true;
+    } else if (a == 0 || b == 0 || (absA + absB < Float.MIN_NORMAL)) {
+      // a or b is zero or both are extremely close to it
+      // relative error is less meaningful here
+      return diff < (epsilon * Float.MIN_NORMAL);
+    } else { // use relative error
+      return diff / Math.min((absA + absB), Float.MAX_VALUE) < epsilon;
+    }
+  }
+
+  public static boolean nearlyEqual(double a, double b, double epsilon) {
+    final double absA = Math.abs(a);
+    final double absB = Math.abs(b);
+    final double diff = Math.abs(a - b);
+
+    if (a == b) { // shortcut, handles infinities
+      return true;
+    } else if (a == 0 || b == 0 || (absA + absB < Double.MIN_NORMAL)) {
+      // a or b is zero or both are extremely close to it
+      // relative error is less meaningful here
+      return diff < (epsilon * Double.MIN_NORMAL);
+    } else { // use relative error
+      return diff / Math.min((absA + absB), Double.MAX_VALUE) < epsilon;
+    }
+  }
+
+  public static boolean nearlyEqual(double a, double b, int significantFigures) {
+    if (a == b) {
+      return true;
+    }
+    long longA = 0;
+    long longB = 0;
+
+    for (int i = 0; i < significantFigures; i++) {
+      longA += (long) a;
+      a -= (long) a;
+      a *= 10;
+      longA *= 10;
+
+      longB += (long) b;
+      b -= (long) b;
+      b *= 10;
+      longB *= 10;
+      if (longA != longB) {
+        return false;
+      }
+    }
+
+    return significantFigures >= 0;
+  }
+
+  public static String convertDoubleToString(double a, int digits) {
+    return String.format(String.format("%s%d%c", "%.", digits, 'f'), a);
+  }
+
+  public static String convertDoubleToString(double a) {
+    return convertDoubleToString(a, significantDigits(a));
+  }
+
+  public static int significantDigits(double a) {
+    int digits = -1;
+    double r;
+    do {
+      digits++;
+      r = roundTo(a, digits);
+    } while (nearlyEqual(a, r, digits + 1));
+
+    return digits;
+  }
+
+  public static String convertDoubleToMinimalString(double a, int maxDigits) {
+    return convertDoubleToString(a, Math.min(maxDigits, significantDigits(a)));
+  }
+
+  public static double roundTo(double a, int digits) {
+    return BigDecimal.valueOf(a).setScale(digits, RoundingMode.HALF_EVEN).doubleValue();
+  }
 
   public static <E> E selectRandom(Collection<? extends E> collection) {
     return selectRandom(collection, ThreadLocalRandom.current());
@@ -452,5 +546,83 @@ public class Util {
     }
     return 100D * ((double) f) / ((double) t);
   }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, boolean b, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(b);
+    }
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, char c, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(c);
+    }
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, char[] c, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(c);
+    }
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, CharSequence c, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(c);
+    }
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, double d, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(d);
+    }
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, float f, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(f);
+    }
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, int i, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(i);
+    }
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, long l, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(l);
+    }
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, Object o, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(o);
+    }
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, String s, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(s);
+    }
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendNTimes(StringBuilder stringBuilder, StringBuffer s, int n) {
+    for (int a = 0; a < n; a++) {
+      stringBuilder.append(s);
+    }
+    return stringBuilder;
+  }
+
 
 }

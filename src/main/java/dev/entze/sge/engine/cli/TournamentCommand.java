@@ -13,7 +13,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
-@Command(name = "tournament", aliases = {"t"}, description = "")
+@Command(name = "tournament", aliases = {"t"}, description = "Let agents play in a tournament.")
 public class TournamentCommand extends AbstractCommand implements Runnable {
 
   @Option(names = {"-c",
@@ -62,10 +62,10 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
       "--agent"}, arity = "1..*", paramLabel = "AGENT", description = "Configuration of agents.")
   private List<String> agentConfiguration = new ArrayList<>();
 
-  @Parameters(index = "0", arity = "0..*", description = {"Other valid synopsis"})
+  @Parameters(index = "0", arity = "0..*", description = {"Not explicitly specified files or configuration of agents."})
   private List<String> arguments = new ArrayList<>();
 
-  @Parameters(index = "1", arity = "1", paramLabel = "MODE", description = {"Tournament Mode"})
+  @Parameters(index = "1", arity = "1", paramLabel = "MODE", description = "Tournament Mode. Valid values: ${COMPLETION-CANDIDATES}")
   private TournamentMode tournamentMode = TournamentMode.ROUND_ROBIN;
 
   @Override

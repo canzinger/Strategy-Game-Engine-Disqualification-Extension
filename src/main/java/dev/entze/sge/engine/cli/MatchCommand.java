@@ -14,15 +14,7 @@ import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 @Command(name = "match", aliases = {
-    "m"}, description = "Let agents play against each other in a single match.", customSynopsis = {
-    "sge match [OPTION]... FILE... [AGENT]...",
-    "   or: sge match [OPTION]... [AGENT]... FILE...",
-    "   or: sge match [OPTION]... [FILE]... [DIRECTORY]... [AGENT]...",
-    "   or: sge match [OPTION]... [AGENT]... [FILE]... [DIRECTORY]...",
-    "   or: sge match [OPTION]... -f FILE... [ARGUMENTS]...",
-    "   or: sge match [OPTION]... -d DIRECTORY... [ARGUMENTS]...",
-    "   or: sge match [OPTION]... -a AGENT... [ARGUMENTS]...",
-})
+    "m"}, description = "Let agents play against each other in a single match.")
 public class MatchCommand extends AbstractCommand implements Runnable {
 
   @Option(names = {"-c",
@@ -71,7 +63,8 @@ public class MatchCommand extends AbstractCommand implements Runnable {
       "--agent"}, arity = "1..*", paramLabel = "AGENT", description = "Configuration of agents.")
   private List<String> agentConfiguration = new ArrayList<>();
 
-  @Parameters(index = "0", arity = "0..*", description = {"Other valid synopsis"})
+  @Parameters(index = "0", arity = "0..*", description = {
+      "Not explicitly specified files or configuration of agents."})
   private List<String> arguments = new ArrayList<>();
 
 

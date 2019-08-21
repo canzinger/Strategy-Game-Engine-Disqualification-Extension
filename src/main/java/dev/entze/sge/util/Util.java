@@ -31,7 +31,7 @@ public class Util {
    * @param epsilon - relative error
    * @return if the two numbers are within the relative epsilon of one another
    */
-  public static boolean nearlyEqual(float a, float b, float epsilon) {
+  public static boolean nearlyEquals(float a, float b, float epsilon) {
     final float absA = Math.abs(a);
     final float absB = Math.abs(b);
     final float diff = Math.abs(a - b);
@@ -47,7 +47,7 @@ public class Util {
     }
   }
 
-  public static boolean nearlyEqual(double a, double b, double epsilon) {
+  public static boolean nearlyEquals(double a, double b, double epsilon) {
     final double absA = Math.abs(a);
     final double absB = Math.abs(b);
     final double diff = Math.abs(a - b);
@@ -63,29 +63,24 @@ public class Util {
     }
   }
 
-  public static boolean nearlyEqual(double a, double b, int significantFigures) {
+  public static boolean nearlyEquals(double a, double b, int significantFigures) {
     if (a == b) {
       return true;
     }
-    long longA = 0;
-    long longB = 0;
 
-    for (int i = 0; i < significantFigures; i++) {
-      longA += (long) a;
-      a -= (long) a;
-      a *= 10;
-      longA *= 10;
-
-      longB += (long) b;
-      b -= (long) b;
-      b *= 10;
-      longB *= 10;
-      if (longA != longB) {
+    for (int i = 0; i <= significantFigures; i++) {
+      if (((long) a) != ((long) b)) {
         return false;
       }
+      a *= 10;
+      b *= 10;
     }
 
-    return significantFigures >= 0;
+    return true;
+  }
+
+  public static long doubleAsLong(double a, int significantFigures) {
+    return Math.round(Math.floor(a * Math.pow(10, significantFigures)));
   }
 
   public static String convertDoubleToString(double a, int digits) {
@@ -97,14 +92,19 @@ public class Util {
   }
 
   public static int significantDigits(double a) {
-    int digits = -1;
+    int d = -1;
     double r;
+    boolean allEqual = true;
     do {
-      digits++;
-      r = roundTo(a, digits);
-    } while (nearlyEqual(a, r, digits + 1));
+      d++;
+      r = roundTo(a, d);
+      allEqual = true;
+      for (int s = 18; allEqual && s > d; s--) {
+        allEqual = nearlyEquals(a, r, s);
+      }
+    } while (d < 19 && !allEqual);
 
-    return digits;
+    return d;
   }
 
   public static String convertDoubleToMinimalString(double a, int maxDigits) {
@@ -113,6 +113,25 @@ public class Util {
 
   public static double roundTo(double a, int digits) {
     return BigDecimal.valueOf(a).setScale(digits, RoundingMode.HALF_EVEN).doubleValue();
+  }
+
+  public static StringBuilder appendWithBlankBuffer(StringBuilder stringBuilder, double d,
+      int width) {
+    String string = Util.convertDoubleToMinimalString(d, width - 2);
+    width -= string.length();
+    Util.appendNTimes(stringBuilder, ' ', width / 2 + (width % 2))
+        .append(string);
+    Util.appendNTimes(stringBuilder, ' ', width / 2);
+    return stringBuilder;
+  }
+
+  public static StringBuilder appendWithBlankBuffer(StringBuilder stringBuilder, String string,
+      int width) {
+    width -= string.length();
+    Util.appendNTimes(stringBuilder, ' ', width / 2 + (width % 2))
+        .append(string);
+    Util.appendNTimes(stringBuilder, ' ', width / 2);
+    return stringBuilder;
   }
 
   public static <E> E selectRandom(Collection<? extends E> collection) {

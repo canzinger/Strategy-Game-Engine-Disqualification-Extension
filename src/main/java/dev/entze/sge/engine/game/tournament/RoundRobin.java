@@ -28,9 +28,8 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
   private final Logger log;
   private final ExecutorService pool;
 
-  public RoundRobin(GameFactory<G> gameFactory, String board, List<E> gameAgents, boolean debug,
-      long computationTime,
-      TimeUnit timeUnit, Logger log, ExecutorService pool) {
+  public RoundRobin(GameFactory<G> gameFactory, String board, List<E> gameAgents,
+      long computationTime, TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
     this.tournamentResult = null;
     this.textRepresentation = null;
     this.gameFactory = gameFactory;
@@ -60,10 +59,8 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
     int maxWidth = gameAgentWidths.stream().mapToInt(Integer::intValue).max().orElse(0);
 
     appendSeperationLine(stringBuilder, gameAgentWidths, maxWidth);
-    stringBuilder.append('|').append(' ');
-
-    stringBuilder.append(String.join(" | ", gameAgentNames));
-    stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+    stringBuilder.append('|').append(' ').append(String.join(" | ", gameAgentNames)).append(' ')
+        .append('|').append('\n');
     appendSeperationLine(stringBuilder, gameAgentWidths, maxWidth);
 
     for (int x = 0; x < gameAgents.size(); x++) {
@@ -78,7 +75,7 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
 
         double[] results = matchResult.getResult();
         double result = results[0] - results[1];
-        String resultString = Util.convertDoubleToMinimalString(result, 2);
+        String resultString = Util.convertDoubleToMinimalString(result, width - 2);
         width -= resultString.length();
 
         Util.appendNTimes(stringBuilder, ' ', width / 2 + (width % 2)).append(resultString);

@@ -170,14 +170,16 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
     log.info_(ActionRecord.iterableToString(actionRecords, lastPlayer));
 
-    System.out.print("Result: ");
-    for (int i = 0; i < gameAgents.size(); i++) {
-      System.out.print("Player " + i + ": " + result[i]);
-      if (i + 1 < gameAgents.size()) {
-        System.out.print(", ");
-      }
-    }
-    System.out.println();
+    /*
+     System.out.print("Result: ");
+     for (int i = 0; i < gameAgents.size(); i++) {
+     System.out.print("Player " + i + ": " + result[i]);
+     if (i + 1 < gameAgents.size()) {
+     System.out.print(", ");
+     }
+     }
+     System.out.println();
+     */
     for (E gameAgent : gameAgents) {
       gameAgent.tearDown();
     }

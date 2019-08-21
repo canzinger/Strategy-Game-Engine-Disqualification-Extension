@@ -11,18 +11,20 @@ import java.util.concurrent.TimeUnit;
 public enum TournamentMode {
 
   ROUND_ROBIN {
-    public Tournament<Game<?, ?>, ?, ?> getTournament(GameFactory<Game<?, ?>> gameFactory,
-        String board, List<GameAgent<Game<?, ?>, ?>> gameAgents, boolean debug,
+    public Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> getTournament(
+        GameFactory<Game<Object, Object>> gameFactory,
+        String board, List<GameAgent<Game<Object, Object>, Object>> gameAgents,
         long computationTime,
-        TimeUnit timeUnit, Logger log, ExecutorService pool) {
-      return new RoundRobin<>(gameFactory, board, gameAgents, debug, computationTime, timeUnit, log,
+        TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
+      return new RoundRobin<>(gameFactory, board, gameAgents, computationTime, timeUnit, debug, log,
           pool);
     }
   };
 
-  abstract Tournament<Game<?, ?>, ?, ?> getTournament(GameFactory<Game<?, ?>> gameFactory,
-      String board, List<GameAgent<Game<?, ?>, ?>> gameAgents, boolean debug,
+  public abstract Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> getTournament(
+      GameFactory<Game<Object, Object>> gameFactory,
+      String board, List<GameAgent<Game<Object, Object>, Object>> gameAgents,
       long computationTime,
-      TimeUnit timeUnit, Logger log, ExecutorService pool);
+      TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool);
 
 }

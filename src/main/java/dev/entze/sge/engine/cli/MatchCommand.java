@@ -2,6 +2,7 @@ package dev.entze.sge.engine.cli;
 
 import dev.entze.sge.agent.GameAgent;
 import dev.entze.sge.engine.game.Match;
+import dev.entze.sge.engine.game.MatchResult;
 import dev.entze.sge.game.Game;
 import java.io.File;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import picocli.CommandLine.ParentCommand;
     "   or: sge match [OPTION]... -d DIRECTORY... [ARGUMENTS]...",
     "   or: sge match [OPTION]... -a AGENT... [ARGUMENTS]...",
 })
-public class MatchCommand implements Runnable {
+public class MatchCommand extends AbstractCommand implements Runnable {
 
   @Option(names = {"-c",
       "--computation-time"}, defaultValue = "60", description = "Amount of computational time given for each action")
@@ -76,43 +77,7 @@ public class MatchCommand implements Runnable {
 
   @Override
   public void run() {
-    sge.debug = sge.debug || debug;
-    if (verbose.length != 0 || quiet.length != 0) {
-      sge.log.setLogLevel(quiet.length - (verbose.length + (sge.debug ? 1 : 0)));
-    }
-
-    sge.determineArguments(arguments, files, directories, agentConfiguration);
-    sge.processDirectories(files, directories);
-
-    sge.log.tra("Files: ");
-
-    for (File file : files) {
-      sge.log.tra_(file.getPath() + " ");
-    }
-
-    sge.log.trace_();
-
-    sge.loadFiles(files);
-    sge.log.debug("Successfully loaded all files.");
-
-    if (numberOfPlayers < 0) {
-      numberOfPlayers = sge.gameFactory.getMinimumNumberOfPlayers();
-    }
-
-    sge.fillAgentList(agentConfiguration, numberOfPlayers);
-
-    sge.log.deb("Configuration: ");
-    for (String s : agentConfiguration) {
-      sge.log.deb_(s + " ");
-    }
-    sge.log.debug_();
-
-    board = sge.interpretBoardString(board);
-    if (board == null) {
-      sge.log.debug("No initial board given.");
-    } else {
-      sge.log.debug("Initial board: " + board.split("\n")[0] + (board.contains("\n") ? "..." : ""));
-    }
+    loadCommon();
 
     List<GameAgent<Game<Object, Object>, Object>> agentList = sge
         .createAgentListFromConfiguration(numberOfPlayers, agentConfiguration);
@@ -121,7 +86,70 @@ public class MatchCommand implements Runnable {
         sge.gameFactory.newInstance(board, numberOfPlayers),
         agentList, computationTime, timeUnit, sge.debug, sge.log, sge.pool);
 
-    match.call();
+    MatchResult<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>> matchResult = match
+        .call();
 
+    System.out.println("\n".concat(matchResult.toString()).concat("\n"));
+
+  }
+
+  @Override
+  public SgeCommand getSge() {
+    return sge;
+  }
+
+  @Override
+  public boolean[] getQuiet() {
+    return quiet;
+  }
+
+  @Override
+  public boolean[] getVerbose() {
+    return verbose;
+  }
+
+  @Override
+  public int getNumberOfPlayers() {
+    return numberOfPlayers;
+  }
+
+  @Override
+  public String getBoard() {
+    return board;
+  }
+
+  @Override
+  public boolean isDebug() {
+    return debug;
+  }
+
+  @Override
+  public List<File> getFiles() {
+    return files;
+  }
+
+  @Override
+  public List<File> getDirectories() {
+    return directories;
+  }
+
+  @Override
+  public List<String> getAgentConfiguration() {
+    return agentConfiguration;
+  }
+
+  @Override
+  public List<String> getArguments() {
+    return arguments;
+  }
+
+  @Override
+  protected void setNumberOfPlayers(int numberOfPlayers) {
+    this.numberOfPlayers = numberOfPlayers;
+  }
+
+  @Override
+  protected void setBoard(String board) {
+    this.board = board;
   }
 }

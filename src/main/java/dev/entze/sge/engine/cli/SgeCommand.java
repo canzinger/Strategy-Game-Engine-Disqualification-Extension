@@ -429,7 +429,7 @@ public class SgeCommand implements Callable<Void> {
     log.traProcess("Processing agents", 0, agentFactories.size());
     for (int a = 0; a < agentFactories.size(); a++) {
       log.tra_("\r");
-      log.traProcess("Processing agents", a, agentFactories.size());
+      log.traProcess("Processing agents", a + 1, agentFactories.size());
       String agentName = agentFactories.get(a).getAgentName();
       if (!agentConfigurationLowercase.contains(agentName.toLowerCase())) {
         agentConfigurationLowercase.add(agentName.toLowerCase());
@@ -437,7 +437,6 @@ public class SgeCommand implements Callable<Void> {
         added++;
       }
     }
-
     log.trace_(", done.");
 
     return added;

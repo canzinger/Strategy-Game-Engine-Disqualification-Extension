@@ -89,7 +89,12 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
       throw new IllegalArgumentException("Illegal player number.");
     }
 
-    sge.fillAgentList(agentConfiguration);
+    if (agentConfiguration.size() < min) {
+      if (!agentConfiguration.isEmpty()) {
+        sge.log.warn("Not enough agents, filling up with others.");
+      }
+      sge.fillAgentList(agentConfiguration);
+    }
 
     if (shuffle) {
       Collections.shuffle(agentConfiguration);

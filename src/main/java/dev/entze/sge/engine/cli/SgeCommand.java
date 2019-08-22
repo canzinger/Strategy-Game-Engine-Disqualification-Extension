@@ -8,6 +8,7 @@ import dev.entze.sge.engine.factory.GameFactory;
 import dev.entze.sge.engine.loader.AgentLoader;
 import dev.entze.sge.engine.loader.GameLoader;
 import dev.entze.sge.game.Game;
+import dev.entze.sge.util.Util;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -39,6 +40,9 @@ import picocli.CommandLine.RunAll;
     BatchCommand.class
 })
 public class SgeCommand implements Callable<Void> {
+
+  private static final long AWAIT_TERMINATION_TIME = 5;
+  private static final TimeUnit AWAIT_TERMINATION_TIMEUNIT = TimeUnit.SECONDS;
 
   private static final String SGE_TYPE = "Sge-Type";
   private static final String SGE_TYPE_GAME = "game";
@@ -503,22 +507,24 @@ public class SgeCommand implements Callable<Void> {
     }
     log.tra("Shutting down ThreadPool");
     pool.shutdown();
-    log.tra_(".");
+    log.trace_(", done.");
+    log.tra("Waiting " + Util
+        .convertUnitToReadableString(AWAIT_TERMINATION_TIME, AWAIT_TERMINATION_TIMEUNIT)
+        + " for termination");
     try {
-      if (!pool.awaitTermination(5, TimeUnit.SECONDS)) {
-        log.trace_();
+      if (!pool.awaitTermination(AWAIT_TERMINATION_TIME, AWAIT_TERMINATION_TIMEUNIT)) {
+        log.trace_(", failed.");
         log.info("ThreadPool did not yet shutdown. Forcing.");
         pool.shutdownNow();
       } else {
-        log.tra_(".");
+        log.trace_(", done.");
       }
     } catch (
         InterruptedException e) {
-      log.warn_();
+      log.trace_(", failed.");
       log.warn("ThreadPool termination was interrupted.");
       throw e;
     }
-    log.trace_("done");
   }
 
 

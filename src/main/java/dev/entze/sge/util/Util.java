@@ -411,6 +411,14 @@ public class Util {
     return List.copyOf(collection);
   }
 
+  public static String convertUnitToReadableString(long item, TimeUnit unit) {
+    return convertUnitToReadableString(item, unit, unit);
+  }
+
+  public static String convertUnitToReadableString(long item, Unit unit) {
+    return convertUnitToReadableString(item, unit, unit);
+  }
+
   public static String convertUnitToReadableString(long item, TimeUnit unit, TimeUnit target) {
     return convertUnitToReadableString(item, new TimeUnitWrapper(unit),
         new TimeUnitWrapper(target));
@@ -643,5 +651,42 @@ public class Util {
     return stringBuilder;
   }
 
+  public static double scoreOutOfUtility(double[] utility, int i) {
+    double value = utility[i];
+    double max = Double.NEGATIVE_INFINITY;
+    for (int v = 0; v < utility.length; v++) {
+      if (v != i) {
+        max = Math.max(max, utility[v]);
+      }
+    }
+
+    return (value >= max ? (1D / utility.length) : 0D)
+        + (value > max ? (((double) (utility.length - 1)) / utility.length) : 0D);
+  }
+
+  public static double[] scoreOutOfUtility(double[] utility) {
+    double[] score = new double[utility.length];
+    double max = Double.NEGATIVE_INFINITY;
+    int lastChange = -1;
+    for (int i = 0; i < utility.length; i++) {
+      if (max < utility[i]) {
+        max = utility[i];
+        lastChange = i;
+      }
+      score[i] =
+          (utility[i] >= max ? (1D / utility.length) : 0D)
+              + (utility[i] > max ? (((double) (utility.length - 1)) / utility.length) : 0D);
+    }
+
+    if (lastChange > 0) {
+      for (int i = 0; i < score.length; i++) {
+        score[i] =
+            (utility[i] >= max ? (1D / utility.length) : 0D)
+                + (utility[i] > max ? (((double) (utility.length - 1)) / utility.length) : 0D);
+      }
+    }
+
+    return score;
+  }
 
 }

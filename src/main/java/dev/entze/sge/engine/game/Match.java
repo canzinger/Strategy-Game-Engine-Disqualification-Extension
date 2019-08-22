@@ -242,7 +242,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
       if (!tearDowns.isEmpty()) {
         log.trace_(", failed.");
-        log.warn("Following agents where not verified to be teared down: "
+        log.warn("Following agents where not verified to be torn down: "
             .concat(tearDowns.stream().map(Pair::getA).collect(Collectors.joining(", "))));
       } else {
         log.trace_(", done.");

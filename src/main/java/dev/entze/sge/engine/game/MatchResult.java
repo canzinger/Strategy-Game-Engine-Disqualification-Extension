@@ -60,8 +60,7 @@ public class MatchResult<G extends Game<?, ?>, E extends GameAgent<G, ?>> {
       Util.appendWithBlankBuffer(stringBuilder, result[i], width).append('|');
     }
     stringBuilder.append('\n');
-    appendSeperationLine(stringBuilder, gameAgentWidths);
-
+    appendSeperationLine(stringBuilder, gameAgentWidths).deleteCharAt(stringBuilder.length() - 1);
     string = stringBuilder.toString();
     return string;
   }

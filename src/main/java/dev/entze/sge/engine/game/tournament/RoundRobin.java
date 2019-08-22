@@ -12,9 +12,11 @@ import dev.entze.sge.util.pair.MutablePair;
 import dev.entze.sge.util.pair.Pair;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -64,11 +66,43 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
     return twoResult;
   }
 
-  public static <G extends Game<? extends A, ?>, E extends GameAgent<G, ? extends A>, A> Map<String, Pair<Double, Double>> resultAsTable(
-      List<MatchResult<G, E>> tournamentResult) {
-    Map<String, Pair<Double, Double>> result = new HashMap<>();
 
-    return result;
+
+  public static String twoTableToString(Map<String, Map<String, Double>> twoTable) {
+    StringBuilder stringBuilder = new StringBuilder();
+
+    List<String> gameAgentNames = twoTable.entrySet().stream().sorted(
+        Comparator.comparingInt(o -> o.getValue().size())).map(Entry::getKey)
+        .collect(Collectors.toUnmodifiableList());
+    List<Integer> gameAgentWidths = gameAgentNames.stream().map(String::length)
+        .collect(Collectors.toList());
+    int maxWidth = gameAgentWidths.stream().mapToInt(Integer::intValue).max().orElse(0);
+
+    appendSeperationLine(stringBuilder, gameAgentWidths, maxWidth).append('|');
+    Util.appendNTimes(stringBuilder, ' ', maxWidth + 2);
+    stringBuilder.append('|').append(' ').append(String.join(" | ", gameAgentNames)).append(' ')
+        .append('|').append('\n');
+    appendSeperationLine(stringBuilder, gameAgentWidths, maxWidth);
+
+    for (int y = 0; y < gameAgentNames.size(); y++) {
+      String yAgentName = gameAgentNames.get(y);
+      stringBuilder.append('|');
+      Util.appendWithBlankBuffer(stringBuilder, yAgentName, maxWidth + 2).append('|');
+      for (int x = 0; x < gameAgentNames.size(); x++) {
+        String xAgentName = gameAgentNames.get(x);
+        if (twoTable.containsKey(yAgentName) && twoTable.get(yAgentName).containsKey(xAgentName)) {
+          Util.appendWithBlankBuffer(stringBuilder, twoTable.get(yAgentName).get(xAgentName),
+              gameAgentWidths.get(x) + 2);
+        } else {
+          Util.appendNTimes(stringBuilder, ' ', gameAgentWidths.get(x) + 2);
+        }
+        stringBuilder.append('|');
+      }
+      stringBuilder.append('\n');
+    }
+    appendSeperationLine(stringBuilder, gameAgentWidths, maxWidth)
+        .deleteCharAt(stringBuilder.length() - 1);
+    return stringBuilder.toString();
   }
 
   @Override
@@ -77,46 +111,18 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
       return "Not played yet.";
     } else if (textRepresentation != null) {
       return textRepresentation;
-    } else if (numberOfPlayers == 2 && twoResult == null) {
-
-    }
-    StringBuilder stringBuilder = new StringBuilder();
-
-    List<String> gameAgentNames = gameAgents.stream().map(Object::toString)
-        .collect(Collectors.toList());
-    List<Integer> gameAgentWidths = gameAgentNames.stream().map(String::length)
-        .collect(Collectors.toList());
-
-    int maxWidth = gameAgentWidths.stream().mapToInt(Integer::intValue).max().orElse(0);
-
-    appendSeperationLine(stringBuilder, gameAgentWidths, maxWidth);
-    stringBuilder.append('|').append(' ').append(String.join(" | ", gameAgentNames)).append(' ')
-        .append('|').append('\n');
-    appendSeperationLine(stringBuilder, gameAgentWidths, maxWidth);
-
-    for (int x = 0; x < gameAgents.size(); x++) {
-      for (int y = 0; y < x; y++) {
-        int width = gameAgentWidths.get(y) + 2;
-        final int finalX = x;
-        final int finalY = y;
-        MatchResult<G, E> matchResult = tournamentResult.stream().filter(
-            r -> r.getGameAgents().get(0).equals(gameAgents.get(finalX))
-                && r.getGameAgents().get(1).equals(gameAgents.get(finalY))).findAny()
-            .orElseThrow();
-
-        double[] results = matchResult.getResult();
-        double result = results[0] - results[1];
-        String resultString = Util.convertDoubleToMinimalString(result, width - 2);
-        width -= resultString.length();
-
-        Util.appendNTimes(stringBuilder, ' ', width / 2 + (width % 2)).append(resultString);
-        Util.appendNTimes(stringBuilder, ' ', width / 2).append('|');
+    } else if (numberOfPlayers == 2) {
+      if (twoResult == null) {
+        twoResult = resultAsTwoTable(tournamentResult);
       }
-      appendNSkips(stringBuilder, gameAgentWidths, gameAgents.size() - x);
-      stringBuilder.append('\n');
-      appendSeperationLine(stringBuilder, gameAgentWidths, maxWidth);
+      textRepresentation = twoTableToString(twoResult);
+    } else {
+      if (result == null) {
+        result = Tournament.resultAsTable(tournamentResult);
+      }
+      //TODO: tableToString(result);
     }
-    textRepresentation = stringBuilder.toString();
+
     return textRepresentation;
   }
 

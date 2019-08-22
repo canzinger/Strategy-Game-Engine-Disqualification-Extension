@@ -19,6 +19,18 @@ public enum TournamentMode {
       return new RoundRobin<>(gameFactory, board, gameAgents, computationTime, timeUnit, debug, log,
           pool);
     }
+
+    @Override
+    public int getMinimumPerRound() {
+      return 2;
+    }
+
+    @Override
+    public int getMaximumPerRound() {
+      return 2;
+    }
+
+
   };
 
   public abstract Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> getTournament(
@@ -27,4 +39,7 @@ public enum TournamentMode {
       long computationTime,
       TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool);
 
+  public abstract int getMinimumPerRound();
+
+  public abstract int getMaximumPerRound();
 }

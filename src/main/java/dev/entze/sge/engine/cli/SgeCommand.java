@@ -84,7 +84,11 @@ public class SgeCommand implements Callable<Void> {
 
     cli.setCaseInsensitiveEnumValuesAllowed(true);
 
-    List<Object> ran = cli.parseWithHandler(new RunAll(), args);
+    try {
+      List<Object> ran = cli.parseWithHandler(new RunAll(), args);
+    } catch (Exception e) {
+      sge.log.printStackTrace(e);
+    }
 
     try {
       sge.cleanUpPool();
@@ -371,30 +375,37 @@ public class SgeCommand implements Callable<Void> {
 
   }
 
-  public int fillAgentList(List<String> agentConfiguration, int numberOfPlayers) {
+  /**
+   * Fills the agent configuration until it has the minimum amount of players
+   *
+   * @param agentConfiguration agent configuration
+   * @param minimumPlayers minimum number of players required
+   * @return number of agents added to the configuration
+   */
+  public int fillAgentList(List<String> agentConfiguration, int minimumPlayers) {
     int added = 0;
     List<String> agentConfigurationLowercase = agentConfiguration.stream()
         .map(String::toLowerCase)
         .collect(Collectors.toList());
 
-    log.traProcess("Adding agents", agentConfiguration.size(), numberOfPlayers);
+    log.traProcess("Adding agents", agentConfiguration.size(), minimumPlayers);
 
-    for (int i = 0; i < agentFactories.size() && agentConfiguration.size() < numberOfPlayers;
+    for (int i = 0; i < agentFactories.size() && agentConfiguration.size() < minimumPlayers;
         i++) {
       String agentName = agentFactories.get(i).getAgentName();
       if (!agentConfigurationLowercase.contains(agentName.toLowerCase())) {
         agentConfigurationLowercase.add(agentName.toLowerCase());
         agentConfiguration.add(agentName);
         log.tra_("\r");
-        log.traProcess("Adding agents", agentConfiguration.size(), numberOfPlayers);
+        log.traProcess("Adding agents", agentConfiguration.size(), minimumPlayers);
         added++;
       }
     }
 
-    while (agentConfiguration.size() < numberOfPlayers) {
+    while (agentConfiguration.size() < minimumPlayers) {
       agentConfiguration.add("Human");
       log.tra_("\r");
-      log.traProcess("Adding agents", agentConfiguration.size(), numberOfPlayers);
+      log.traProcess("Adding agents", agentConfiguration.size(), minimumPlayers);
       added++;
     }
 
@@ -403,16 +414,39 @@ public class SgeCommand implements Callable<Void> {
     return added;
   }
 
-  public List<GameAgent<Game<Object, Object>, Object>> createAgentListFromConfiguration(
-      int numberOfPlayers,
-      List<String> configuration) {
-    if (numberOfPlayers != configuration.size() || !(
-        gameFactory.getMinimumNumberOfPlayers() <= numberOfPlayers && numberOfPlayers <= gameFactory
-            .getMaximumNumberOfPlayers())) {
-      return null;
+  /**
+   * Fills the agent configuration until every agent in the agentFactories is present.
+   *
+   * @param agentConfiguration agent configuration
+   * @return number of agents added to the configuration
+   */
+  public int fillAgentList(List<String> agentConfiguration) {
+    int added = 0;
+    List<String> agentConfigurationLowercase = agentConfiguration.stream()
+        .map(String::toLowerCase)
+        .collect(Collectors.toList());
+
+    log.traProcess("Processing agents", 0, agentFactories.size());
+    for (int a = 0; a < agentFactories.size(); a++) {
+      log.tra_("\r");
+      log.traProcess("Processing agents", a, agentFactories.size());
+      String agentName = agentFactories.get(a).getAgentName();
+      if (!agentConfigurationLowercase.contains(agentName.toLowerCase())) {
+        agentConfigurationLowercase.add(agentName.toLowerCase());
+        agentConfiguration.add(agentName);
+        added++;
+      }
     }
 
-    List<GameAgent<Game<Object, Object>, Object>> agentList = new ArrayList<>(numberOfPlayers);
+    log.trace_(", done.");
+
+    return added;
+  }
+
+  public List<GameAgent<Game<Object, Object>, Object>> createAgentListFromConfiguration(
+      List<String> configuration) {
+
+    List<GameAgent<Game<Object, Object>, Object>> agentList = new ArrayList<>(configuration.size());
     boolean everyPlayerMatches = true;
 
     for (String player : configuration) {

@@ -1,5 +1,6 @@
 package dev.entze.sge.engine;
 
+import dev.entze.sge.util.Util;
 import java.io.PrintStream;
 
 public class Logger {
@@ -90,7 +91,7 @@ public class Logger {
   }
 
   public void traProcess(String string, int i, int max) {
-    traf("%s: %.0f%% (%d/%d)", string, 100D * (double) i / (double) max, i, max);
+    traf("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
   }
 
   public void tra_() {
@@ -148,7 +149,7 @@ public class Logger {
   }
 
   public void debProcess(String string, int i, int max) {
-    debf("%s: %.0f%% (%d/%d)", string, 100D * (double) i / (double) max, i, max);
+    debf("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
   }
 
   public void deb_() {
@@ -206,7 +207,7 @@ public class Logger {
   }
 
   public void infProcess(String string, int i, int max) {
-    inff("%s: %.0f%% (%d/%d)", string, 100D * (double) i / (double) max, i, max);
+    inff("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
   }
 
   public void inf_() {
@@ -264,7 +265,7 @@ public class Logger {
   }
 
   public void warProcess(String string, int i, int max) {
-    warf("%s: %.0f%% (%d/%d)", string, 100D * (double) i / (double) max, i, max);
+    warf("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
   }
 
   public void war_() {
@@ -322,7 +323,7 @@ public class Logger {
   }
 
   public void errProcess(String string, int i, int max) {
-    errf("%s: %.0f%% (%d/%d)", string, 100D * (double) i / (double) max, i, max);
+    errf("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
   }
 
   public void err_() {

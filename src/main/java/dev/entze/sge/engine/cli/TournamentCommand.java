@@ -6,6 +6,7 @@ import dev.entze.sge.engine.game.tournament.TournamentMode;
 import dev.entze.sge.game.Game;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import picocli.CommandLine.Command;
@@ -39,7 +40,7 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
   private boolean[] verbose = new boolean[0];
 
   @Option(names = {"-p",
-      "--number-of-players"}, arity = "1", paramLabel = "N", description = "Number of players. By default the minimum required to play")
+      "--number-of-players"}, arity = "1", paramLabel = "N", description = "Number of players. By default the minimum the tournament supports.")
   private int numberOfPlayers = (-1);
 
   @Option(names = {"-b",
@@ -62,17 +63,42 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
       "--agent"}, arity = "1..*", paramLabel = "AGENT", description = "Configuration of agents.")
   private List<String> agentConfiguration = new ArrayList<>();
 
-  @Parameters(index = "0", arity = "0..*", description = {"Not explicitly specified files or configuration of agents."})
+  @Option(names = {"-r", "-s", "--shuffle"}, description = "Shuffle configuration of agents.")
+  private boolean shuffle = false;
+
+  @Parameters(index = "0", arity = "0..*", description = {
+      "Not explicitly specified files or configuration of agents."})
   private List<String> arguments = new ArrayList<>();
 
-  @Parameters(index = "1", arity = "1", paramLabel = "MODE", description = "Tournament Mode. Valid values: ${COMPLETION-CANDIDATES}")
+  @Parameters(index = "1", arity = "0..1", paramLabel = "MODE", description = "Tournament Mode. Valid values: ${COMPLETION-CANDIDATES}")
   private TournamentMode tournamentMode = TournamentMode.ROUND_ROBIN;
 
   @Override
   public void run() {
     loadCommon();
+
+    int min = Math
+        .max(sge.gameFactory.getMinimumNumberOfPlayers(), tournamentMode.getMinimumPerRound());
+    int max = Math
+        .min(sge.gameFactory.getMaximumNumberOfPlayers(), tournamentMode.getMaximumPerRound());
+
+    if (numberOfPlayers < 0) {
+      numberOfPlayers = min;
+    } else if (!(min <= numberOfPlayers && numberOfPlayers <= max)) {
+      sge.log.error("Tournament cannot be played with this number of players.");
+      throw new IllegalArgumentException("Illegal player number.");
+    }
+
+    sge.fillAgentList(agentConfiguration);
+
+    printAgentConfiguration();
+
     List<GameAgent<Game<Object, Object>, Object>> agentList = sge
-        .createAgentListFromConfiguration(numberOfPlayers, agentConfiguration);
+        .createAgentListFromConfiguration(agentConfiguration);
+
+    if (shuffle) {
+      Collections.shuffle(agentList);
+    }
 
     Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> tournament = tournamentMode
         .getTournament(sge.gameFactory, board, agentList, computationTime, timeUnit, sge.debug,

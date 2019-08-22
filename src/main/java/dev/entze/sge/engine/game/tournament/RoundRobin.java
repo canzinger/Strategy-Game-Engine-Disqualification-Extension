@@ -10,6 +10,7 @@ import dev.entze.sge.util.Util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -122,6 +123,14 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
       return Collections.unmodifiableList(tournamentResult);
     }
     tournamentResult = new ArrayList<>();
+
+    int gameAgentsSize = gameAgents.size();
+    int numberOfGames =
+        (gameAgentsSize * gameAgentsSize - gameAgentsSize) / 2;
+    log.info("Starting Round Robin tournament with " + gameAgentsSize + " contestants, "
+        + numberOfGames + " game" + (numberOfGames == 1 ? "" : "s") + ".");
+    log.debug(
+        "Agents: " + gameAgents.stream().map(Objects::toString).collect(Collectors.joining(", ")));
 
     for (int x = 0; x < gameAgents.size(); x++) {
       E xAgent = gameAgents.get(x);

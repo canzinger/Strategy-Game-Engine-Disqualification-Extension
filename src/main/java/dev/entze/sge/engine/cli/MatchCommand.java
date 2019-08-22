@@ -6,6 +6,7 @@ import dev.entze.sge.engine.game.MatchResult;
 import dev.entze.sge.game.Game;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import picocli.CommandLine.Command;
@@ -18,7 +19,7 @@ import picocli.CommandLine.ParentCommand;
 public class MatchCommand extends AbstractCommand implements Runnable {
 
   @Option(names = {"-c",
-      "--computation-time"}, defaultValue = "60", description = "Amount of computational time given for each action")
+      "--computation-time"}, defaultValue = "60", description = "Amount of computational time given for each action.")
   long computationTime = 60;
 
   @Option(names = {"-u",
@@ -59,6 +60,9 @@ public class MatchCommand extends AbstractCommand implements Runnable {
       "--directory"}, arity = "1..*", paramLabel = "DIRECTORY", description = "Directory(s) of game and agents. Note that all subdirectories will be considered.")
   private List<File> directories = new ArrayList<>();
 
+  @Option(names = {"-r", "-s", "--shuffle"}, description = "Shuffle configuration of agents.")
+  private boolean shuffle = false;
+
   @Option(names = {"-a",
       "--agent"}, arity = "1..*", paramLabel = "AGENT", description = "Configuration of agents.")
   private List<String> agentConfiguration = new ArrayList<>();
@@ -72,8 +76,29 @@ public class MatchCommand extends AbstractCommand implements Runnable {
   public void run() {
     loadCommon();
 
+    if (numberOfPlayers < 0) {
+      numberOfPlayers = sge.gameFactory.getMinimumNumberOfPlayers();
+    } else if (!(sge.gameFactory.getMinimumNumberOfPlayers() <= numberOfPlayers
+        && numberOfPlayers <= sge.gameFactory.getMaximumNumberOfPlayers())) {
+      sge.log.error("Game cannot be played with this number of players.");
+      throw new IllegalArgumentException("Illegal player number.");
+    }
+
+    if (agentConfiguration.size() < numberOfPlayers) {
+      sge.fillAgentList(agentConfiguration, numberOfPlayers);
+    } else if (agentConfiguration.size() > numberOfPlayers) {
+      sge.log.error("Too many agents given.");
+      throw new IllegalArgumentException("Illegal agent configuration.");
+    }
+
+    printAgentConfiguration();
+
     List<GameAgent<Game<Object, Object>, Object>> agentList = sge
-        .createAgentListFromConfiguration(numberOfPlayers, agentConfiguration);
+        .createAgentListFromConfiguration(agentConfiguration);
+
+    if (shuffle) {
+      Collections.shuffle(agentList);
+    }
 
     Match<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> match = new Match<>(
         sge.gameFactory.newInstance(board, numberOfPlayers),

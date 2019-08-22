@@ -91,14 +91,14 @@ public class MatchCommand extends AbstractCommand implements Runnable {
       throw new IllegalArgumentException("Illegal agent configuration.");
     }
 
+    if (shuffle) {
+      Collections.shuffle(agentConfiguration);
+    }
+
     printAgentConfiguration();
 
     List<GameAgent<Game<Object, Object>, Object>> agentList = sge
         .createAgentListFromConfiguration(agentConfiguration);
-
-    if (shuffle) {
-      Collections.shuffle(agentList);
-    }
 
     Match<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> match = new Match<>(
         sge.gameFactory.newInstance(board, numberOfPlayers),

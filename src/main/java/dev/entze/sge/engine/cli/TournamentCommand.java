@@ -91,14 +91,14 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
 
     sge.fillAgentList(agentConfiguration);
 
+    if (shuffle) {
+      Collections.shuffle(agentConfiguration);
+    }
+
     printAgentConfiguration();
 
     List<GameAgent<Game<Object, Object>, Object>> agentList = sge
         .createAgentListFromConfiguration(agentConfiguration);
-
-    if (shuffle) {
-      Collections.shuffle(agentList);
-    }
 
     Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> tournament = tournamentMode
         .getTournament(sge.gameFactory, board, agentList, computationTime, timeUnit, sge.debug,

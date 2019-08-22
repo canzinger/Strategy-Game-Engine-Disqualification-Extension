@@ -5,7 +5,11 @@ import dev.entze.sge.agent.HumanAgent;
 import dev.entze.sge.engine.Logger;
 import dev.entze.sge.game.ActionRecord;
 import dev.entze.sge.game.Game;
+import dev.entze.sge.util.pair.ImmutablePair;
+import dev.entze.sge.util.pair.Pair;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -13,6 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? extends A>, A> implements
     Callable<MatchResult<G, E>> {
@@ -51,12 +56,48 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
   @SuppressWarnings("unchecked")
   @Override
   public MatchResult<G, E> call() {
+    long startTime = System.nanoTime();
     if (matchResult != null) {
       return matchResult;
     }
-    long startTime = System.nanoTime();
-    for (int i = 0; i < gameAgents.size(); i++) {
-      gameAgents.get(i).setUp(gameAgents.size(), i);
+    {
+      Deque<Pair<String, Future<Void>>> setUps = new ArrayDeque<>(gameAgents.size());
+      for (int i = 0; i < gameAgents.size(); i++) {
+        final E gameAgent = gameAgents.get(i);
+        int finalI = i;
+        setUps
+            .add(new ImmutablePair<>(gameAgent.toString(), pool.submit(() -> {
+              gameAgent.setUp(gameAgents.size(), finalI);
+              return null;
+            })));
+      }
+
+      final int setUpsSize = setUps.size();
+      log.traProcess("Setting up agents", 0, setUpsSize);
+      while (!setUps.isEmpty() && Thread.currentThread().isAlive() && !Thread.currentThread()
+          .isInterrupted()) {
+        Pair<String, Future<Void>> setUp = setUps.pop();
+        log.tra_("\r");
+        log.traProcess("Setting up agents", setUpsSize - setUps.size(), setUpsSize);
+        try {
+          setUp.getB().get();
+        } catch (InterruptedException e) {
+          log.trace_(", failed.");
+          log.debug("Interrupted while setting up agent ".concat(setUp.getA()));
+          log.printStackTrace(e);
+        } catch (ExecutionException e) {
+          log.debug("Exception while setting up agent ".concat(setUp.getA()));
+          log.printStackTrace(e);
+        }
+      }
+
+      if (!setUps.isEmpty()) {
+        log.trace_(", failed.");
+        log.warn("Following agents where not verified to be set up: "
+            .concat(setUps.stream().map(Pair::getA).collect(Collectors.joining(", "))));
+      } else {
+        log.trace_(", done.");
+      }
     }
 
     double[] result = new double[gameAgents.size()];
@@ -170,18 +211,42 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
     log.info_(ActionRecord.iterableToString(actionRecords, lastPlayer));
 
-    /*
-     System.out.print("Result: ");
-     for (int i = 0; i < gameAgents.size(); i++) {
-     System.out.print("Player " + i + ": " + result[i]);
-     if (i + 1 < gameAgents.size()) {
-     System.out.print(", ");
-     }
-     }
-     System.out.println();
-     */
-    for (E gameAgent : gameAgents) {
-      gameAgent.tearDown();
+    {
+      Deque<Pair<String, Future<Void>>> tearDowns = new ArrayDeque<>(gameAgents.size());
+      for (E gameAgent : gameAgents) {
+        tearDowns
+            .add(new ImmutablePair<>(gameAgent.toString(), pool.submit(() -> {
+              gameAgent.tearDown();
+              return null;
+            })));
+      }
+
+      final int tearDownsSize = tearDowns.size();
+      log.traProcess("Tearing down agents", 0, tearDownsSize);
+      while (!tearDowns.isEmpty() && Thread.currentThread().isAlive() && !Thread.currentThread()
+          .isInterrupted()) {
+        Pair<String, Future<Void>> tearDown = tearDowns.pop();
+        log.tra_("\r");
+        log.traProcess("Tearing down agents", tearDownsSize - tearDowns.size(), tearDownsSize);
+        try {
+          tearDown.getB().get();
+        } catch (InterruptedException e) {
+          log.trace_(", failed.");
+          log.debug("Interrupted while tearing down agent ".concat(tearDown.getA()));
+          log.printStackTrace(e);
+        } catch (ExecutionException e) {
+          log.debug("Exception while tearing down agent ".concat(tearDown.getA()));
+          log.printStackTrace(e);
+        }
+      }
+
+      if (!tearDowns.isEmpty()) {
+        log.trace_(", failed.");
+        log.warn("Following agents where not verified to be teared down: "
+            .concat(tearDowns.stream().map(Pair::getA).collect(Collectors.joining(", "))));
+      } else {
+        log.trace_(", done.");
+      }
     }
 
     matchResult = new MatchResult<>(gameAgents, startTime, endTime, result);

@@ -1,7 +1,17 @@
 package dev.entze.sge.engine.cli;
 
+import dev.entze.sge.agent.GameAgent;
+import dev.entze.sge.game.Game;
+import dev.entze.sge.util.pair.ImmutablePair;
+import dev.entze.sge.util.pair.Pair;
 import java.io.File;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 public abstract class AbstractCommand {
 
@@ -89,6 +99,47 @@ public abstract class AbstractCommand {
     loadArguments();
     loadFiles();
     loadBoard();
+  }
+
+  protected void destroyAgents(Collection<GameAgent<Game<Object, Object>, Object>> agents) {
+    Deque<Pair<String, Future<Void>>> destroys = new ArrayDeque<>(agents.size());
+
+    for (GameAgent<Game<Object, Object>, Object> gameAgent : agents) {
+      destroys.add(new ImmutablePair<>(gameAgent.toString(), getSge().pool.submit(() -> {
+        gameAgent.destroy();
+        return null;
+      })));
+    }
+
+    final int size = destroys.size();
+
+    getSge().log.traProcess("Destroying agents", 0, size);
+
+    while (!destroys.isEmpty() && Thread.currentThread().isAlive() && !Thread.currentThread()
+        .isInterrupted()) {
+      Pair<String, Future<Void>> tearDown = destroys.pop();
+      getSge().log.tra_("\r");
+      getSge().log.traProcess("Destroying agents", size - destroys.size(), size);
+      try {
+        tearDown.getB().get();
+      } catch (InterruptedException e) {
+        getSge().log.trace_(", failed.");
+        getSge().log.debug("Interrupted while destroying agent ".concat(tearDown.getA()));
+        getSge().log.printStackTrace(e);
+      } catch (ExecutionException e) {
+        getSge().log.trace_(", failed.");
+        getSge().log.debug("Exception while destroying agent ".concat(tearDown.getA()));
+        getSge().log.printStackTrace(e);
+      }
+    }
+
+    if (!destroys.isEmpty()) {
+      getSge().log.trace_(", failed.");
+      getSge().log.warn("Following agents where not verified to be destroyed: "
+          .concat(destroys.stream().map(Pair::getA).collect(Collectors.joining(", "))));
+    } else {
+      getSge().log.trace_(", done.");
+    }
   }
 
 }

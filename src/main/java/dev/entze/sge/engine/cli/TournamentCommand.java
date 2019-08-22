@@ -106,8 +106,8 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
         .createAgentListFromConfiguration(agentConfiguration);
 
     Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> tournament = tournamentMode
-        .getTournament(sge.gameFactory, board, agentList, computationTime, timeUnit, sge.debug,
-            sge.log, sge.pool);
+        .getTournament(sge.gameFactory, numberOfPlayers, board, agentList, computationTime,
+            timeUnit, sge.debug, sge.log, sge.pool);
 
     try {
       tournament.call();
@@ -118,6 +118,7 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
 
     System.out.println("\n".concat(tournament.toTextRepresentation()).concat("\n"));
 
+    destroyAgents(agentList);
   }
 
   @Override

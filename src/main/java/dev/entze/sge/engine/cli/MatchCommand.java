@@ -109,6 +109,7 @@ public class MatchCommand extends AbstractCommand implements Runnable {
 
     System.out.println("\n".concat(matchResult.toString()).concat("\n"));
 
+    destroyAgents(agentList);
   }
 
   @Override

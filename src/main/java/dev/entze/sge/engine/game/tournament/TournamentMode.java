@@ -12,11 +12,12 @@ public enum TournamentMode {
 
   ROUND_ROBIN {
     public Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> getTournament(
-        GameFactory<Game<Object, Object>> gameFactory,
+        GameFactory<Game<Object, Object>> gameFactory, int numberOfPlayers,
         String board, List<GameAgent<Game<Object, Object>, Object>> gameAgents,
         long computationTime,
         TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
-      return new RoundRobin<>(gameFactory, board, gameAgents, computationTime, timeUnit, debug, log,
+      return new RoundRobin<>(gameFactory, numberOfPlayers, board, gameAgents, computationTime,
+          timeUnit, debug, log,
           pool);
     }
 
@@ -34,7 +35,7 @@ public enum TournamentMode {
   };
 
   public abstract Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> getTournament(
-      GameFactory<Game<Object, Object>> gameFactory,
+      GameFactory<Game<Object, Object>> gameFactory, int numberOfPlayers,
       String board, List<GameAgent<Game<Object, Object>, Object>> gameAgents,
       long computationTime,
       TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool);

@@ -8,9 +8,11 @@ import dev.entze.sge.engine.game.Match;
 import dev.entze.sge.engine.game.MatchResult;
 import dev.entze.sge.game.Game;
 import dev.entze.sge.util.Util;
+import dev.entze.sge.util.pair.ImmutablePair;
 import dev.entze.sge.util.pair.MutablePair;
 import dev.entze.sge.util.pair.Pair;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -63,9 +65,23 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
       List<MatchResult<G, E>> tournamentResult) {
     Map<String, Map<String, Double>> twoResult = new HashMap<>();
 
+    for (MatchResult<G, E> matchResult : tournamentResult) {
+      final List<E> agents = matchResult.getGameAgents();
+      final double[] results = matchResult.getResult();
+      final double result = results[0] - results[1];
+      final String xAgent = agents.get(0).toString();
+      final String yAgent = agents.get(1).toString();
+      twoResult.compute(xAgent, (k, v) -> {
+        if (v == null) {
+          v = new HashMap<>();
+        }
+        v.put(yAgent, result);
+        return v;
+      });
+    }
+
     return twoResult;
   }
-
 
 
   public static String twoTableToString(Map<String, Map<String, Double>> twoTable) {
@@ -91,8 +107,9 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
       for (int x = 0; x < gameAgentNames.size(); x++) {
         String xAgentName = gameAgentNames.get(x);
         if (twoTable.containsKey(yAgentName) && twoTable.get(yAgentName).containsKey(xAgentName)) {
+          stringBuilder.append(' ');
           Util.appendWithBlankBuffer(stringBuilder, twoTable.get(yAgentName).get(xAgentName),
-              gameAgentWidths.get(x) + 2);
+              gameAgentWidths.get(x)).append(' ');
         } else {
           Util.appendNTimes(stringBuilder, ' ', gameAgentWidths.get(x) + 2);
         }
@@ -120,7 +137,7 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
       if (result == null) {
         result = Tournament.resultAsTable(tournamentResult);
       }
-      //TODO: tableToString(result);
+      textRepresentation = Tournament.tableToString(result);
     }
 
     return textRepresentation;
@@ -137,18 +154,6 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
     }
 
     stringBuilder.deleteCharAt(stringBuilder.length() - 1).append('|').append('\n');
-    return stringBuilder;
-  }
-
-  private static StringBuilder appendNSkips(StringBuilder stringBuilder, List<Integer> widths,
-      int n) {
-    if (n == 0) {
-      return stringBuilder;
-    }
-    stringBuilder.append('|');
-    for (int i = 0; i < n; i++) {
-      Util.appendNTimes(stringBuilder, ' ', widths.get(i) + 2).append('|');
-    }
     return stringBuilder;
   }
 
@@ -197,6 +202,29 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
   }
 
   private List<MatchResult<G, E>> tournament() {
+    int[] indices = new int[numberOfPlayers];
+
+    for (int i = 0; i < indices.length; i++) {
+      indices[i] = i;
+    }
+
+    do {
+      List<E> agentList = Arrays.stream(indices).mapToObj(gameAgents::get)
+          .collect(Collectors.toUnmodifiableList());
+      Match<G, E, A> match = new Match<>(newInstanceOfGame(), agentList, computationTime, timeUnit,
+          debug, log, pool);
+      MatchResult<G, E> matchResult = match.call();
+      double[] utilities = matchResult.getResult();
+      double[] scores = Util.scoresOutOfUtilities(utilities);
+      for (int i = 0; i < agentList.size(); i++) {
+        String agentName = agentList.get(i).toString();
+        final double score = scores[i];
+        final double utility = utilities[i];
+        result.compute(agentName, (k, v) -> v == null ? new ImmutablePair<>(score, utility)
+            : new ImmutablePair<>(v.getA() + score, v.getB() + utility));
+      }
+      indices = Util.combinations(indices);
+    } while (indices[numberOfPlayers - 1] < gameAgents.size());
 
     return tournamentResult;
   }

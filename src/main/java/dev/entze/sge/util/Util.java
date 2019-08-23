@@ -664,26 +664,27 @@ public class Util {
         + (value > max ? (((double) (utility.length - 1)) / utility.length) : 0D);
   }
 
-  public static double[] scoreOutOfUtility(double[] utility) {
+  public static double[] scoresOutOfUtilities(double[] utility){
+    return scoresOutOfUtilities(utility, 8);
+  }
+
+  public static double[] scoresOutOfUtilities(double[] utility, final int significantFigures) {
     double[] score = new double[utility.length];
     double max = Double.NEGATIVE_INFINITY;
-    int lastChange = -1;
-    for (int i = 0; i < utility.length; i++) {
-      if (max < utility[i]) {
-        max = utility[i];
-        lastChange = i;
+    int numberOfMaxs = 0;
+    for (double u : utility) {
+      if (max <= u || nearlyEquals(max, u, significantFigures)) {
+        if (max < u && !nearlyEquals(max, u, significantFigures)) {
+          numberOfMaxs = 0;
+          max = u;
+        }
+        numberOfMaxs++;
       }
-      score[i] =
-          (utility[i] >= max ? (1D / utility.length) : 0D)
-              + (utility[i] > max ? (((double) (utility.length - 1)) / utility.length) : 0D);
     }
 
-    if (lastChange > 0) {
-      for (int i = 0; i < score.length; i++) {
-        score[i] =
-            (utility[i] >= max ? (1D / utility.length) : 0D)
-                + (utility[i] > max ? (((double) (utility.length - 1)) / utility.length) : 0D);
-      }
+    for (int i = 0; i < score.length; i++) {
+      score[i] = (utility[i] >= max || nearlyEquals(max, utility[i], significantFigures) ? (1D
+          / ((double) numberOfMaxs)) : 0);
     }
 
     return score;

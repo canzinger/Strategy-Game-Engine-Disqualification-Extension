@@ -50,27 +50,54 @@ public class MatchResult<G extends Game<?, ?>, E extends GameAgent<G, ?>> {
     List<Integer> gameAgentWidths = gameAgentNames.stream().map(String::length)
         .collect(Collectors.toList());
 
-    appendSeperationLine(stringBuilder, gameAgentWidths);
+    double[] score = Util.scoresOutOfUtilities(result);
+    String scoreString = "Score";
+    String utilityString = "Utility";
+    int firstColumnWidth = Math.max(scoreString.length(), utilityString.length());
+
+    appendSeperationLine(stringBuilder, firstColumnWidth, gameAgentWidths).append('|');
+    Util.appendNTimes(stringBuilder, ' ', firstColumnWidth + 2);
     stringBuilder.append('|').append(' ').append(String.join(" | ", gameAgentNames)).append(' ')
         .append('|')
         .append('\n');
-    appendSeperationLine(stringBuilder, gameAgentWidths).append('|');
+    appendSeperationLine(stringBuilder, firstColumnWidth, gameAgentWidths).append('|');
+
+    Util.appendWithBlankBuffer(stringBuilder, scoreString, firstColumnWidth + 2).append('|');
+
     for (int i = 0; i < gameAgentWidths.size(); i++) {
-      int width = gameAgentWidths.get(i) + 2;
-      Util.appendWithBlankBuffer(stringBuilder, result[i], width).append('|');
+      int width = gameAgentWidths.get(i);
+      stringBuilder.append(' ');
+      Util.appendWithBlankBuffer(stringBuilder, score[i], width).append(' ').append('|');
     }
+
+    stringBuilder.append('\n').append('|');
+
+    Util.appendWithBlankBuffer(stringBuilder, utilityString, firstColumnWidth + 2).append('|');
+
+    for (int i = 0; i < gameAgentWidths.size(); i++) {
+      int width = gameAgentWidths.get(i);
+      stringBuilder.append(' ');
+      Util.appendWithBlankBuffer(stringBuilder, result[i], width).append(' ').append('|');
+    }
+
     stringBuilder.append('\n');
-    appendSeperationLine(stringBuilder, gameAgentWidths).deleteCharAt(stringBuilder.length() - 1);
+    appendSeperationLine(stringBuilder, firstColumnWidth, gameAgentWidths)
+        .deleteCharAt(stringBuilder.length() - 1);
     string = stringBuilder.toString();
     return string;
   }
 
   private static StringBuilder appendSeperationLine(StringBuilder stringBuilder,
+      int firstColumnWidth,
       List<Integer> widths) {
+
     stringBuilder.append('|');
+    Util.appendNTimes(stringBuilder, '-', firstColumnWidth + 2).append('+');
+
     for (Integer width : widths) {
       Util.appendNTimes(stringBuilder, '-', width + 2).append('+');
     }
+
     stringBuilder.deleteCharAt(stringBuilder.length() - 1).append('|').append('\n');
     return stringBuilder;
   }

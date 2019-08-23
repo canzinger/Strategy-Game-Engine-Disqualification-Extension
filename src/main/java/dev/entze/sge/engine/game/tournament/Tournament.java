@@ -39,16 +39,45 @@ public interface Tournament<G extends Game<? extends A, ?>, E extends GameAgent<
     List<Integer> agentNamesWidth = agentNames.stream().map(String::length)
         .collect(Collectors.toUnmodifiableList());
 
-    stringBuilder.append('|').append(' ').append(String.join(" | ", agentNames)).append(' ')
+    String scoreString = "Score";
+    String utilityString = "Utility";
+    final int firstColumnWidth = Math.max(scoreString.length(), utilityString.length());
+
+    stringBuilder.append('|');
+    Util.appendNTimes(stringBuilder, ' ', firstColumnWidth + 2).append('|').append(' ')
+        .append(String.join(" | ", agentNames)).append(' ')
         .append('|').append('\n');
 
     stringBuilder.append('|');
     for (Integer size : agentNamesWidth) {
       Util.appendNTimes(stringBuilder, '-', size + 2).append('+');
     }
-    stringBuilder.deleteCharAt(stringBuilder.length() - 1).append('|').append('\n');
+    stringBuilder.deleteCharAt(stringBuilder.length() - 1).append('|').append('\n').append('|');
+    Util.appendWithBlankBuffer(stringBuilder, scoreString, firstColumnWidth + 2);
+    for (String agentName : agentNames) {
+      stringBuilder.append('|');
+      if (table.containsKey(agentName)) {
+        double scoreValue = table.get(agentName).getA();
+        stringBuilder.append(' ');
+        Util.appendWithBlankBuffer(stringBuilder, scoreValue, agentName.length()).append(' ');
+      } else {
+        Util.appendNTimes(stringBuilder, ' ', agentName.length() + 2);
+      }
+    }
+    stringBuilder.append('|').append('\n');
 
-    //TODO: score utility
+    Util.appendWithBlankBuffer(stringBuilder, utilityString, firstColumnWidth + 2);
+    for (String agentName : agentNames) {
+      stringBuilder.append('|');
+      if (table.containsKey(agentName)) {
+        double utilityValue = table.get(agentName).getB();
+        stringBuilder.append(' ');
+        Util.appendWithBlankBuffer(stringBuilder, utilityValue, agentName.length()).append(' ');
+      } else {
+        Util.appendNTimes(stringBuilder, ' ', agentName.length() + 2);
+      }
+    }
+    stringBuilder.append('|').append('\n');
 
     return stringBuilder.toString();
   }
@@ -61,7 +90,7 @@ public interface Tournament<G extends Game<? extends A, ?>, E extends GameAgent<
     for (MatchResult<G, E> matchResult : tournamentResult) {
       List<E> gameAgents = matchResult.getGameAgents();
       final double[] utilities = matchResult.getResult();
-      final double[] scores = Util.scoreOutOfUtility(utilities);
+      final double[] scores = Util.scoresOutOfUtilities(utilities);
 
       for (int i = 0; i < gameAgents.size(); i++) {
         final String gameAgentName = gameAgents.get(i).toString();

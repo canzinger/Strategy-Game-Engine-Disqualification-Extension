@@ -303,86 +303,22 @@ public class Util {
     }
   }
 
-  public static <E> Collection<Collection<E>> combinations(Collection<E> collection, int r) {
-    final int n = collection.size();
-    if (n == 0 || r <= 0) {
-      return Collections.emptyList();
-    }
-    if (n <= r) {
-      return List.of(List.copyOf(collection));
-    }
-    List<E> list;
-    if (collection instanceof List) {
-      list = (List<E>) collection;
-    } else {
-      list = new ArrayList<>(collection);
-    }
-    int[] indices = new int[r];
-    for (int i = 0; i < r; i++) {
-      indices[i] = i;
-    }
-
-    Collection<Collection<E>> combinations = new ArrayList<>();
-    Collection<E> combination = new ArrayList<>(r);
-    do {
-      combination.clear();
-      for (int index : indices) {
-        combination.add(list.get(index));
-      }
-      combinations.add(List.copyOf(combination));
-      indices = combinations(indices);
-    } while (indices[r - 1] < n);
-
-    return combinations;
-  }
-
   public static int[] combinations(int[] last) {
     int[] next = last.clone();
     for (int i = 0; i + 1 < next.length; i++) {
       if ((next[i] + 1) < next[i + 1]) {
         next[i]++;
+        for (int j = 0; j < i; j++) {
+          next[j] = j;
+        }
         return next;
       }
     }
     next[next.length - 1]++;
+    for (int i = 0; i < next.length - 1; i++) {
+      next[i] = i;
+    }
     return next;
-  }
-
-  public static <E> Collection<List<E>> permutations(Collection<E> collection, int r) {
-    final int n = collection.size();
-    if (n == 0 || r <= 0) {
-      return Collections.emptyList();
-    }
-    if (n <= r) {
-      return List.of(List.copyOf(collection));
-    }
-    List<E> list;
-    if (collection instanceof List) {
-      list = (List<E>) collection;
-    } else {
-      list = new ArrayList<>(collection);
-    }
-
-    int[] indices = new int[r];
-    for (int i = 0; i < r; i++) {
-      indices[i] = i;
-    }
-
-    Collection<List<E>> permutations = new ArrayList<>();
-    List<E> permutation = new ArrayList<>(r);
-
-    do {
-      permutation.clear();
-      for (int index : indices) {
-        permutation.add(list.get(index));
-      }
-      permutations.add(List.copyOf(permutation));
-      do {
-        indices = permutations(indices, r);
-      } while (hasDuplicates(indices) && !allEqualTo(indices, 0));
-    } while (!allEqualTo(indices, 0));
-
-    return permutations;
   }
 
   public static int[] permutations(int[] last, int r) {
@@ -664,7 +600,7 @@ public class Util {
         + (value > max ? (((double) (utility.length - 1)) / utility.length) : 0D);
   }
 
-  public static double[] scoresOutOfUtilities(double[] utility){
+  public static double[] scoresOutOfUtilities(double[] utility) {
     return scoresOutOfUtilities(utility, 8);
   }
 

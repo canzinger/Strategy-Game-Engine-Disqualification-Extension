@@ -49,8 +49,13 @@ public class ActionRecord<A> {
   }
 
 
-  public static <A> String iterableToString(Iterable<ActionRecord<A>> actionRecords,
-      int lastPlayer) {
+  public static <A> String iterableToString(List<ActionRecord<A>> actionRecords) {
+    if (actionRecords.isEmpty()) {
+      return "<>";
+    }
+
+    int lastPlayer = actionRecords.get(0).getPlayer() + 1;
+
     StringBuilder builder = new StringBuilder();
 
     boolean flushPlayer = false;
@@ -76,10 +81,6 @@ public class ActionRecord<A> {
     builder.append('>');
 
     return builder.toString();
-  }
-
-  public static <A> String iterableToString(List<ActionRecord<A>> actionRecords) {
-    return iterableToString(actionRecords, actionRecords.get(actionRecords.size() - 1).getPlayer());
   }
 
 }

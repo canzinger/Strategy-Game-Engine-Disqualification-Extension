@@ -1,5 +1,6 @@
 package dev.entze.sge.util;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import dev.entze.sge.util.unit.InformationUnit;
@@ -102,6 +103,30 @@ public class UtilTest {
 
   @Test
   public void test_convertToMinimalUnits() {
+  }
+
+
+  @Test
+  public void test_combinations() {
+    int[] is = new int[] {0, 1, 2};
+    is = Util.combinations(is);
+    assertArrayEquals(new int[] {0, 1, 3}, is);
+    is = Util.combinations(is);
+    assertArrayEquals(new int[] {0, 2, 3}, is);
+    is = Util.combinations(is);
+    assertArrayEquals(new int[] {1, 2, 3}, is);
+    is = Util.combinations(is);
+    assertArrayEquals(new int[] {0, 1, 4}, is);
+    is = Util.combinations(is);
+    assertArrayEquals(new int[] {0, 2, 4}, is);
+    is = Util.combinations(is);
+    assertArrayEquals(new int[] {1, 2, 4}, is);
+    is = Util.combinations(is);
+    assertArrayEquals(new int[] {0, 3, 4}, is);
+    is = Util.combinations(is);
+    assertArrayEquals(new int[] {1, 3, 4}, is);
+    is = Util.combinations(is);
+    assertArrayEquals(new int[] {2, 3, 4}, is);
   }
 
 }

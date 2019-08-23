@@ -155,6 +155,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           log.warn("No action given.");
           result[thisPlayer] = (-1D);
           matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
+          log.debf("%d plies: ", game.getNumberOfActions());
+          log.debug_(ActionRecord.iterableToString(game.getActionRecords()));
           return matchResult;
         }
 
@@ -171,6 +173,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           }
           result[thisPlayer] = (-1D);
           matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
+          log.debf("%d plies: ", game.getNumberOfActions());
+          log.debug_(ActionRecord.iterableToString(game.getActionRecords()));
           return matchResult;
         }
 
@@ -207,9 +211,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     log.info_(game.toTextRepresentation());
     log.inf(game.getNumberOfActions() + " plies ");
     List<ActionRecord<A>> actionRecords = game.getActionRecords();
-    lastPlayer = actionRecords.get(0).getPlayer() + 1;
 
-    log.info_(ActionRecord.iterableToString(actionRecords, lastPlayer));
+    log.info_(ActionRecord.iterableToString(actionRecords));
 
     {
       Deque<Pair<String, Future<Void>>> tearDowns = new ArrayDeque<>(gameAgents.size());

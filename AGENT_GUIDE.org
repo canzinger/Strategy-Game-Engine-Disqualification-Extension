@@ -1,0 +1,103 @@
+#+TITLE: How to write an agent for sge
+
+* Quick Start
+
+** Java Installation
+
+sge is written for Java 11 which is available under [[https://jdk.java.net/][https://jdk.java.net/]]
+
+** Engine Installation
+
+The engine itself is bundled with all it's dependencies in a fat-jar, usually
+named sge-MA.MI.P.jar or strategyGameEngine-MA.MI.P.jar and can be executed with
+
+#+BEGIN_SRC
+
+java -jar sge-MA.MI.P.jar
+
+#+END_SRC
+
+
+*** Synopsis
+
+Note: A comprehensive synopsis can be viewed with the ~-h~ or ~--help~ flag.
+
+To load a game or an agent and play a single match append the jar to the execution line.
+
+#+BEGIN_SRC
+
+java -jar sge-MA.MI.P.jar match jar [jars...]
+
+#+END_SRC
+
+The engine can determine if it is a game or an agent by itself so the order does
+not matter.
+
+** Game Installation
+
+The game itself is only required to be called via the engine as an argument.
+
+** Agent Installation
+
+Agents are only required to be called via the engine as an argument.
+
+** Writing an Agent
+
+*** Build environment
+
+#+TODO: Adding the dependencies over jcenter()
+
+Through the build tool make sure that following attributes are ensured:
+
++ Source Compatibility: 1.11
++ Following Manifest attributes
+  - 'Sge-Type': 'agent'
+  - 'Agent-Class': path.to.actual.agent
+  - 'Agent-Name': The name of the agent
++ Engine is in classpath
++ Recommended: Game is in classpath
+
+To achieve this in gradle:
+
+#+BEGIN_SRC gradle
+
+sourceCompatibility = 1.11
+
+jar {
+    manifest {
+        attributes 'Sge-Type': 'agent'
+        attributes 'Agent-Class': 'dev.entze.sge.agent.mctsagent.MctsAgent'
+        attributes 'Agent-Name': 'MctsAgent'
+    }
+}
+
+#+END_SRC
+
+*** Implementing the GameAgent Interface
+
+In order to write an agent for sge a class has to implement the interface
+~dev.entze.sge.agent.GameAgent~. It is also highly recommended to extend from
+~dev.entze.sge.agent.AbstractAgent~.
+
+Here an minimal working example:
+
+#+BEGIN_SRC java
+
+import dev.entze.sge.agent.*;
+import dev.entze.sge.engine.Logger;
+
+public class FirstAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction> {
+
+ public FirstAgent(Logger log){
+  super(log);
+ }
+
+ public RiskAction computeNextAction(Risk game, long computationTime, TimeUnit timeUnit){
+  return List.copyOf(game.getPossibleActions()).get(0);
+ }
+
+}
+
+#+END_SRC
+
+# * Comprehensive Guide

@@ -383,7 +383,7 @@ public class SgeCommand implements Callable<Void> {
    * Fills the agent configuration until it has the minimum amount of players
    *
    * @param agentConfiguration agent configuration
-   * @param minimumPlayers minimum number of players required
+   * @param minimumPlayers     minimum number of players required
    * @return number of agents added to the configuration
    */
   public int fillAgentList(List<String> agentConfiguration, int minimumPlayers) {
@@ -515,7 +515,7 @@ public class SgeCommand implements Callable<Void> {
       if (!pool.awaitTermination(AWAIT_TERMINATION_TIME, AWAIT_TERMINATION_TIMEUNIT)) {
         log.trace_(", failed.");
         log.info("ThreadPool did not yet shutdown. Forcing.");
-        pool.shutdownNow();
+        List<Runnable> stillRunning = pool.shutdownNow();
       } else {
         log.trace_(", done.");
       }

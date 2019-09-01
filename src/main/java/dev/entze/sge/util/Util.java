@@ -1,5 +1,7 @@
 package dev.entze.sge.util;
 
+import com.google.common.math.IntMath;
+import com.google.common.math.LongMath;
 import dev.entze.sge.game.ActionRecord;
 import dev.entze.sge.game.Game;
 import dev.entze.sge.util.node.GameNode;
@@ -23,11 +25,23 @@ import java.util.concurrent.TimeUnit;
 
 public class Util {
 
+  public static int nPr(int n, int k) {
+    int res = 1;
+
+    for (int i = (n - k) + 1; i <= n; i++) {
+      res *= i;
+    }
+
+    return res;
+  }
+
+
+
   /**
    * Taken from <a href=https://floating-point-gui.de/errors/comparison/>https://floating-point-gui.de/errors/comparison/</a>
    *
-   * @param a - a float
-   * @param b - a float
+   * @param a       - a float
+   * @param b       - a float
    * @param epsilon - relative error
    * @return if the two numbers are within the relative epsilon of one another
    */
@@ -467,8 +481,8 @@ public class Util {
   /**
    * Return an array of minimal units. For example 25 hours are converted to 1 day and 1 hour.
    *
-   * @param item - the item
-   * @param unit - the unit
+   * @param item        - the item
+   * @param unit        - the unit
    * @param targetUnits - the targeted Units
    * @return an array of minimal timeUnits
    */

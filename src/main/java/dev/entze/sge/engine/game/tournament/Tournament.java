@@ -1,6 +1,7 @@
 package dev.entze.sge.engine.game.tournament;
 
 import dev.entze.sge.agent.GameAgent;
+import dev.entze.sge.engine.game.Match;
 import dev.entze.sge.engine.game.MatchResult;
 import dev.entze.sge.game.Game;
 import dev.entze.sge.util.Util;
@@ -16,6 +17,9 @@ import java.util.stream.Collectors;
 
 public interface Tournament<G extends Game<? extends A, ?>, E extends GameAgent<G, ? extends A>, A> extends
     Callable<List<MatchResult<G, E>>> {
+
+  @Override
+  List<MatchResult<G, E>> call();
 
   default String toTextRepresentation() {
     try {

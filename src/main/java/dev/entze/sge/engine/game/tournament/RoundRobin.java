@@ -24,39 +24,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ? extends A>, A> implements
+public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ? extends A>, A> extends
+    AbstractTournament<G, E, A> implements
     Tournament<G, E, A> {
 
-  private List<MatchResult<G, E>> tournamentResult;
-  private String textRepresentation;
   private Map<String, Map<String, Double>> twoResult;
   private Map<String, Pair<Double, Double>> result;
-
-  private final GameFactory<G> gameFactory;
-  private final int numberOfPlayers;
-  private final String board;
-  private final List<E> gameAgents;
-  private final boolean debug;
-  private final long computationTime;
-  private final TimeUnit timeUnit;
-  private final Logger log;
-  private final ExecutorService pool;
-
 
   public RoundRobin(GameFactory<G> gameFactory, int numberOfPlayers, String board,
       List<E> gameAgents,
       long computationTime, TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
-    this.tournamentResult = null;
-    this.textRepresentation = null;
-    this.gameFactory = gameFactory;
-    this.numberOfPlayers = numberOfPlayers;
-    this.board = board;
-    this.gameAgents = gameAgents;
-    this.debug = debug;
-    this.computationTime = computationTime;
-    this.timeUnit = timeUnit;
-    this.log = log;
-    this.pool = pool;
+    super(gameFactory, numberOfPlayers, board, gameAgents, computationTime, timeUnit, debug, log,
+        pool);
     this.result = null;
     this.twoResult = null;
   }
@@ -125,7 +104,7 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
   @Override
   public String toTextRepresentation() {
     if (tournamentResult == null) {
-      return "Not played yet.";
+      return "not played";
     } else if (textRepresentation != null) {
       return textRepresentation;
     } else if (numberOfPlayers == 2) {
@@ -229,9 +208,6 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
     return tournamentResult;
   }
 
-  @SuppressWarnings("unchecked")
-  private Game<A, ?> newInstanceOfGame() {
-    return (Game<A, ?>) gameFactory.newInstance(board, numberOfPlayers);
-  }
+
 
 }

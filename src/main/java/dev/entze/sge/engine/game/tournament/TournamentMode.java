@@ -28,10 +28,30 @@ public enum TournamentMode {
 
     @Override
     public int getMaximumPerRound() {
-      return 2;
+      return Integer.MAX_VALUE;
     }
 
 
+  },
+  DOUBLE_ROUND_ROBIN {
+    @Override
+    public Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> getTournament(
+        GameFactory<Game<Object, Object>> gameFactory, int numberOfPlayers, String board,
+        List<GameAgent<Game<Object, Object>, Object>> gameAgents, long computationTime,
+        TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
+      return new DoubleRoundRobin<>(gameFactory, numberOfPlayers, board, gameAgents,
+          computationTime, timeUnit, debug, log, pool);
+    }
+
+    @Override
+    public int getMinimumPerRound() {
+      return 2;
+    }
+
+    @Override
+    public int getMaximumPerRound() {
+      return Integer.MAX_VALUE;
+    }
   };
 
   public abstract Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> getTournament(

@@ -18,7 +18,7 @@ import picocli.CommandLine.ParentCommand;
 public class TournamentCommand extends AbstractCommand implements Runnable {
 
   @Option(names = {"-c",
-      "--computation-time"}, defaultValue = "60", description = "Amount of computational time given for each action")
+      "--computation-time"}, defaultValue = "60", description = "Amount of computational time given for each action.")
   long computationTime = 60;
 
   @Option(names = {"-u",
@@ -28,7 +28,7 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
   @ParentCommand
   private SgeCommand sge;
 
-  @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
+  @Option(names = {"-h", "--help"}, usageHelp = true, description = "Prints this message.")
   private boolean helpRequested = false;
 
   @Option(names = {"-q",
@@ -66,12 +66,14 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
   @Option(names = {"-r", "-s", "--shuffle"}, description = "Shuffle configuration of agents.")
   private boolean shuffle = false;
 
+  @Option(names = {"-m",
+      "--mode"}, arity = "1", paramLabel = "MODE", description = "Tournament Mode. Valid values: ${COMPLETION-CANDIDATES}")
+  private TournamentMode tournamentMode = TournamentMode.ROUND_ROBIN;
+
   @Parameters(index = "0", arity = "0..*", description = {
       "Not explicitly specified files or configuration of agents."})
   private List<String> arguments = new ArrayList<>();
 
-  @Parameters(index = "1", arity = "0..1", paramLabel = "MODE", description = "Tournament Mode. Valid values: ${COMPLETION-CANDIDATES}")
-  private TournamentMode tournamentMode = TournamentMode.ROUND_ROBIN;
 
   @Override
   public void run() {

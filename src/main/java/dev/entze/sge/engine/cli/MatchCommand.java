@@ -29,7 +29,7 @@ public class MatchCommand extends AbstractCommand implements Runnable {
   @ParentCommand
   private SgeCommand sge;
 
-  @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
+  @Option(names = {"-h", "--help"}, usageHelp = true, description = "Prints this message.")
   private boolean helpRequested = false;
 
   @Option(names = {"-q",
@@ -41,7 +41,7 @@ public class MatchCommand extends AbstractCommand implements Runnable {
   private boolean[] verbose = new boolean[0];
 
   @Option(names = {"-p",
-      "--number-of-players"}, arity = "1", paramLabel = "N", description = "Number of players. By default the minimum required to play")
+      "--number-of-players"}, arity = "1", paramLabel = "N", description = "Number of players. By default the minimum required to play.")
   private int numberOfPlayers = (-1);
 
   @Option(names = {"-b",

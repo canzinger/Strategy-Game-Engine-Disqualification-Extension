@@ -1,7 +1,5 @@
 package dev.entze.sge.util;
 
-import com.google.common.math.IntMath;
-import com.google.common.math.LongMath;
 import dev.entze.sge.game.ActionRecord;
 import dev.entze.sge.game.Game;
 import dev.entze.sge.util.node.GameNode;
@@ -36,12 +34,11 @@ public class Util {
   }
 
 
-
   /**
    * Taken from <a href=https://floating-point-gui.de/errors/comparison/>https://floating-point-gui.de/errors/comparison/</a>
    *
-   * @param a       - a float
-   * @param b       - a float
+   * @param a - a float
+   * @param b - a float
    * @param epsilon - relative error
    * @return if the two numbers are within the relative epsilon of one another
    */
@@ -302,6 +299,60 @@ public class Util {
     return false;
   }
 
+  public static boolean isAscending(int[] array) {
+    for (int i = 0; i < array.length - 1; i++) {
+      if (array[i] > array[i + 1]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static boolean isStrictlyAscending(int[] array) {
+    for (int i = 0; i < array.length - 1; i++) {
+      if (array[i] >= array[i + 1]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static boolean isDescending(int[] array) {
+    for (int i = 0; i < array.length - 1; i++) {
+      if (array[i] < array[i + 1]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static boolean isStrictlyDescending(int[] array) {
+    for (int i = 0; i < array.length - 1; i++) {
+      if (array[i] <= array[i + 1]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static boolean isIndexEqualToValue(int[] array) {
+    for (int i = 0; i < array.length; i++) {
+      if (array[i] != i) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static boolean isReverseIndexEqualToValue(int[] array) {
+    for (int i = 0; i < array.length; i++) {
+      if (array[i] != (array.length - 1) - i) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public static <E> void shuffle(Deque<E> deque) {
     shuffle(deque, new Random());
   }
@@ -336,18 +387,24 @@ public class Util {
   }
 
   public static int[] permutations(int[] last, int r) {
-    final int n = last.length;
-    int[] next = last.clone();
+    int[] next = last;
+    do {
+      next = multipermutations(next, r);
+    } while (hasDuplicates(next));
 
-    for (int i = 0; i < n; i++) {
+    return next;
+  }
+
+  public static int[] multipermutations(int[] last, int r) {
+    int[] next = last.clone();
+    for (int i = 0; i < next.length; i++) {
       next[i]++;
-      if (next[i] >= r) {
+      if (next[i] > r) {
         next[i] = 0;
       } else {
-        break;
+        return next;
       }
     }
-
     return next;
   }
 
@@ -481,8 +538,8 @@ public class Util {
   /**
    * Return an array of minimal units. For example 25 hours are converted to 1 day and 1 hour.
    *
-   * @param item        - the item
-   * @param unit        - the unit
+   * @param item - the item
+   * @param unit - the unit
    * @param targetUnits - the targeted Units
    * @return an array of minimal timeUnits
    */

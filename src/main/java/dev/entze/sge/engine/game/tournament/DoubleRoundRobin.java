@@ -1,6 +1,5 @@
 package dev.entze.sge.engine.game.tournament;
 
-import com.google.common.math.IntMath;
 import dev.entze.sge.agent.GameAgent;
 import dev.entze.sge.engine.Logger;
 import dev.entze.sge.engine.factory.GameFactory;
@@ -10,6 +9,7 @@ import dev.entze.sge.game.Game;
 import dev.entze.sge.util.Util;
 import dev.entze.sge.util.pair.Pair;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,8 +41,9 @@ public class DoubleRoundRobin<G extends Game<? extends A, ?>, E extends GameAgen
       int gameAgentsSize = gameAgents.size();
       int numberOfGames = Util.nPr(gameAgentsSize, numberOfPlayers);
       tournamentResult = new ArrayList<>(numberOfGames);
-      log.info("Starting Double Round Robin tournament with " + gameAgentsSize + " contestants, "
-          + numberOfGames + " game" + (numberOfGames == 1 ? "" : "s") + ".");
+      log.info("Starting Double Round Robin tournament with " + gameAgentsSize + " contestant" + (
+          gameAgentsSize == 1 ? "" : "s") + ", " + numberOfGames + " game" + (numberOfGames == 1
+          ? "" : "s") + ".");
       log.debug(
           "Agents: " + gameAgents.stream().map(Objects::toString)
               .collect(Collectors.joining(", ")));
@@ -75,7 +76,27 @@ public class DoubleRoundRobin<G extends Game<? extends A, ?>, E extends GameAgen
   }
 
   private void tournament() {
+
+    final int n = gameAgents.size();
+    int[] indices = new int[numberOfPlayers];
+    for (int i = 0; i < numberOfPlayers; i++) {
+      indices[i] = (numberOfPlayers - 1) - i;
+    }
+
+    do {
+
+      List<E> agentList = Arrays.stream(indices).mapToObj(gameAgents::get)
+          .collect(Collectors.toList());
+      Match<G, E, A> match = new Match<>(newInstanceOfGame(), agentList, computationTime, timeUnit,
+          debug, log, pool);
+      MatchResult<G, E> matchResult = match.call();
+      tournamentResult.add(matchResult);
+
+      indices = Util.permutations(indices, n);
+    } while (Util.isReverseIndexEqualToValue(indices));
+
   }
+
 
   @Override
   public String toTextRepresentation() {

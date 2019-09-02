@@ -57,9 +57,9 @@ public class SgeCommand implements Callable<Void> {
   List<AgentFactory> agentFactories = null;
   GameFactory<Game<Object, Object>> gameFactory = null;
 
-  @Option(names = {"-h", "--help"}, usageHelp = true, description = "print this message")
+  @Option(names = {"-h", "--help"}, usageHelp = true, description = "Prints this message.")
   boolean helpRequested = false;
-  @Option(names = {"-V", "--version"}, versionHelp = true, description = "print the version")
+  @Option(names = {"-V", "--version"}, versionHelp = true, description = "Prints the version.")
   boolean versionRequested = false;
   @Option(names = {"-q",
       "--quiet"}, description = "Found once: Log only warnings. Twice: only errors. Thrice: no output.")

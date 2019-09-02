@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import org.fusesource.jansi.AnsiConsole;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -113,9 +114,13 @@ public class SgeCommand implements Callable<Void> {
         "warn]: ", System.err, "",
         "error]: ", System.err, "");
 
+    AnsiConsole.systemInstall();
+
     log.tra("Initialising ThreadPool");
     pool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 2));
     log.trace_(", done.");
+
+    AnsiConsole.systemUninstall();
 
     return null;
   }
@@ -383,7 +388,7 @@ public class SgeCommand implements Callable<Void> {
    * Fills the agent configuration until it has the minimum amount of players
    *
    * @param agentConfiguration agent configuration
-   * @param minimumPlayers     minimum number of players required
+   * @param minimumPlayers minimum number of players required
    * @return number of agents added to the configuration
    */
   public int fillAgentList(List<String> agentConfiguration, int minimumPlayers) {
@@ -511,13 +516,16 @@ public class SgeCommand implements Callable<Void> {
     log.tra("Waiting " + Util
         .convertUnitToReadableString(AWAIT_TERMINATION_TIME, AWAIT_TERMINATION_TIMEUNIT)
         + " for termination");
+    long startTime = System.nanoTime();
     try {
       if (!pool.awaitTermination(AWAIT_TERMINATION_TIME, AWAIT_TERMINATION_TIMEUNIT)) {
         log.trace_(", failed.");
         log.info("ThreadPool did not yet shutdown. Forcing.");
         List<Runnable> stillRunning = pool.shutdownNow();
       } else {
-        log.trace_(", done.");
+        long endTime = System.nanoTime();
+        log.trace_(", done in " + Util
+            .convertUnitToMinimalString(endTime - startTime, TimeUnit.NANOSECONDS) + ".");
       }
     } catch (
         InterruptedException e) {

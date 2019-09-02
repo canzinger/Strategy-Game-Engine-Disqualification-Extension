@@ -1,10 +1,13 @@
 package dev.entze.sge.engine.game;
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 import dev.entze.sge.agent.GameAgent;
 import dev.entze.sge.agent.HumanAgent;
 import dev.entze.sge.engine.Logger;
 import dev.entze.sge.game.ActionRecord;
 import dev.entze.sge.game.Game;
+import dev.entze.sge.util.Util;
 import dev.entze.sge.util.pair.ImmutablePair;
 import dev.entze.sge.util.pair.Pair;
 import java.util.ArrayDeque;
@@ -18,6 +21,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+import org.fusesource.jansi.Ansi;
 
 public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? extends A>, A> implements
     Callable<MatchResult<G, E>> {
@@ -31,6 +35,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
   private MatchResult<G, E> matchResult;
   private Game<A, ?> game;
   private List<E> gameAgents;
+  private String lastTextualRepresentation;
 
   public Match(Game<A, ?> game, List<E> gameAgents, long computationTime,
       TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
@@ -60,6 +65,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     if (matchResult != null) {
       return matchResult;
     }
+    lastTextualRepresentation = "";
     {
       Deque<Pair<String, Future<Void>>> setUps = new ArrayDeque<>(gameAgents.size());
       for (int i = 0; i < gameAgents.size(); i++) {
@@ -119,7 +125,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
               "Player " + game.getCurrentPlayer() + " - " + gameAgents.get(thisPlayer).toString()
                   + ":");
           if (!withHumanPlayer || isHuman) {
-            log.info_(playersGame.toTextRepresentation());
+            printTextualRepresentation();
           }
         }
 
@@ -195,7 +201,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       if (game.getCurrentPlayer() >= 0 && isHuman && !(gameAgents
           .get(game.getCurrentPlayer()) instanceof HumanAgent) || lastPlayer == game
           .getCurrentPlayer()) {
-        log.info_(game.getGame().toTextRepresentation());
+        printTextualRepresentation();
       }
     }
     long endTime = System.nanoTime();
@@ -254,6 +260,31 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
     matchResult = new MatchResult<>(gameAgents, startTime, endTime, result);
     return matchResult;
+  }
+
+  private void printTextualRepresentation() {
+    String textualRepresentation = game.getGame().toTextRepresentation();
+    if (lastTextualRepresentation.isEmpty()) {
+      log.info_(textualRepresentation);
+    } else {
+      List<String> separations = Util
+          .separateByDifferences(lastTextualRepresentation, textualRepresentation);
+      boolean reset = true;
+      Ansi message = ansi();
+      for (String separation : separations) {
+        if (reset) {
+          message = message.reset();
+        } else {
+          message = message.fgBrightGreen();
+        }
+        message = message.a(separation);
+        reset = !reset;
+      }
+
+      message = message.reset();
+      log.info_(message.toString());
+    }
+    lastTextualRepresentation = textualRepresentation;
   }
 
   public List<E> getGameAgents() {

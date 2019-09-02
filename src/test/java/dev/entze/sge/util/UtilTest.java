@@ -4,6 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import dev.entze.sge.util.unit.InformationUnit;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
@@ -127,6 +128,131 @@ public class UtilTest {
     assertArrayEquals(new int[] {1, 3, 4}, is);
     is = Util.combinations(is);
     assertArrayEquals(new int[] {2, 3, 4}, is);
+  }
+
+
+  @Test
+  public void test_separateByDifference_equals() {
+    String a = "abc";
+    String b = "abc";
+
+    assertEquals(List.of("abc"), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_emptyToNew() {
+    String a = "";
+    String b = "abc";
+
+    assertEquals(List.of("", "abc"), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_toEmpty() {
+    String a = "abc";
+    String b = "";
+
+    assertEquals(List.of(""), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_3middle() {
+    String a = "abc";
+    String b = "a2c";
+
+    assertEquals(List.of("a", "2", "c"), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_3left() {
+    String a = "abc";
+    String b = "1bc";
+
+    assertEquals(List.of("", "1", "bc"), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_3right() {
+    String a = "abc";
+    String b = "ab3";
+
+    assertEquals(List.of("ab", "3"), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_3insertNew() {
+    String a = "abc";
+    String b = "abbc";
+
+    assertEquals(List.of("ab", "b", "c"), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_6insertNew() {
+    String a = "abcdef";
+    String b = "abccdff";
+
+    assertEquals(List.of("abc", "c", "d", "f", "f"), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_3completelyDifferent() {
+    String a = "abc";
+    String b = "123";
+
+    assertEquals(List.of("", "123"), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_1() {
+    String a = "aaaaa";
+    String b = "111aaa222aaa";
+
+    assertEquals(List.of("", "111", "aaa", "222", "aa", "a"), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_2() {
+    String a = "| 0:2 |";
+    String b = "| 1:1 |";
+
+    assertEquals(List.of("| ", "1", ":", "1", " |"), Util.separateByDifferences(a, b));
+  }
+
+  @Test
+  public void test_separateByDifference_Risk(){
+    String a = "+-----+\n"
+        + "| 1:2 |\n"
+        + "+-----+\n"
+        + "       \\     +-----+\n"
+        + "        \\____| 0:3 |\n"
+        + "        /    +-----+\n"
+        + "       /\n"
+        + "+-----+\n"
+        + "| 1:1 |\n"
+        + "+-----+\n";
+    String b = "+-----+\n"
+        + "| 1:2 |\n"
+        + "+-----+\n"
+        + "       \\     +-----+\n"
+        + "        \\____| 0:3 |\n"
+        + "        /    +-----+\n"
+        + "       /\n"
+        + "+-----+\n"
+        + "| 1:2 |\n"
+        + "+-----+";
+
+    assertEquals(List.of("+-----+\n"
+        + "| 1:2 |\n"
+        + "+-----+\n"
+        + "       \\     +-----+\n"
+        + "        \\____| 0:3 |\n"
+        + "        /    +-----+\n"
+        + "       /\n"
+        + "+-----+\n"
+        + "| 1:", "2",  " |\n"
+        + "+-----+"), Util.separateByDifferences(a, b));
+
   }
 
 }

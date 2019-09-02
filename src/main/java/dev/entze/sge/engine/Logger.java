@@ -79,7 +79,7 @@ public class Logger {
   }
 
   public void printStackTrace(Exception e) {
-    if (-1 >= logLevel) {
+    if (isDebug()) {
       e.printStackTrace();
     }
   }
@@ -92,6 +92,10 @@ public class Logger {
 
   public void traProcess(String string, int i, int max) {
     traf("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
+  }
+
+  public boolean isTrace() {
+    return -2 >= logLevel;
   }
 
   public void tra_() {
@@ -152,12 +156,16 @@ public class Logger {
     debf("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
   }
 
+  public boolean isDebug() {
+    return -1 >= logLevel;
+  }
+
   public void deb_() {
-    print(debugStream, -2);
+    print(debugStream, -1);
   }
 
   public void deb_(String string) {
-    print(debugStream, -2, string);
+    print(debugStream, -1, string);
   }
 
   public void debf_(String format, Object... args) {
@@ -210,12 +218,16 @@ public class Logger {
     inff("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
   }
 
+  public boolean isInfo() {
+    return 0 >= logLevel;
+  }
+
   public void inf_() {
-    print(infoStream, -2);
+    print(infoStream, 0);
   }
 
   public void inf_(String string) {
-    print(infoStream, -2, string);
+    print(infoStream, 0, string);
   }
 
   public void inff_(String format, Object... args) {
@@ -268,12 +280,16 @@ public class Logger {
     warf("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
   }
 
+  public boolean isWarn() {
+    return 1 >= logLevel;
+  }
+
   public void war_() {
-    print(warnStream, -2);
+    print(warnStream, 1);
   }
 
   public void war_(String string) {
-    print(warnStream, -2, string);
+    print(warnStream, 1, string);
   }
 
   public void warf_(String format, Object... args) {
@@ -326,12 +342,16 @@ public class Logger {
     errf("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
   }
 
+  public boolean isError() {
+    return 2 >= logLevel;
+  }
+
   public void err_() {
-    print(errorStream, -2);
+    print(errorStream, 2);
   }
 
   public void err_(String string) {
-    print(errorStream, -2, string);
+    print(errorStream, 2, string);
   }
 
   public void errf_(String format, Object... args) {

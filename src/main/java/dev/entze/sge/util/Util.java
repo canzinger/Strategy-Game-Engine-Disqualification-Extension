@@ -1,5 +1,6 @@
 package dev.entze.sge.util;
 
+import com.google.common.base.Strings;
 import dev.entze.sge.game.ActionRecord;
 import dev.entze.sge.game.Game;
 import dev.entze.sge.util.node.GameNode;
@@ -695,6 +696,44 @@ public class Util {
     }
 
     return score;
+  }
+
+  public static List<String> separateByDifferences(String original, String other) {
+    List<String> separations = new ArrayList<>();
+
+    String common;
+    do {
+
+      //separate a common prefix
+      common = Strings.commonPrefix(original, other);
+      separations.add(common);
+      int begin = common.length();
+      original = original.substring(begin);
+      other = other.substring(begin);
+
+      //find after which char other equals original again
+      int skipOther = other.length();
+      int skipOriginal = original.length();
+
+      for (int oth = 0; oth < other.length() && skipOther == other.length(); oth++) {
+        for (int ori = 0; ori < original.length(); ori++) {
+          if (original.charAt(ori) == other.charAt(oth)) {
+            skipOther = oth;
+            skipOriginal = ori;
+            break;
+          }
+        }
+      }
+
+      if (0 < skipOther) {
+        separations.add(other.substring(0, skipOther));
+      }
+      other = other.substring(skipOther);
+      original = original.substring(skipOriginal);
+
+    } while (!other.isEmpty());
+
+    return separations;
   }
 
 }

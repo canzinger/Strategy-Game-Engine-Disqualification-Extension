@@ -89,6 +89,7 @@ public class SgeCommand implements Callable<Void> {
 
     cli.setCaseInsensitiveEnumValuesAllowed(true);
 
+    AnsiConsole.systemInstall();
     try {
       List<Object> ran = cli.parseWithHandler(new RunAll(), args);
     } catch (Exception e) {
@@ -101,6 +102,7 @@ public class SgeCommand implements Callable<Void> {
       sge.log.error_();
       sge.log.error("Interrupted.");
     }
+    AnsiConsole.systemUninstall();
 
   }
 
@@ -114,13 +116,10 @@ public class SgeCommand implements Callable<Void> {
         "warn]: ", System.err, "",
         "error]: ", System.err, "");
 
-    AnsiConsole.systemInstall();
-
-    log.tra("Initialising ThreadPool");
+    int threads = Math.max(Runtime.getRuntime().availableProcessors(), 2);
+    log.traf("Initialising ThreadPool with %d threads", threads);
     pool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 2));
     log.trace_(", done.");
-
-    AnsiConsole.systemUninstall();
 
     return null;
   }

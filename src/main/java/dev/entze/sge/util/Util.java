@@ -501,10 +501,11 @@ public class Util {
       return "0" + targetUnits[0].toShortString();
     }
 
+    boolean first = true;
     StringBuilder stringBuilder = new StringBuilder();
     for (int i = minimalTimes.length - 1; i >= 0 && nonZeros >= 0; i--) {
       if (minimalTimes[i] > 0) {
-        if (i < minimalTimes.length - 1) {
+        if (i < minimalTimes.length - 1 && !first) {
           if (nonZeros > 1) {
             stringBuilder.append(", ");
           } else {
@@ -514,6 +515,7 @@ public class Util {
         stringBuilder.append(minimalTimes[i]).append(' ')
             .append(targetUnits[i].toString().toLowerCase());
         nonZeros--;
+        first = false;
       }
     }
 

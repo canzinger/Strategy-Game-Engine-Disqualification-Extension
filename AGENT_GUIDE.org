@@ -63,12 +63,16 @@ To achieve this in gradle:
 
 sourceCompatibility = 1.11
 
+dependencies {
+ compile fileTree(dir: path-to-engine-and-game, include: ['*.jar'])
+}
+
 jar {
-    manifest {
-        attributes 'Sge-Type': 'agent'
-        attributes 'Agent-Class': 'dev.entze.sge.agent.mctsagent.MctsAgent'
-        attributes 'Agent-Name': 'MctsAgent'
-    }
+ manifest {
+  attributes 'Sge-Type': 'agent'
+  attributes 'Agent-Class': 'com.mydomain.firstagent.FirstAgent'
+  attributes 'Agent-Name': 'FirstAgent'
+ }
 }
 
 #+END_SRC
@@ -77,27 +81,49 @@ jar {
 
 In order to write an agent for sge a class has to implement the interface
 ~dev.entze.sge.agent.GameAgent~. It is also highly recommended to extend from
-~dev.entze.sge.agent.AbstractAgent~.
+~dev.entze.sge.agent.AbstractAgent~. It provides comparators which allow to
+compare games by utility and heuristic value and a method
+~shouldStopComputation()~ which checks if the a certain part (per default half)
+of the computation time was already used.
 
-Here an minimal working example:
+Here an minimal working example for the game Risk:
 
 #+BEGIN_SRC java
 
 import dev.entze.sge.agent.*;
 import dev.entze.sge.engine.Logger;
+import dev.entze.sge.game.risk.board.*;
 
-public class FirstAgent extends AbstractGameAgent<Risk, RiskAction> implements GameAgent<Risk, RiskAction> {
+public class FirstAgent extends AbstractGameAgent<Risk, RiskAction>
+  implements GameAgent<Risk, RiskAction> {
 
  public FirstAgent(Logger log){
   super(log);
  }
 
- public RiskAction computeNextAction(Risk game, long computationTime, TimeUnit timeUnit){
+ @Override
+ public RiskAction computeNextAction(Risk game,
+                                     long computationTime,
+                                     TimeUnit timeUnit){
+  //optionally set AbstractGameAgent timers
+  super.setTimers(computationTime, timeUnit);
+  //choose the first option
   return List.copyOf(game.getPossibleActions()).get(0);
  }
 
 }
 
 #+END_SRC
+
+Note that there has to exist at least a constructor with ~Logger~ as argument.
+This logger does not have to be used though.
+
+Every instance of the agents is created via this constructor. This also means
+that if the same agent plays against itself two instances of it are created.
+
+Every agent also has the methods ~setUp(numberOfPlayers, playerNumber)~ called
+before every match, ~tearDown()~ called after every match, and ~destroy()~
+called before shutting down. These methods can be used to get resources in place
+or to destroy them. Note that the same instance is used for multiple matches.
 
 # * Comprehensive Guide

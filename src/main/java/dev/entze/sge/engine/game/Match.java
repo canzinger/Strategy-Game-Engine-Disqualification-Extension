@@ -1,13 +1,10 @@
 package dev.entze.sge.engine.game;
 
-import static org.fusesource.jansi.Ansi.ansi;
-
 import dev.entze.sge.agent.GameAgent;
 import dev.entze.sge.agent.HumanAgent;
 import dev.entze.sge.engine.Logger;
 import dev.entze.sge.game.ActionRecord;
 import dev.entze.sge.game.Game;
-import dev.entze.sge.util.Util;
 import dev.entze.sge.util.pair.ImmutablePair;
 import dev.entze.sge.util.pair.Pair;
 import java.util.ArrayDeque;
@@ -21,7 +18,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-import org.fusesource.jansi.Ansi;
 
 public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? extends A>, A> implements
     Callable<MatchResult<G, E>> {
@@ -189,8 +185,13 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
         A action = game.determineNextAction();
         if (action == null || !game.isValidAction(action)) {
-          log.error(
-              "There is a programming error in the implementation of the game. Could not determine next action.");
+          log.err(
+              "There is a programming error in the implementation of the game.");
+          if (action == null) {
+            log.error_(" Next action is null.");
+          } else {
+            log.error_(" Next action is invalid.");
+          }
           throw new IllegalStateException("The current game violates the implementation contract");
         }
         game = game.doAction(action);
@@ -264,28 +265,30 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
   private void printTextualRepresentation() {
     String textualRepresentation = game.getGame().toTextRepresentation();
+    /*
     if (lastTextualRepresentation.isEmpty()) {
       log.info_(textualRepresentation);
     } else {
       List<String> separations = Util
           .separateByDifferences(lastTextualRepresentation, textualRepresentation);
-      boolean reset = true;
-      Ansi message = ansi();
+      boolean colour = false;
+      Ansi message = ansi().reset();
       for (String separation : separations) {
-        if (reset) {
-          message = message.reset();
-        } else {
+        if (colour) {
           message = message.fgBrightGreen();
         }
-        message = message.a(separation);
-        reset = !reset;
+        message = message.a(separation).reset();
+        colour = !colour;
       }
 
       message = message.reset();
       log.info_(message.toString());
     }
+     */
+    log.info_(textualRepresentation);
     lastTextualRepresentation = textualRepresentation;
   }
+
 
   public List<E> getGameAgents() {
     return gameAgents;

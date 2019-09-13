@@ -1,4 +1,8 @@
-#+TITLE: How to write an agent for sge
+#+TITLE: How to write an agent for sge v1.0.x
+#+AUTHOR: Lukas Grassauer
+#+EMAIL: entze@grassauer.eu
+#+DATE: last changed: 2019-09-13
+
 
 * Java Installation
 
@@ -131,25 +135,24 @@ compare games by utility and heuristic value and a method
 ~shouldStopComputation()~ which checks if the a certain part (per default half)
 of the computation time was already used.
 
-Here an minimal working example for the game Risk:
+Here an minimal working example that chooses the first available option of any game:
 
 #+BEGIN_SRC java
 
 import dev.entze.sge.agent.*;
 import dev.entze.sge.engine.Logger;
-import dev.entze.sge.game.risk.board.*;
 
-public class FirstAgent extends AbstractGameAgent<Risk, RiskAction>
-  implements GameAgent<Risk, RiskAction> {
+public class FirstAgent extends AbstractGameAgent<G extends Game<A, ?>>, A>
+  implements GameAgent<G extends Game<A, ?>, A> {
 
  public FirstAgent(Logger log){
   super(log);
  }
 
  @Override
- public RiskAction computeNextAction(Risk game,
-                                     long computationTime,
-                                     TimeUnit timeUnit){
+ public A computeNextAction(G game,
+                            long computationTime,
+                            TimeUnit timeUnit){
   //optionally set AbstractGameAgent timers
   super.setTimers(computationTime, timeUnit);
   //choose the first option

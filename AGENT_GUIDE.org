@@ -5,13 +5,23 @@
 ** Java Installation
 
 sge is written for Java 11 which is available under [[https://jdk.java.net/][https://jdk.java.net/]]
+Verify the version with
+
+
+#+BEGIN_SRC bash
+
+java -version
+
+#+END_SRC
+
+The version should be at least 11.
 
 ** Engine Installation
 
 The engine itself is bundled with all it's dependencies in a fat-jar, usually
-named sge-MA.MI.P.jar or strategyGameEngine-MA.MI.P.jar and can be executed with
+named ~sge-MA.MI.P.jar~ or ~strategyGameEngine-MA.MI.P.jar~ and can be executed with
 
-#+BEGIN_SRC
+#+BEGIN_SRC bash
 
 java -jar sge-MA.MI.P.jar
 
@@ -24,9 +34,9 @@ Note: A comprehensive synopsis can be viewed with the ~-h~ or ~--help~ flag.
 
 To load a game or an agent and play a single match append the jar to the execution line.
 
-#+BEGIN_SRC
+#+BEGIN_SRC bash
 
-java -jar sge-MA.MI.P.jar match jar [jars...]
+java -jar sge-MA.MI.P.jar match gameJar [agentJars...]
 
 #+END_SRC
 
@@ -45,8 +55,6 @@ Agents are only required to be called via the engine as an argument.
 
 *** Build environment
 
-#+TODO: Adding the dependencies over jcenter()
-
 Through the build tool make sure that following attributes are ensured:
 
 + Source Compatibility: 1.11
@@ -59,7 +67,7 @@ Through the build tool make sure that following attributes are ensured:
 
 To achieve this in gradle:
 
-#+BEGIN_SRC gradle
+#+BEGIN_SRC build.gradle
 
 sourceCompatibility = 1.11
 
@@ -76,6 +84,45 @@ jar {
 }
 
 #+END_SRC
+
+
+*** Development Environment
+
+**** Intellij IDEA
+
+First create a new Gradle project, by selecting /File/, then /New/ and then
+/Project.../ (see Figure 1).
+
+#+CAPTION: Create a new project in Intellij IDEA.
+#+NAME: fig:gnewproj
+[[./AGENT_GUIDE_IDEA_NEW_PROJECT.png]]
+
+Select /Gradle/ (see Figure 2) and then follow the wizard.
+
+#+CAPTION: Select the Gradle project template.
+#+NAME: fig:ggradle
+[[./AGENT_GUIDE_IDEA_GRADLE.png]]
+
+After that replace the contents of the ~build.gradle~ file with that given in
+/Build Environment/.
+
+**** Eclipse
+
+First create a new Gradle project, by selecting /File/, then /New/ and then
+/Project.../ (see Figure 3)
+
+#+CAPTION: Create a new project in Eclipse.
+#+NAME: fig:enewproj
+[[./AGENT_GUIDE_ECLIPSE_NEW_PROJECT.png]]
+
+#+CAPTION: Select the Gradle project template.
+#+NAME: fig:egradle
+[[./AGENT_GUIDE_ECLIPSE_GRADLE.png]]
+
+Select /Gradle/, then /Gradle Project/ (see Figure 4) and then follow the
+wizard. After that replace the contents of the ~build.gradle~ file with that
+given in /Build Environment/.
+
 
 *** Implementing the GameAgent Interface
 
@@ -125,5 +172,133 @@ Every agent also has the methods ~setUp(numberOfPlayers, playerNumber)~ called
 before every match, ~tearDown()~ called after every match, and ~destroy()~
 called before shutting down. These methods can be used to get resources in place
 or to destroy them. Note that the same instance is used for multiple matches.
+
+*** Game API
+
+Every game follows the ~Game<A, B>~ API, where ~A~ is an action and ~B~ is the
+board.
+
+The javadoc explains every method and their contracts in detail, however here
+are the most important relisted.
+
+#+BEGIN_SRC java
+
+/**
+ * Checks whether the game is over yet. Once this state is reached it can
+ * not be left.
+ *
+ * @return true if and only if game over
+ */
+boolean isGameOver();
+
+/**
+ * Checks which player's move it is and returns the id of the player.
+ * A negative number indicates some indeterminacy which is resolved by
+ * the game itself.
+ *
+ * @return the id of the player
+ */
+int getCurrentPlayer();
+
+/**
+ * Applies the (public) utility function for the given player. The
+ * utility function is the final measure which determines how
+ * "good" a player does. The player with the highest value is
+ * considered the winner. On equality it is considered a tie.
+ *
+ * @param player - the player
+ * @return the result of the utility function for the player
+ */
+double getUtilityValue(int player);
+
+/**
+ * Applies the heuristic function for the given player. This function
+ * is a more lax measure in how "good" a player does, it is not used
+ * to determine the outcome of a game. Per default the same as
+ * getUtilityValue().
+ *
+ * @param player - the player
+ * @return the result of the heuristic function for the player
+ */
+default double getHeuristicValue(int player) {
+  return getUtilityValue(player);
+}
+
+/**
+ * Collects all possible moves and returns them as a set. Should the
+ * game be over an empty set is returned instead.
+ *
+ * @return a set of all possible moves
+ */
+Set<A> getPossibleActions();
+
+/**
+ * Returns a copy of the current board. Notice that only in non-canonical
+ * games some information might be hidden.
+ *
+ * @return the board
+ */
+B getBoard();
+
+/**
+ * Checks whether doAction(action) would not throw an exception.
+ *
+ * @param action - the action
+ * @return true - iff the action is valid and possible
+ */
+boolean isValidAction(A action);
+
+/**
+ * Does a given action.
+ *
+ * @param action - the action to take
+ * @return a new copy of the game with the given action applied
+ * @throws IllegalArgumentException - In the case of a non-existing action or null
+ * @throws IllegalStateException    - If game over
+ */
+Game<A, B> doAction(A action);
+
+/**
+ * Returns the record of all previous actions and which player has done it.
+ *
+ * @return the record of all previous actions
+ */
+List<ActionRecord<A>> getActionRecords();
+
+/**
+ * If the game is in a state of indeterminacy, this method will return an
+ * action according to the distribution of probabilities, or hidden
+ * information. If the game is in a definitive state null is returned.
+ *
+ * @return a possible action, which determines the game
+ */
+A determineNextAction();
+
+#+END_SRC
+
+
+*** Debugging
+
+To effectively debug (in JUnit for example). You can create a new instance of
+the game with the constructor and an instance of your agent.
+
+#+BEGIN_SRC java
+
+@Test
+public void text_example(){
+ ExampleGame exampleGame = new ExampleGame();
+ FirstAgent agent = new FirstAgent();
+
+ // Bring game and agent to the required state
+
+
+ ExampleAction action = agent.determineNextAction(exampleGame, 30, TimeUnit.SECONDS);
+ ExampleGame next = (ExampleGame) exampleGame.doAction(action);
+
+ //Test if agent behaves as expected
+
+}
+
+#+END_SRC
 
 # * Comprehensive Guide

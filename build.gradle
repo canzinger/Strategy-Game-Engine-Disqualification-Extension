@@ -75,8 +75,8 @@ publishing {
 
 
 bintray {
-    user = System.getenv("BINTRAY_NAME")
-    key = System.getenv("BINTRAY_KEY")
+    user = "${bintrayName}"
+    key = "${bintrayKey}"
     publications = ['mavenPublication']
     pkg {
         repo = 'StrategyGameEngine'
@@ -92,11 +92,10 @@ jar {
     manifest {
         attributes 'Main-Class': 'dev.entze.sge.engine.cli.SgeCommand'
     }
-    classifier = 'lib'
 }
 
 shadowJar {
-    classifier = ''
+    classifier = 'exe'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

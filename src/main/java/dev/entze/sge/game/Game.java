@@ -111,7 +111,7 @@ public interface Game<A, B> {
   /**
    * Applies the (public) utility function of each player and returns the result multiplied with
    * their weight in a sum.
-   *
+   * <p>
    * Should no weight be supplied for a given player's utility function getPlayerUtilityWeight() is
    * used instead. Any number of weights can be given.
    *
@@ -133,7 +133,7 @@ public interface Game<A, B> {
   /**
    * Applies the heuristic function of each player and returns the result multiplied with their
    * weight in a sum.
-   *
+   * <p>
    * Should no weight be supplied for a given player's utility function getPlayerHeuristicWeight()
    * is used instead. Any number of weights can be given.
    *
@@ -153,7 +153,9 @@ public interface Game<A, B> {
   }
 
   /**
-   * Applies the (public) utility function for the given player.
+   * Applies the (public) utility function for the given player. The utility function is the final
+   * measure which determines how "good" a player does. The player with the highest value is
+   * considered the winner. On equality it is considered a tie.
    *
    * @param player - the player
    * @return the result of the utility function for the player
@@ -161,8 +163,9 @@ public interface Game<A, B> {
   double getUtilityValue(int player);
 
   /**
-   * Applies the heuristic function for the given player. Per default the same as
-   * getUtilityValue().
+   * Applies the heuristic function for the given player. This function is a more lax measure in how
+   * "good" a player does, it is not used to determine the outcome of a game. Per default the same
+   * as getUtilityValue().
    *
    * @param player - the player
    * @return the result of the heuristic function for the player
@@ -203,7 +206,7 @@ public interface Game<A, B> {
    * @param action - the action to take
    * @return a new copy of the game with the given action applied
    * @throws IllegalArgumentException - In the case of a non-existing action or null
-   * @throws IllegalStateException - If game over
+   * @throws IllegalStateException    - If game over
    */
   Game<A, B> doAction(A action);
 
@@ -212,7 +215,7 @@ public interface Game<A, B> {
    *
    * @return a new copy of the game with an action applied
    * @throws IllegalArgumentException - If the game is not in an non-deterministic state
-   * @throws IllegalStateException - If game over
+   * @throws IllegalStateException    - If game over
    */
   default Game<A, B> doAction() {
     return doAction(determineNextAction());

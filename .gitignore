@@ -131,3 +131,5 @@ gradle-app.setting
 **/build/
 
 # End of https://www.gitignore.io/api/intellij+all,gradle,java
+
+AGENT_GUIDE.pdf

@@ -1,10 +1,8 @@
 #+TITLE: How to write an agent for sge
 
-* Quick Start
+* Java Installation
 
-** Java Installation
-
-sge is written for Java 11 which is available under [[https://jdk.java.net/][https://jdk.java.net/]]
+sge is written for Java 11 which is available under [[https://jdk.java.net/][https://jdk.java.net/]].
 Verify the version with
 
 
@@ -16,7 +14,7 @@ java -version
 
 The version should be at least 11.
 
-** Engine Installation
+* Engine Installation
 
 The engine itself is bundled with all it's dependencies in a fat-jar, usually
 named ~sge-MA.MI.P.jar~ or ~strategyGameEngine-MA.MI.P.jar~ and can be executed with
@@ -28,7 +26,7 @@ java -jar sge-MA.MI.P.jar
 #+END_SRC
 
 
-*** Synopsis
+** Synopsis
 
 Note: A comprehensive synopsis can be viewed with the ~-h~ or ~--help~ flag.
 
@@ -43,17 +41,17 @@ java -jar sge-MA.MI.P.jar match gameJar [agentJars...]
 The engine can determine if it is a game or an agent by itself so the order does
 not matter.
 
-** Game Installation
+* Game Installation
 
 The game itself is only required to be called via the engine as an argument.
 
-** Agent Installation
+* Agent Installation
 
 Agents are only required to be called via the engine as an argument.
 
-** Writing an Agent
+* Writing an Agent
 
-*** Build environment
+** Build environment
 
 Through the build tool make sure that following attributes are ensured:
 
@@ -86,9 +84,9 @@ jar {
 #+END_SRC
 
 
-*** Development Environment
+** Development Environment
 
-**** Intellij IDEA
+*** Intellij IDEA
 
 First create a new Gradle project, by selecting /File/, then /New/ and then
 /Project.../ (see Figure 1).
@@ -106,7 +104,7 @@ Select /Gradle/ (see Figure 2) and then follow the wizard.
 After that replace the contents of the ~build.gradle~ file with that given in
 /Build Environment/.
 
-**** Eclipse
+*** Eclipse
 
 First create a new Gradle project, by selecting /File/, then /New/ and then
 /Project.../ (see Figure 3)
@@ -124,7 +122,7 @@ wizard. After that replace the contents of the ~build.gradle~ file with that
 given in /Build Environment/.
 
 
-*** Implementing the GameAgent Interface
+** Implementing the GameAgent Interface
 
 In order to write an agent for sge a class has to implement the interface
 ~dev.entze.sge.agent.GameAgent~. It is also highly recommended to extend from
@@ -162,8 +160,9 @@ public class FirstAgent extends AbstractGameAgent<Risk, RiskAction>
 
 #+END_SRC
 
-Note that there has to exist at least a constructor with ~Logger~ as argument.
-This logger does not have to be used though.
+Note that there has to exist at least a constructor with
+~dev.entze.sge.engine.Logger~ as argument. This logger does not have to be used
+though.
 
 Every instance of the agents is created via this constructor. This also means
 that if the same agent plays against itself two instances of it are created.
@@ -173,7 +172,7 @@ before every match, ~tearDown()~ called after every match, and ~destroy()~
 called before shutting down. These methods can be used to get resources in place
 or to destroy them. Note that the same instance is used for multiple matches.
 
-*** Game API
+** Game API
 
 Every game follows the ~Game<A, B>~ API, where ~A~ is an action and ~B~ is the
 board.
@@ -277,7 +276,7 @@ A determineNextAction();
 #+END_SRC
 
 
-*** Debugging
+** Debugging
 
 To effectively debug (in JUnit for example). You can create a new instance of
 the game with the constructor and an instance of your agent.

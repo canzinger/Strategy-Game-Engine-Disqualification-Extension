@@ -1,16 +1,19 @@
 plugins {
     id 'java'
     id 'idea'
+    id "maven-publish"
     id 'com.github.johnrengelman.shadow' version '4.0.2'
+    id "com.jfrog.bintray" version "1.8.4"
 }
 
-group 'dev.entze'
+group 'at.ac.tuwien.ifs.sge'
 version '0.0.0'
 
 sourceCompatibility = 1.11
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 
@@ -21,6 +24,68 @@ dependencies {
     compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.18'
     compile group: 'com.google.guava', name: 'guava', version: '28.0-jre'
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+def pomConfig = {
+
+    licenses {
+        license {
+            name "GNU Affero General Public License version 3"
+            url "https://opensource.org/licenses/agpl-v3.html"
+            distribution "repo"
+        }
+    }
+
+    developers {
+        developer {
+            id "entze"
+            name "Lukas Grassauer"
+            email "entze@grassauer.eu"
+        }
+    }
+
+    scm {
+        url "https://gitlab.com/Entze/strategy-game-engine"
+    }
+}
+
+publishing {
+    publications {
+        mavenPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar {
+                classifier "sources"
+            }
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+            groupId getGroup()
+            artifactId = "sge"
+            version = getVersion()
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'The core engine library, needed to implement games and agents.')
+                root.appendNode('name', 'sge')
+                root.appendNode('url', 'The core engine library, needed to implement games and agents.')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+
+bintray {
+    user = System.getenv("BINTRAY_NAME")
+    key = System.getenv("BINTRAY_KEY")
+    publications = ['mavenPublication']
+    pkg {
+        repo = 'StrategyGameEngine'
+        name = 'at.ac.tuwien.ifs.sge'
+        version {
+            name = '0.0.0'
+            released = new Date()
+        }
+    }
 }
 
 jar {

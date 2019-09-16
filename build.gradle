@@ -26,54 +26,6 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-def pomConfig = {
-
-    licenses {
-        license {
-            name "GNU Affero General Public License version 3"
-            url "https://opensource.org/licenses/agpl-v3.html"
-            distribution "repo"
-        }
-    }
-
-    developers {
-        developer {
-            id "entze"
-            name "Lukas Grassauer"
-            email "entze@grassauer.eu"
-        }
-    }
-
-    scm {
-        url "https://gitlab.com/Entze/strategy-game-engine"
-    }
-}
-
-publishing {
-    publications {
-        mavenPublication(MavenPublication) {
-            from components.java
-            artifact sourcesJar {
-                classifier "sources"
-            }
-            artifact javadocJar {
-                classifier "javadoc"
-            }
-            groupId getGroup()
-            artifactId = "sge"
-            version = getVersion()
-            pom.withXml {
-                def root = asNode()
-                root.appendNode('description', 'The core engine library, needed to implement games and agents.')
-                root.appendNode('name', 'sge')
-                root.appendNode('url', 'The core engine library, needed to implement games and agents.')
-                root.children().last() + pomConfig
-            }
-        }
-    }
-}
-
-
 bintray {
     user = "${bintrayName}"
     key = "${bintrayKey}"
@@ -103,6 +55,12 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
@@ -113,3 +71,41 @@ artifacts {
     archives javadocJar
 }
 
+publishing {
+    publications {
+        mavenPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            pom {
+                name = "sge"
+                description = "The core engine library, needed to implement games and agents."
+                licenses {
+                    license {
+                        name = "GNU Affero General Public License version 3"
+                        url = "https://opensource.org/licenses/agpl-v3.html"
+                        distribution = "repo"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "entze"
+                        name = "Lukas Grassauer"
+                        email = "entze@grassauer.eu"
+                    }
+                }
+
+                scm {
+                    url = "https://gitlab.com/Entze/strategy-game-engine"
+                    connection = "https://gitlab.com/Entze/strategy-game-engine.git"
+                    developerConnection = "git@gitlab.com:Entze/strategy-game-engine.git"
+                }
+            }
+            repositories {
+                maven {
+                    url = "https://jcenter.bintray.com/at/ac/tuwien/ifs/sge/sge/"
+                }
+            }
+        }
+    }
+}

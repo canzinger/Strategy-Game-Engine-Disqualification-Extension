@@ -310,3 +310,101 @@ public void text_example(){
 #+END_SRC
 
 # * Comprehensive Guide
+
+** Logging
+
+The standard logger implementation provides five levels of logging.
+
+1. Trace
+2. Debug
+3. Info
+4. Warn
+5. Error
+
+An API-abiding agent is passed a logger which has the same level as the engine.
+This can be useful as repeated printing is suboptimal for the performance,
+however some debug information is sometimes useful.
+
+A logger can be configured with pre and post strings which are pre- and appended
+to some of the printed strings.
+
+Every level of logging has a couple of variants. Here demonstrated with ~debug~.
+
+#+BEGIN_SRC java
+
+  /**
+   * Prints "$string: $enumerator".
+   */
+  debEnum(String string, int enumerator);
+
+  /**
+   * Prints "$string: $percent ($i/$max)" where percent is i/max numerically.
+   */
+  debProcess(String string, int i, int max);
+
+  /**
+   * Returns true iff the log level is at least debug.
+   */
+  boolean isDebug();
+
+  /**
+   * Prints nothing.
+   */
+  deb_();
+
+  /**
+   * Prints the string without pre and post and without newline.
+   */
+  deb_(String string);
+
+  /**
+   * Prints the format, without pre and post and without newline.
+   */
+  debf_(String format, Object... args);
+
+  /**
+   * Prints pre and post without newline.
+   */
+  deb();
+
+  /**
+   * Prints the string with pre and post but without newline.
+   */
+  deb(String string);
+
+  /**
+   * Prints the format, with pre and post but without newline.
+   */
+  debf(String format, Object... args);
+
+  /**
+   * Prints a newline.
+   */
+  debug_();
+
+  /**
+   * Prints the string, without pre and post but with newline.
+   */
+  debug_(String string);
+
+  /**
+   * Prints the format, without pre and post but with newline.
+   */
+  debugf_(String format, Object... args);
+
+  /**
+   * Prints pre and post and a newline.
+   */
+  debug();
+
+  /**
+   * Prints the string, pre and post and a newline.
+   */
+  void debug(String string);
+
+  /**
+   * Prints the format, pre and post and a newline.
+   */
+  debugf(String format, Object... args) {
+
+#+END_SRC

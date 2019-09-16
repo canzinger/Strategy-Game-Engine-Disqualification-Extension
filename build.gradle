@@ -32,7 +32,7 @@ bintray {
     publications = ['mavenPublication']
     pkg {
         repo = 'StrategyGameEngine'
-        name = 'at.ac.tuwien.ifs.sge'
+        name = 'sge'
         version {
             name = "0.1.0"
             released = new Date()

@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'at.ac.tuwien.ifs.sge'
-version '0.0.0'
+version '0.1.0'
 
 sourceCompatibility = 1.11
 
@@ -34,7 +34,7 @@ bintray {
         repo = 'StrategyGameEngine'
         name = 'at.ac.tuwien.ifs.sge'
         version {
-            name = '0.0.0'
+            name = "0.1.0"
             released = new Date()
         }
     }

@@ -135,17 +135,18 @@ given in /Build Environment/.
 
 In order to write an agent for sge a class has to implement the interface
 ~GameAgent~. It is also highly recommended to extend from
-~dev.entze.sge.agent.AbstractAgent~. It provides comparators which allow to
-compare games by utility and heuristic value and a method
+~at.ac.tuwien.ifs.sge.agent.AbstractAgent~. It provides comparators which allow
+to compare games by utility and heuristic value and a method
 ~shouldStopComputation()~ which checks if the a certain part (per default half)
 of the computation time was already used.
 
-Here an minimal working example that chooses the first available option of any game:
+Here an minimal working example that chooses the first available option of any
+game:
 
 #+BEGIN_SRC java
 
-import dev.entze.sge.agent.*;
-import Logger;
+import at.ac.tuwien.ifs.sge.agent.*;
+import at.ac.tuwien.ifs.sge.engine.Logger;
 
 public class FirstAgent extends AbstractGameAgent<G extends Game<A, ?>>, A>
   implements GameAgent<G extends Game<A, ?>, A> {
@@ -169,8 +170,8 @@ public class FirstAgent extends AbstractGameAgent<G extends Game<A, ?>>, A>
 #+END_SRC
 
 Note that there has to exist at least a constructor with
-~Logger~ as argument. This logger does not have to be used
-though.
+~at.ac.tuwien.ifs.sge.engine.Logger~ as argument. This logger does not have to
+be used though.
 
 Every instance of the agents is created via this constructor. This also means
 that if the same agent plays against itself two instances of it are created.

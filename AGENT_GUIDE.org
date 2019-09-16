@@ -129,7 +129,7 @@ given in /Build Environment/.
 ** Implementing the GameAgent Interface
 
 In order to write an agent for sge a class has to implement the interface
-~dev.entze.sge.agent.GameAgent~. It is also highly recommended to extend from
+~GameAgent~. It is also highly recommended to extend from
 ~dev.entze.sge.agent.AbstractAgent~. It provides comparators which allow to
 compare games by utility and heuristic value and a method
 ~shouldStopComputation()~ which checks if the a certain part (per default half)
@@ -140,7 +140,7 @@ Here an minimal working example that chooses the first available option of any g
 #+BEGIN_SRC java
 
 import dev.entze.sge.agent.*;
-import dev.entze.sge.engine.Logger;
+import Logger;
 
 public class FirstAgent extends AbstractGameAgent<G extends Game<A, ?>>, A>
   implements GameAgent<G extends Game<A, ?>, A> {
@@ -164,7 +164,7 @@ public class FirstAgent extends AbstractGameAgent<G extends Game<A, ?>>, A>
 #+END_SRC
 
 Note that there has to exist at least a constructor with
-~dev.entze.sge.engine.Logger~ as argument. This logger does not have to be used
+~Logger~ as argument. This logger does not have to be used
 though.
 
 Every instance of the agents is created via this constructor. This also means

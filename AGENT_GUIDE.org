@@ -73,8 +73,13 @@ To achieve this in gradle:
 
 sourceCompatibility = 1.11
 
+repositories {
+ jcenter()
+}
+
 dependencies {
- compile fileTree(dir: path-to-engine-and-game, include: ['*.jar'])
+  compile group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.0'
+  //also consider to add the game in the same manner
 }
 
 jar {

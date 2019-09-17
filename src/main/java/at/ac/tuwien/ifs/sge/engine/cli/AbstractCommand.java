@@ -60,7 +60,7 @@ public abstract class AbstractCommand {
     getSge().log.tra_("Files: ");
 
     for (File file : getFiles()) {
-      getSge().log.tra_(file.getPath() + " ");
+      getSge().log._tra_(file.getPath() + " ");
     }
 
     getSge().log._trace();

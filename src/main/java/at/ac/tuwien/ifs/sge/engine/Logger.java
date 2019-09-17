@@ -92,6 +92,8 @@ public class Logger {
     }
   }
 
+  //region print
+
   private void print(PrintStream stream, int level, boolean pre, boolean post) {
     if (level >= logLevel) {
       if (pre) {
@@ -198,6 +200,10 @@ public class Logger {
       }
     }
   }
+
+  //endregion
+
+  //region println
 
   private void println(PrintStream stream, int level, boolean pre, boolean post) {
     if (level >= logLevel) {
@@ -326,6 +332,10 @@ public class Logger {
     }
   }
 
+  //endregion
+
+  //region format
+
   private void format(PrintStream stream, int level, boolean pre, boolean post, String format,
       Object... args) {
     if (level >= logLevel) {
@@ -354,12 +364,15 @@ public class Logger {
     }
   }
 
+  //endregion
+
   public void printStackTrace(Exception e) {
     if (isDebug()) {
       e.printStackTrace();
     }
   }
 
+  //region isLevel
 
   /**
    * Returns true iff the log level is at least trace.
@@ -399,8 +412,9 @@ public class Logger {
   public boolean isError() {
     return 2 >= logLevel;
   }
+  //endregion
 
-  //Enum
+  //region Enum
 
   /**
    * Prints $string: $enumerator without pre and post and newline
@@ -681,8 +695,9 @@ public class Logger {
   public void errorEnum(String string, int enumerator) {
     errorf("%s: %d", string, enumerator);
   }
+  //endregion
 
-  //Process:
+  //region Process
 
   /**
    * Prints $string: %percent% ($i/$max) where percent is i/max numerically without pre and post and
@@ -1003,8 +1018,11 @@ public class Logger {
   public void errorProcess(String string, int i, int max) {
     errorf("%s: %.0f%% (%d/%d)", string, Util.percentage(i, max), i, max);
   }
+  //endregion
 
-  // Print atoms:
+  //region Atoms
+
+  //region Trace
 
   /**
    * Prints no string without pre and post and newline.
@@ -1566,6 +1584,10 @@ public class Logger {
     formatln(traceStream, -2, true, true, format, args);
   }
 
+  //endregion
+
+  //region Debug
+
   /**
    * Prints no string without pre and post and newline.
    */
@@ -2125,6 +2147,10 @@ public class Logger {
   public void debugf(String format, Object... args) {
     formatln(debugStream, -1, true, true, format, args);
   }
+
+  //endregion
+
+  //region Info
 
   /**
    * Prints no string without pre and post and newline.
@@ -2686,6 +2712,10 @@ public class Logger {
     formatln(infoStream, 0, true, true, format, args);
   }
 
+  //endregion
+
+  //region Warn
+
   /**
    * Prints no string without pre and post and newline.
    */
@@ -3246,6 +3276,10 @@ public class Logger {
     formatln(warnStream, 1, true, true, format, args);
   }
 
+  //endregion
+
+  //region Error
+
   /**
    * Prints no string without pre and post and newline.
    */
@@ -3805,5 +3839,9 @@ public class Logger {
   public void errorf(String format, Object... args) {
     formatln(errorStream, 2, true, true, format, args);
   }
+
+  //endregion
+
+  //endregion
 
 }

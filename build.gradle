@@ -42,7 +42,7 @@ bintray {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'dev.entze.sge.engine.cli.SgeCommand'
+        attributes 'Main-Class': 'at.ac.tuwien.ifs.sge.engine.cli.SgeCommand'
     }
 }
 

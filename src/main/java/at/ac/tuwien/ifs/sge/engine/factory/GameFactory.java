@@ -28,15 +28,15 @@ public class GameFactory<G extends Game<?, ?>> implements Factory<G> {
     try {
       return gameConstructor.newInstance(initargs);
     } catch (InstantiationException e) {
-      log.error_();
+      log._error_();
       log.error("Could not instantiate new element with constructor of game");
       log.printStackTrace(e);
     } catch (IllegalAccessException e) {
-      log.error_();
+      log._error_();
       log.error("Could not access constructor of game");
       log.printStackTrace(e);
     } catch (InvocationTargetException e) {
-      log.error_();
+      log._error_();
       log.error("Could not invoke constructor of game");
       log.printStackTrace(e);
     }

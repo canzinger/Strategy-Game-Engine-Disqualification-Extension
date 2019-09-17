@@ -1,9 +1,9 @@
 package at.ac.tuwien.ifs.sge.engine.cli;
 
-import at.ac.tuwien.ifs.sge.util.pair.ImmutablePair;
-import at.ac.tuwien.ifs.sge.util.pair.Pair;
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
 import at.ac.tuwien.ifs.sge.game.Game;
+import at.ac.tuwien.ifs.sge.util.pair.ImmutablePair;
+import at.ac.tuwien.ifs.sge.util.pair.Pair;
 import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -57,13 +57,13 @@ public abstract class AbstractCommand {
   }
 
   protected void loadFiles() {
-    getSge().log.tra("Files: ");
+    getSge().log.tra_("Files: ");
 
     for (File file : getFiles()) {
       getSge().log.tra_(file.getPath() + " ");
     }
 
-    getSge().log.trace_();
+    getSge().log._trace();
 
     getSge().loadFiles(getFiles());
     getSge().log.debug("Successfully loaded all files.");
@@ -86,11 +86,11 @@ public abstract class AbstractCommand {
   }
 
   protected void printAgentConfiguration() {
-    getSge().log.deb("Configuration: ");
+    getSge().log.deb_("Configuration: ");
     for (String s : getAgentConfiguration()) {
-      getSge().log.deb_(s + " ");
+      getSge().log._deb_(s + " ");
     }
-    getSge().log.debug_();
+    getSge().log._debug();
   }
 
   protected void loadCommon() {
@@ -113,32 +113,32 @@ public abstract class AbstractCommand {
 
     final int size = destroys.size();
 
-    getSge().log.traProcess("Destroying agents", 0, size);
+    getSge().log.traProcess_("Destroying agents", 0, size);
 
     while (!destroys.isEmpty() && Thread.currentThread().isAlive() && !Thread.currentThread()
         .isInterrupted()) {
       Pair<String, Future<Void>> tearDown = destroys.pop();
-      getSge().log.tra_("\r");
-      getSge().log.traProcess("Destroying agents", size - destroys.size(), size);
+      getSge().log._tra_("\r");
+      getSge().log.traProcess_("Destroying agents", size - destroys.size(), size);
       try {
         tearDown.getB().get();
       } catch (InterruptedException e) {
-        getSge().log.trace_(", failed.");
+        getSge().log._trace(", failed.");
         getSge().log.debug("Interrupted while destroying agent ".concat(tearDown.getA()));
         getSge().log.printStackTrace(e);
       } catch (ExecutionException e) {
-        getSge().log.trace_(", failed.");
+        getSge().log._trace(", failed.");
         getSge().log.debug("Exception while destroying agent ".concat(tearDown.getA()));
         getSge().log.printStackTrace(e);
       }
     }
 
     if (!destroys.isEmpty()) {
-      getSge().log.trace_(", failed.");
+      getSge().log._trace(", failed.");
       getSge().log.warn("Following agents where not verified to be destroyed: "
           .concat(destroys.stream().map(Pair::getA).collect(Collectors.joining(", "))));
     } else {
-      getSge().log.trace_(", done.");
+      getSge().log._trace(", done.");
     }
   }
 

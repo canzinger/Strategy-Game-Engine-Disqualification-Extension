@@ -75,16 +75,16 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       }
 
       final int setUpsSize = setUps.size();
-      log.traProcess("Setting up agents", 0, setUpsSize);
+      log.traProcess_("Setting up agents", 0, setUpsSize);
       while (!setUps.isEmpty() && Thread.currentThread().isAlive() && !Thread.currentThread()
           .isInterrupted()) {
         Pair<String, Future<Void>> setUp = setUps.pop();
-        log.tra_("\r");
-        log.traProcess("Setting up agents", setUpsSize - setUps.size(), setUpsSize);
+        log._tra_("\r");
+        log.traProcess_("Setting up agents", setUpsSize - setUps.size(), setUpsSize);
         try {
           setUp.getB().get();
         } catch (InterruptedException e) {
-          log.trace_(", failed.");
+          log._trace(", failed.");
           log.debug("Interrupted while setting up agent ".concat(setUp.getA()));
           log.printStackTrace(e);
         } catch (ExecutionException e) {
@@ -94,11 +94,11 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       }
 
       if (!setUps.isEmpty()) {
-        log.trace_(", failed.");
+        log._trace(", failed.");
         log.warn("Following agents where not verified to be set up: "
             .concat(setUps.stream().map(Pair::getA).collect(Collectors.joining(", "))));
       } else {
-        log.trace_(", done.");
+        log._trace(", done.");
       }
     }
 
@@ -157,13 +157,13 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           log.warn("No action given.");
           result[thisPlayer] = (-1D);
           matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
-          log.debf("%d plies: ", game.getNumberOfActions());
-          log.debug_(ActionRecord.iterableToString(game.getActionRecords()));
+          log.debf_("%d plies: ", game.getNumberOfActions());
+          log._debug(ActionRecord.iterableToString(game.getActionRecords()));
           return matchResult;
         }
 
         if (!isHuman) {
-          log.info_("> " + action.toString());
+          log._info_("> " + action.toString());
         }
 
         if (!game.isValidAction(action)) {
@@ -175,8 +175,8 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           }
           result[thisPlayer] = (-1D);
           matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
-          log.debf("%d plies: ", game.getNumberOfActions());
-          log.debug_(ActionRecord.iterableToString(game.getActionRecords()));
+          log.debf_("%d plies: ", game.getNumberOfActions());
+          log._debug(ActionRecord.iterableToString(game.getActionRecords()));
           return matchResult;
         }
 
@@ -185,12 +185,12 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
         A action = game.determineNextAction();
         if (action == null || !game.isValidAction(action)) {
-          log.err(
+          log.err_(
               "There is a programming error in the implementation of the game.");
           if (action == null) {
-            log.error_(" Next action is null.");
+            log._error(" Next action is null.");
           } else {
-            log.error_(" Next action is invalid.");
+            log._error(" Next action is invalid.");
           }
           throw new IllegalStateException("The current game violates the implementation contract");
         }
@@ -213,13 +213,13 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       result[i] = utility[i];
     }
 
-    log.info_("-----");
+    log._info_("-----");
     log.info("Game over.");
-    log.info_(game.toTextRepresentation());
+    log._info_(game.toTextRepresentation());
     log.inf(game.getNumberOfActions() + " plies ");
     List<ActionRecord<A>> actionRecords = game.getActionRecords();
 
-    log.info_(ActionRecord.iterableToString(actionRecords));
+    log._info(ActionRecord.iterableToString(actionRecords));
 
     {
       Deque<Pair<String, Future<Void>>> tearDowns = new ArrayDeque<>(gameAgents.size());
@@ -232,30 +232,31 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       }
 
       final int tearDownsSize = tearDowns.size();
-      log.traProcess("Tearing down agents", 0, tearDownsSize);
+      log.traProcess_("Tearing down agents", 0, tearDownsSize);
       while (!tearDowns.isEmpty() && Thread.currentThread().isAlive() && !Thread.currentThread()
           .isInterrupted()) {
         Pair<String, Future<Void>> tearDown = tearDowns.pop();
-        log.tra_("\r");
-        log.traProcess("Tearing down agents", tearDownsSize - tearDowns.size(), tearDownsSize);
+        log._tra_("\r");
+        log.traProcess_("Tearing down agents", tearDownsSize - tearDowns.size(), tearDownsSize);
         try {
           tearDown.getB().get();
         } catch (InterruptedException e) {
-          log.trace_(", failed.");
+          log._trace(", failed.");
           log.debug("Interrupted while tearing down agent ".concat(tearDown.getA()));
           log.printStackTrace(e);
         } catch (ExecutionException e) {
+          log._trace(", failed.");
           log.debug("Exception while tearing down agent ".concat(tearDown.getA()));
           log.printStackTrace(e);
         }
       }
 
       if (!tearDowns.isEmpty()) {
-        log.trace_(", failed.");
+        log._trace(", failed.");
         log.warn("Following agents where not verified to be torn down: "
             .concat(tearDowns.stream().map(Pair::getA).collect(Collectors.joining(", "))));
       } else {
-        log.trace_(", done.");
+        log._trace(", done.");
       }
     }
 
@@ -285,7 +286,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       log.info_(message.toString());
     }
      */
-    log.info_(textualRepresentation);
+    log._info_(textualRepresentation);
     lastTextualRepresentation = textualRepresentation;
   }
 

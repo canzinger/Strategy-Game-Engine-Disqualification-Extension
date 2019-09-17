@@ -29,15 +29,15 @@ public class AgentFactory implements Factory<GameAgent<Game<Object, Object>, Obj
           "warn]: ", System.err, "",
           "error]: ", System.err, ""));
     } catch (InstantiationException e) {
-      log.error_();
+      log._error_();
       log.error("Could not instantiate new element with constructor of agent " + agentName);
       log.printStackTrace(e);
     } catch (IllegalAccessException e) {
-      log.error_();
+      log._error_();
       log.error("Could not access constructor of agent " + agentName);
       log.printStackTrace(e);
     } catch (InvocationTargetException e) {
-      log.error_();
+      log._error_();
       log.error("Could not invoke constructor of agent " + agentName);
       log.printStackTrace(e);
     }

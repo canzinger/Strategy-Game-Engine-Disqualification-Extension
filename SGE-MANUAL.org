@@ -10,6 +10,7 @@
 ~sge~ is a game engine primarily designed for autonomous agent playing discrete
 and sequential games.
 
+
 * Prerequisites
 
 ** Java Installation
@@ -24,6 +25,7 @@ and sequential games.
  #+END_SRC
 
  The version should be at least 11.
+
 
 ** Engine Installation
 
@@ -47,6 +49,7 @@ It does not have to be installed in a classical sense.
           Sometimes also called a *move*.
 - Action :: something the player can do which can end the *turn* or lead into another *action*.
 
+
 * Synopsis
 
 ** ~sge~
@@ -69,6 +72,7 @@ The engine has, as of version {{{version}}}, two working commands:
 1. match
 2. tournament
 
+
 ** ~sge match~
 
 A match is a single game that is played by agents. There are several ways to
@@ -83,7 +87,7 @@ match. This list is called the agent configuration. Should the user not have
 given any, it adds unused agents, and finally human players should those run out
 as well.
 
-The agents are then instantiated and matched in the same
+The agents are then instantiated and the match is played in this order.
 
 *** Arguments
 
@@ -114,9 +118,11 @@ order an instance of ~agent1~, ~agent2~ and another instance of ~agent1~.
 
 *** Options
 
+
 ** ~sge tournament~
 
 Note: It makes sense to read the subsection ~sge match~ first.
+
 
 * Writing an Agent
 
@@ -396,5 +402,6 @@ A logger can be configured with pre and post strings which are pre- and appended
 to some of the printed strings.
 
 Every level of logging has a couple of variants.
+
 
 * Writing a Game

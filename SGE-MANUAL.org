@@ -1,57 +1,122 @@
-#+TITLE: How to write an agent for sge v1.0.x
+#+MACRO: version 1.0.0
+#+TITLE: SGE {{{version}}} - Manual
+#+SUBTITLE: Draft
 #+AUTHOR: Lukas Grassauer
 #+EMAIL: entze@grassauer.eu
-#+DATE: last changed: 2019-09-13
+#+DATE: last changed: 2019-09-18
 
+* About
 
-* Java Installation
+~sge~ is a game engine primarily designed for autonomous agent playing discrete
+and sequential games.
 
-sge is written for Java 11 which is available under [[https://jdk.java.net/][https://jdk.java.net/]].
-Verify the version with
+* Prerequisites
 
+** Java Installation
 
-#+BEGIN_SRC bash
+ sge is written for Java 11 which is available under [[https://jdk.java.net/][https://jdk.java.net/]].
+ Verify the version with
 
-java -version
+ #+BEGIN_SRC sh
 
-#+END_SRC
+ java -version
 
-The version should be at least 11.
+ #+END_SRC
 
-* Engine Installation
+ The version should be at least 11.
+
+** Engine Installation
 
 The engine itself is bundled with all it's dependencies in a fat-jar, usually
-named ~sge-MA.MI.P.jar~ or ~strategyGameEngine-MA.MI.P.jar~ and can be executed with
+named ~sge-1.0.0-exe.jar~ and can be executed with
 
-#+BEGIN_SRC bash
+#+BEGIN_SRC sh
 
-java -jar sge-MA.MI.P.jar
-
-#+END_SRC
-
-
-** Synopsis
-
-Note: A comprehensive synopsis can be viewed with the ~-h~ or ~--help~ flag.
-
-To load a game or an agent and play a single match append the jar to the execution line.
-
-#+BEGIN_SRC bash
-
-java -jar sge-MA.MI.P.jar match gameJar [agentJars...]
+java -jar sge-1.0.0-exe.jar
 
 #+END_SRC
 
-The engine can determine if it is a game or an agent by itself so the order does
-not matter.
+It does not have to be installed in a classical sense.
 
-* Game Installation
 
-The game itself is only required to be called via the engine as an argument.
+** Vocabulary
 
-* Agent Installation
+- Match :: A certain number (can also be only one) of agents play a single game.
+- Round :: consists of every players *turn*.
+- Turn :: consists of all the *actions* a player makes until he ends his *turn*.
+          Sometimes also called a *move*.
+- Action :: something the player can do which can end the *turn* or lead into another *action*.
 
-Agents are only required to be called via the engine as an argument.
+* Synopsis
+
+** ~sge~
+
+The engine is a executable jar file which loads other jar files and the usage
+follows the POSIX principle (note ~java -jar sge-1.0.0-exe.jar~ is
+substituted by ~sge~):
+
+#+BEGIN_SRC sh
+
+sge [ENGINE-OPTIONS]... [COMMAND] [COMMAND-OPTIONS...] [COMMAND-ARGUMENTS]...
+
+#+END_SRC
+
+It is important to note that straying from that principle might result in
+unexpected behaviour.
+
+The engine has, as of version {{{version}}}, two working commands:
+
+1. match
+2. tournament
+
+** ~sge match~
+
+A match is a single game that is played by agents. There are several ways to
+allow agents to play matches against each other.
+
+Generally the engine either takes paths or strings as input from the user. The
+engine automatically determines if a string is a path to a file, and if not it
+falls back to interpreting it as a string.
+
+Firstly the engine will create a list of agents that are going to play in this
+match. This list is called the agent configuration. Should the user not have
+given any, it adds unused agents, and finally human players should those run out
+as well.
+
+The agents are then instantiated and matched in the same
+
+*** Arguments
+
+~sge match~ can optionally take paths to a game file, agent file(s) and agent
+configurations. The engine will determine what is what automatically. For
+example:
+
+#+BEGIN_SRC sh
+
+sge match gameJar agent1Jar agent2Jar
+
+#+END_SRC
+
+will start a match with the game provided by ~gameJar~ with the agent provided
+by ~agent1Jar~ vs the agent provided ~agent2Jar~
+
+Or if the order of the players matters (provided ~agent1Jar~ provides agent1 and
+~agent2Jar~ provides ~agent2~):
+
+#+BEGIN_SRC sh
+
+sge match gameJar agent1Jar agent2Jar agent1 agent2 agent1
+
+#+END_SRC
+
+will start a match with the game provided by ~gameJar~. The players are in that
+order an instance of ~agent1~, ~agent2~ and another instance of ~agent1~.
+
+*** Options
+
+** ~sge tournament~
+
+Note: It makes sense to read the subsection ~sge match~ first.
 
 * Writing an Agent
 
@@ -85,8 +150,8 @@ dependencies {
 jar {
  manifest {
   attributes 'Sge-Type': 'agent'
-  attributes 'Agent-Class': 'com.mydomain.firstagent.FirstAgent'
-  attributes 'Agent-Name': 'FirstAgent'
+  attributes 'Agent-Class': 'path.to.actual.agent'
+  attributes 'Agent-Name': 'The name of the agent'
  }
 }
 
@@ -180,6 +245,7 @@ Every agent also has the methods ~setUp(numberOfPlayers, playerNumber)~ called
 before every match, ~tearDown()~ called after every match, and ~destroy()~
 called before shutting down. These methods can be used to get resources in place
 or to destroy them. Note that the same instance is used for multiple matches.
+
 
 ** Game API
 
@@ -311,6 +377,7 @@ public void text_example(){
 
 # * Comprehensive Guide
 
+
 ** Logging
 
 The standard logger implementation provides five levels of logging.
@@ -328,83 +395,6 @@ however some debug information is sometimes useful.
 A logger can be configured with pre and post strings which are pre- and appended
 to some of the printed strings.
 
-Every level of logging has a couple of variants. Here demonstrated with ~debug~.
+Every level of logging has a couple of variants.
 
-#+BEGIN_SRC java
-
-  /**
-   * Prints "$string: $enumerator".
-   */
-  debEnum(String string, int enumerator);
-
-  /**
-   * Prints "$string: $percent ($i/$max)" where percent is i/max numerically.
-   */
-  debProcess(String string, int i, int max);
-
-  /**
-   * Returns true iff the log level is at least debug.
-   */
-  boolean isDebug();
-
-  /**
-   * Prints nothing.
-   */
-  deb_();
-
-  /**
-   * Prints the string without pre and post and without newline.
-   */
-  deb_(String string);
-
-  /**
-   * Prints the format, without pre and post and without newline.
-   */
-  debf_(String format, Object... args);
-
-  /**
-   * Prints pre and post without newline.
-   */
-  deb();
-
-  /**
-   * Prints the string with pre and post but without newline.
-   */
-  deb(String string);
-
-  /**
-   * Prints the format, with pre and post but without newline.
-   */
-  debf(String format, Object... args);
-
-  /**
-   * Prints a newline.
-   */
-  debug_();
-
-  /**
-   * Prints the string, without pre and post but with newline.
-   */
-  debug_(String string);
-
-  /**
-   * Prints the format, without pre and post but with newline.
-   */
-  debugf_(String format, Object... args);
-
-  /**
-   * Prints pre and post and a newline.
-   */
-  debug();
-
-  /**
-   * Prints the string, pre and post and a newline.
-   */
-  void debug(String string);
-
-  /**
-   * Prints the format, pre and post and a newline.
-   */
-  debugf(String format, Object... args) {
-
-#+END_SRC
+* Writing a Game

@@ -60,7 +60,7 @@ substituted by ~sge~):
 
 #+BEGIN_SRC sh
 
-sge [ENGINE-OPTIONS]... [COMMAND] [COMMAND-OPTIONS...] [COMMAND-ARGUMENTS]...
+sge [ENGINE-OPTIONS]... [COMMAND [COMMAND-OPTIONS...] [COMMAND-ARGUMENTS]...]
 
 #+END_SRC
 
@@ -677,4 +677,4 @@ This can be double checked in the javadoc.
  # * Comprehensive Guide
 
 
-** Writing a Game
+# ** Writing a Game

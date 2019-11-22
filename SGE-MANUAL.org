@@ -3,7 +3,7 @@
 #+SUBTITLE: Draft
 #+AUTHOR: Lukas Grassauer
 #+EMAIL: entze@grassauer.eu
-#+DATE: last changed: 2019-09-18
+#+DATE: last changed: 2019-11-22
 
 * About
 
@@ -46,7 +46,7 @@ It does not have to be installed in a classical sense.
 - Match :: A certain number (can also be only one) of agents play a single game.
 - Round :: consists of every players *turn*.
 - Turn :: consists of all the *actions* a player makes until he ends his *turn*.
-          Sometimes also called a *move*.
+          If a turn consists only of a single action it is also called a *move*.
 - Action :: something the player can do which can end the *turn* or lead into another *action*.
 
 

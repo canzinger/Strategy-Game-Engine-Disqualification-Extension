@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'at.ac.tuwien.ifs.sge'
-version '0.3.0'
+version '1.0.0'
 
 sourceCompatibility = 1.11
 

@@ -35,9 +35,9 @@ import picocli.CommandLine.RunAll;
 @Command(name = "sge", description = "A sequential game engine.", version = "sge "
     + SgeCommand.version, subcommands = {
     MatchCommand.class,
-    InteractiveCommand.class,
+    //InteractiveCommand.class,
     TournamentCommand.class,
-    BatchCommand.class
+    //BatchCommand.class
 })
 public class SgeCommand implements Callable<Void> {
 

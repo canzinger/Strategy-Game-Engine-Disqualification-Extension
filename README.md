@@ -14,7 +14,7 @@ java 11
 ./gradlew shadowJar
 ```
 
-Produces a fat-jar in the path build/lib/sge-m.m.p-exe.jar
+Produces a fat-jar in the path build/libs/sge-m.m.p-exe.jar
 
 ## Usage
 

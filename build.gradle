@@ -2,8 +2,8 @@ plugins {
     id 'java'
     id 'idea'
     id "maven-publish"
-    id 'com.github.johnrengelman.shadow' version '4.0.2'
-    id "com.jfrog.bintray" version "1.8.4"
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id "com.jfrog.bintray" version "1.8.5"
 }
 
 group 'at.ac.tuwien.ifs.sge'

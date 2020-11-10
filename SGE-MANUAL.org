@@ -474,8 +474,8 @@ therefore turns on all logging.
  import at.ac.tuwien.ifs.sge.agent.*;
  import at.ac.tuwien.ifs.sge.engine.Logger;
 
- public class FirstAgent extends AbstractGameAgent<G extends Game<A, ?>>, A>
-   implements GameAgent<G extends Game<A, ?>, A> {
+ public class FirstAgent<G extends Game<A, ?>, A> extends AbstractGameAgent<G, A>
+   implements GameAgent<G, A> {
 
   public FirstAgent(Logger log){
    super(log);

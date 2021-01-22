@@ -1,9 +1,9 @@
-#+MACRO: version 1.0.0
+#+MACRO: version 1.0.2
 #+TITLE: SGE {{{version}}} - Manual
 #+SUBTITLE: Draft
 #+AUTHOR: Lukas Grassauer
 #+EMAIL: entze@grassauer.eu
-#+DATE: last changed: 2019-11-22
+#+DATE: last changed: 2021-01-22
 
 * About
 
@@ -30,11 +30,11 @@ and sequential games.
 ** Engine Installation
 
 The engine itself is bundled with all it's dependencies in a fat-jar, usually
-named ~sge-1.0.0-exe.jar~ and can be executed with
+named ~sge-1.0.2-exe.jar~ and can be executed with
 
 #+BEGIN_SRC sh
 
-java -jar sge-1.0.0-exe.jar
+java -jar sge-1.0.2-exe.jar
 
 #+END_SRC
 
@@ -184,6 +184,7 @@ This option has an arity of '1'.
 Limit the number of actions per match. The game is aborted and the utility is
 measured as if it was ended regularly.
 
+
 **** ~-p~, ~--number-of-players~
 
 This option has an arity of '1'.
@@ -212,6 +213,7 @@ Shuffles the agent configuration before starting the match.
 This option has an arity of '1'.
 
 This allows to scale the computation time.
+
 
 **** ~-v~, ~--verbose~
 
@@ -317,6 +319,7 @@ This option is a flag.
 
 Gives an usage overview.
 
+
 **** ~-m~, ~--mode~
 
 This option has an arity of '1'.
@@ -353,6 +356,7 @@ This option has an arity of '1'.
 Limit the number of actions per match. The game is aborted and the utility is
 measured as if it was ended regularly.
 
+
 **** ~-p~, ~--number-of-players~
 
 This option has an arity of '1'.
@@ -383,12 +387,14 @@ This option has an arity of '1'.
 
 This allows to scale the computation time.
 
+
 **** ~-v~, ~--verbose~
 
 This option is a flag.
 
 Decreases the log level by one. These flags can be used cumulatively. ~-vv~
 therefore turns on all logging.
+
 
 * Writing for sge
 
@@ -663,6 +669,7 @@ therefore turns on all logging.
  + ~_debug_~ (Print no pre and post)
 
 This can be double checked in the javadoc.
+
 
 *** Debugging
 

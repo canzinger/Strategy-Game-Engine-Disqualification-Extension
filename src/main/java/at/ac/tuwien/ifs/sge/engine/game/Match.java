@@ -1,12 +1,13 @@
 package at.ac.tuwien.ifs.sge.engine.game;
 
-import at.ac.tuwien.ifs.sge.util.pair.ImmutablePair;
-import at.ac.tuwien.ifs.sge.util.pair.Pair;
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
 import at.ac.tuwien.ifs.sge.agent.HumanAgent;
 import at.ac.tuwien.ifs.sge.engine.Logger;
 import at.ac.tuwien.ifs.sge.game.ActionRecord;
 import at.ac.tuwien.ifs.sge.game.Game;
+import at.ac.tuwien.ifs.sge.util.Util;
+import at.ac.tuwien.ifs.sge.util.pair.ImmutablePair;
+import at.ac.tuwien.ifs.sge.util.pair.Pair;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -32,9 +33,10 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
   private Game<A, ?> game;
   private List<E> gameAgents;
   private String lastTextualRepresentation;
+  private final int maxActions;
 
   public Match(Game<A, ?> game, List<E> gameAgents, long computationTime,
-      TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
+      TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool, int maxActions) {
     this.game = game;
     this.gameAgents = gameAgents;
     if (game.getNumberOfPlayers() != gameAgents.size()) {
@@ -51,6 +53,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     this.log = log;
     this.pool = pool;
     this.matchResult = null;
+    this.maxActions = maxActions;
   }
 
 
@@ -102,13 +105,20 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
       }
     }
 
+    log.tracef("Computation time: %s", Util.convertUnitToMinimalString(computationTime, timeUnit));
+    if (maxActions < Integer.MAX_VALUE - 1) {
+      log.tracef("Maximum number of actions: %s", maxActions);
+      log.tracef("Max completion time: %s",
+          Util.convertUnitToMinimalString(computationTime * maxActions, timeUnit));
+    }
+    int nrOfActions = 0;
     double[] result = new double[gameAgents.size()];
     Arrays.fill(result, 1D);
     int lastPlayer = (-1);
     int thisPlayer;
     boolean isHuman = false;
-    while (!game.isGameOver() && Thread.currentThread().isAlive() && !Thread.currentThread()
-        .isInterrupted()) {
+    while (!game.isGameOver() && nrOfActions < maxActions && Thread.currentThread().isAlive()
+        && !Thread.currentThread().isInterrupted()) {
 
       thisPlayer = game.getCurrentPlayer();
       if (thisPlayer >= 0) {
@@ -157,7 +167,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           log.warn("No action given.");
           result[thisPlayer] = (-1D);
           matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
-          log.debf_("%d plies: ", game.getNumberOfActions());
+          log.debf_("%d actions: ", nrOfActions);
           log._debug(ActionRecord.iterableToString(game.getActionRecords()));
           return matchResult;
         }
@@ -175,7 +185,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
           }
           result[thisPlayer] = (-1D);
           matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
-          log.debf_("%d plies: ", game.getNumberOfActions());
+          log.debf_("%d actions: ", nrOfActions);
           log._debug(ActionRecord.iterableToString(game.getActionRecords()));
           return matchResult;
         }
@@ -196,6 +206,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
         }
         game = game.doAction(action);
       }
+      nrOfActions++;
 
       lastPlayer = thisPlayer;
 
@@ -216,7 +227,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     log._info_("-----");
     log.info("Game over.");
     log._info_(game.toTextRepresentation());
-    log.inf(game.getNumberOfActions() + " plies ");
+    log.inf(game.getNumberOfActions() + " actions ");
     List<ActionRecord<A>> actionRecords = game.getActionRecords();
 
     log._info(ActionRecord.iterableToString(actionRecords));

@@ -1,8 +1,8 @@
 package at.ac.tuwien.ifs.sge.engine.cli;
 
-import at.ac.tuwien.ifs.sge.engine.game.tournament.TournamentMode;
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
 import at.ac.tuwien.ifs.sge.engine.game.tournament.Tournament;
+import at.ac.tuwien.ifs.sge.engine.game.tournament.TournamentMode;
 import at.ac.tuwien.ifs.sge.game.Game;
 import java.io.File;
 import java.util.ArrayList;
@@ -70,6 +70,11 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
       "--mode"}, arity = "1", paramLabel = "MODE", description = "Tournament Mode. Valid values: ${COMPLETION-CANDIDATES}")
   private TournamentMode tournamentMode = TournamentMode.ROUND_ROBIN;
 
+  @Option(names = {
+      "--max-actions"}, arity = "1", paramLabel = "N",
+      description = "Maximum number of actions. Game is aborted after the Nth action. Per default (the maximum) 2^31-2.")
+  private int maxActions = Integer.MAX_VALUE - 1;
+
   @Parameters(index = "0", arity = "0..*", description = {
       "Not explicitly specified files or configuration of agents."})
   private List<String> arguments = new ArrayList<>();
@@ -109,7 +114,7 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
 
     Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> tournament = tournamentMode
         .getTournament(sge.gameFactory, numberOfPlayers, board, agentList, computationTime,
-            timeUnit, sge.debug, sge.log, sge.pool);
+            timeUnit, sge.debug, sge.log, sge.pool, maxActions);
 
     try {
       tournament.call();

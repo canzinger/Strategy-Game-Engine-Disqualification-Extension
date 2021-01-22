@@ -1,9 +1,10 @@
 package at.ac.tuwien.ifs.sge.engine.cli;
 
+import at.ac.tuwien.ifs.sge.agent.GameAgent;
 import at.ac.tuwien.ifs.sge.engine.game.Match;
 import at.ac.tuwien.ifs.sge.engine.game.MatchResult;
 import at.ac.tuwien.ifs.sge.game.Game;
-import at.ac.tuwien.ifs.sge.agent.GameAgent;
+import at.ac.tuwien.ifs.sge.util.Util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,10 +68,14 @@ public class MatchCommand extends AbstractCommand implements Runnable {
       "--agent"}, arity = "1..*", paramLabel = "AGENT", description = "Configuration of agents.")
   private List<String> agentConfiguration = new ArrayList<>();
 
+  @Option(names = {
+      "--max-actions"}, arity = "1", paramLabel = "N",
+      description = "Maximum number of actions. Game is aborted after the Nth action. Per default (the maximum) 2^31-2.")
+  private int maxActions = Integer.MAX_VALUE - 1;
+
   @Parameters(index = "0", arity = "0..*", description = {
       "Not explicitly specified files or configuration of agents."})
   private List<String> arguments = new ArrayList<>();
-
 
   @Override
   public void run() {
@@ -102,11 +107,13 @@ public class MatchCommand extends AbstractCommand implements Runnable {
 
     Match<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> match = new Match<>(
         sge.gameFactory.newInstance(board, numberOfPlayers),
-        agentList, computationTime, timeUnit, sge.debug, sge.log, sge.pool);
+        agentList, computationTime, timeUnit, sge.debug, sge.log, sge.pool, maxActions);
 
     MatchResult<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>> matchResult = match
         .call();
 
+    sge.log.debugf("Finished match in %s.",
+        Util.convertUnitToMinimalString(matchResult.getDuration(), TimeUnit.NANOSECONDS));
     System.out.println("\n".concat(matchResult.toString()).concat("\n"));
 
     destroyAgents(agentList);

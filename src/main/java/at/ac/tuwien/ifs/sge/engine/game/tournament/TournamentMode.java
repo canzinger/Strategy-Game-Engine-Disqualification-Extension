@@ -15,10 +15,10 @@ public enum TournamentMode {
         GameFactory<Game<Object, Object>> gameFactory, int numberOfPlayers,
         String board, List<GameAgent<Game<Object, Object>, Object>> gameAgents,
         long computationTime,
-        TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
+        TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool, int maxActions) {
       return new RoundRobin<>(gameFactory, numberOfPlayers, board, gameAgents, computationTime,
           timeUnit, debug, log,
-          pool);
+          pool, maxActions);
     }
 
     @Override
@@ -38,9 +38,9 @@ public enum TournamentMode {
     public Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> getTournament(
         GameFactory<Game<Object, Object>> gameFactory, int numberOfPlayers, String board,
         List<GameAgent<Game<Object, Object>, Object>> gameAgents, long computationTime,
-        TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
+        TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool, int maxActions) {
       return new DoubleRoundRobin<>(gameFactory, numberOfPlayers, board, gameAgents,
-          computationTime, timeUnit, debug, log, pool);
+          computationTime, timeUnit, debug, log, pool, maxActions);
     }
 
     @Override
@@ -58,7 +58,7 @@ public enum TournamentMode {
       GameFactory<Game<Object, Object>> gameFactory, int numberOfPlayers,
       String board, List<GameAgent<Game<Object, Object>, Object>> gameAgents,
       long computationTime,
-      TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool);
+      TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool, int maxActions);
 
   public abstract int getMinimumPerRound();
 

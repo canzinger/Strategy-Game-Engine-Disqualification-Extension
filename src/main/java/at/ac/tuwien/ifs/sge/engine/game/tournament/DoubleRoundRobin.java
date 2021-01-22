@@ -26,10 +26,10 @@ public class DoubleRoundRobin<G extends Game<? extends A, ?>, E extends GameAgen
 
 
   public DoubleRoundRobin(GameFactory<G> gameFactory, int numberOfPlayers, String board,
-      List<E> gameAgents,
-      long computationTime, TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool) {
+      List<E> gameAgents, long computationTime, TimeUnit timeUnit, boolean debug, Logger log,
+      ExecutorService pool, int maxActions) {
     super(gameFactory, numberOfPlayers, board, gameAgents, computationTime, timeUnit, debug, log,
-        pool);
+        pool, maxActions);
     this.result = null;
     this.twoResult = null;
   }
@@ -65,7 +65,7 @@ public class DoubleRoundRobin<G extends Game<? extends A, ?>, E extends GameAgen
           E xAgent = gameAgents.get(x);
           E yAgent = gameAgents.get(y);
           Match<G, E, A> match = new Match<>(newInstanceOfGame(), List.of(xAgent, yAgent),
-              computationTime, timeUnit, debug, log, pool);
+              computationTime, timeUnit, debug, log, pool, maxActions);
           MatchResult<G, E> matchResult = match.call();
           tournamentResult.add(matchResult);
         }
@@ -88,7 +88,7 @@ public class DoubleRoundRobin<G extends Game<? extends A, ?>, E extends GameAgen
       List<E> agentList = Arrays.stream(indices).mapToObj(gameAgents::get)
           .collect(Collectors.toList());
       Match<G, E, A> match = new Match<>(newInstanceOfGame(), agentList, computationTime, timeUnit,
-          debug, log, pool);
+          debug, log, pool, maxActions);
       MatchResult<G, E> matchResult = match.call();
       tournamentResult.add(matchResult);
 

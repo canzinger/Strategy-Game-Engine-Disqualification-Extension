@@ -177,6 +177,13 @@ This option is a flag.
 Gives an usage overview.
 
 
+**** ~--max-actions~
+
+This option has an arity of '1'.
+
+Limit the number of actions per match. The game is aborted and the utility is
+measured as if it was ended regularly.
+
 **** ~-p~, ~--number-of-players~
 
 This option has an arity of '1'.
@@ -338,6 +345,13 @@ agents, but at most as many as tournament contestants.
 
 Every permutation of agent is played once.
 
+
+**** ~--max-actions~
+
+This option has an arity of '1'.
+
+Limit the number of actions per match. The game is aborted and the utility is
+measured as if it was ended regularly.
 
 **** ~-p~, ~--number-of-players~
 

@@ -90,7 +90,7 @@ public class SgeCommand implements Callable<Void> {
 
     //AnsiConsole.systemInstall();
     try {
-      List<Object> ran = cli.parseWithHandler(new RunAll(), args);
+      cli.execute(args);
     } catch (Exception e) {
       sge.log.printStackTrace(e);
     }

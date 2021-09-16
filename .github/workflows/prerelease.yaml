@@ -25,28 +25,30 @@ jobs:
         shell: bash
         run: ./gradlew --parallel jar shadowJar javadocJar sources
       - name: Check version number
-        run: 'diff -q <(java -jar build/libs/sge-*.*.*-exe.jar --version) <(./gradlew properties | grep -F "version" | grep -E "^version:[ \t]*[0-9]+\.[0-9]+\.[0-9]+$" | sed -E "s/^version:[ \t]*([0-9]+\.[0-9]+\.[0-9]+)$/sge \\1/")'
+        run: 'diff -q <(java -jar build/libs/sge-*.*.*-exe.jar --version) <(./gradlew properties | grep -F "version" | grep -E "^version:[ \t]*[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$" | sed -E "s/^version:[ \t]*([0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT)$/sge \\1/")'
         continue-on-error: true
       - uses: actions/upload-artifact@v2
         name: Upload jar
         with:
           name: jar
-          path: build/libs/sge-*.*.*.jar
+          path: |
+            build/libs/sge-*.*.*-SNAPSHOT.jar
+            !build/libs/sge-*.*.*-SNAPSHOT-*-.jar
       - uses: actions/upload-artifact@v2
         name: Upload sources
         with:
           name: sources
-          path: build/libs/sge-*.*.*-sources.jar
+          path: build/libs/sge-*.*.*-SNAPSHOT-sources.jar
       - uses: actions/upload-artifact@v2
         name: Upload javadoc
         with:
           name: javadoc
-          path: build/libs/sge-*.*.*-javadoc.jar
+          path: build/libs/sge-*.*.*-SNAPSHOT-javadoc.jar
       - uses: actions/upload-artifact@v2
         name: Upload shadow
         with:
           name: shadow
-          path: build/libs/sge-*.*.*-exe.jar
+          path: build/libs/sge-*.*.*-SNAPSHOT-exe.jar
 
 
   github_packages:
@@ -97,10 +99,10 @@ jobs:
         with:
           prerelease: true
           files: |
-             sge-*.*.*.jar
-             sge-*.*.*-exe.jar
-             sge-*.*.*-sources.jar
-             sge-*.*.*-javadoc.jar
+             jar/sge-*.*.*-SNAPSHOT.jar
+             shadow/sge-*.*.*-SNAPSHOT-exe.jar
+             sources/sge-*.*.*-SNAPSHOT-sources.jar
+             javadoc/sge-*.*.*-SNAPSHOT-javadoc.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

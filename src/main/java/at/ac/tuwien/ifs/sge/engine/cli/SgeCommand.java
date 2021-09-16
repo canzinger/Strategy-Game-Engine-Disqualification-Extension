@@ -50,7 +50,7 @@ public class SgeCommand implements Callable<Void> {
   private static final String SGE_AGENT_CLASS = "Agent-Class";
   private static final String SGE_AGENT_NAME = "Agent-Name";
   private static final String SGE_GAME_CLASS = "Game-Class";
-  static final String version = "1.0.3";
+  static final String version = "1.0.3-SNAPSHOT";
 
   Logger log;
   ExecutorService pool;

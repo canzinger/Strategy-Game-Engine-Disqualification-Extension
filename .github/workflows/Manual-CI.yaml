@@ -18,6 +18,6 @@ jobs:
         with:
           args: >-
             --from org
-            --to pdf
+            --to latex
             --output SGE-MANUAL.pdf
             SGE-MANUAL.org

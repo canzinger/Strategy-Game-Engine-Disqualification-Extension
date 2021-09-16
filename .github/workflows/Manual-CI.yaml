@@ -6,6 +6,7 @@ on:
       - "*.org"
       - "*.png"
       - "*.jpg"
+      - ".github/workflows/Manual-CI.yaml"
 
 jobs:
   build:

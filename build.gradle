@@ -15,7 +15,6 @@ repositories {
     mavenCentral()
 }
 
-
 dependencies {
 
     implementation 'info.picocli:picocli:4.6.1'
@@ -40,6 +39,11 @@ shadowJar {
     archiveClassifier.set('exe')
 }
 
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
 
 publishing {
     repositories {
@@ -85,6 +89,6 @@ publishing {
 
 test {
 
-     useJUnit()
-     maxHeapSize = '1G'
+    useJUnit()
+    maxHeapSize = '1G'
 }

@@ -51,7 +51,7 @@ jobs:
           name: jar
           path: |
             build/libs/sge-*.*.*-SNAPSHOT.jar
-            !build/libs/sge-*.*.*-SNAPSHOT-*-.jar
+            !build/libs/sge-*.*.*-SNAPSHOT-*.jar
       - uses: actions/upload-artifact@v2
         name: Upload sources
         with:

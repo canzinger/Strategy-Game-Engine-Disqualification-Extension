@@ -55,8 +55,6 @@ publishing {
     publications {
         mavenPublication(MavenPublication) {
             from components.java
-            artifact sourcesJar
-            artifact javadocJar
             pom {
                 name = "sge"
                 description = "The core engine library, needed to implement games and agents."

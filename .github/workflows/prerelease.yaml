@@ -24,7 +24,7 @@ jobs:
       - name: Upload Manual
         uses: actions/upload-artifact@v2
         with:
-          artifact: manual
+          name: manual
           path: SGE-MANUAL.pdf
   jars:
     name: Build jar, shadowJar, javadoc and sources

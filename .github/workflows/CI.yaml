@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: "Build - ${{ matrix.os }}"
+    name: "Build - ${{ matrix.os }} - java-${{ matrix.java-version }}-${{ matrix.java-distribution }}"
     strategy:
       matrix:
         os:

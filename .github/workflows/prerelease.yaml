@@ -3,7 +3,8 @@ name: Prerelease
 on:
   push:
     tags:
-      - "*-SNAPSHOT"
+      - "v*.*.*-SNAPSHOT"
+      - "v*.*.*-SNAPSHOT-*"
 
 
 jobs:

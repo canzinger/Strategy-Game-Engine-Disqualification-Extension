@@ -8,9 +8,6 @@ on:
       - "gradlew"
       - "gradlew.bat"
       - ".github/workflows/CI.yaml"
-    tags-ignore:
-      - "v*.*.*"
-      - "*-SNAPSHOT"
 
 jobs:
   build:

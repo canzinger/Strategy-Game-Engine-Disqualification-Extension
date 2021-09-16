@@ -25,6 +25,7 @@ jobs:
         run: ./gradlew --parallel jar shadowJar javadocJar sources
       - name: Check version number
         run: 'diff -q <(java -jar build/libs/sge-*.*.*-exe.jar --version) <(./gradlew properties | grep -F "version" | grep -E "^version:[ \t]*[0-9]+\.[0-9]+\.[0-9]+$" | sed -E "s/^version:[ \t]*([0-9]+\.[0-9]+\.[0-9]+)$/sge \\1/")'
+        continue-on-error: false
       - uses: actions/upload-artifact@v2
         name: Upload jar
         with:

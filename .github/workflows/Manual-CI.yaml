@@ -1,0 +1,23 @@
+name: Manual CI
+
+on:
+  push:
+    paths:
+      - "*.org"
+      - "*.png"
+      - "*.jpg"
+
+jobs:
+  build:
+    name: Build manual
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Org
+        uses: docker://pandoc/latex:2.14.0.1
+        with:
+          args: >-
+            --from org
+            --to pdf
+            --output SGE-MANUAL.pdf
+            SGE-MANUAL.org

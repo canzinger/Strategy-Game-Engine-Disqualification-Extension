@@ -1,5 +1,7 @@
 # Strategy Game Engine
 
+[![Java CI](https://github.com/Entze/Strategy-Game-Engine/actions/workflows/CI.yaml/badge.svg)](https://github.com/Entze/Strategy-Game-Engine/actions/workflows/CI.yaml)
+
 A strategy game engine written in Java.
 
 # Installation

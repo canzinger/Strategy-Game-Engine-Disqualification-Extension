@@ -40,8 +40,18 @@ shadowJar {
     archiveClassifier.set('exe')
 }
 
-/*
+
 publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Entze/Strategy-Game-Engine")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
     publications {
         mavenPublication(MavenPublication) {
             from components.java
@@ -71,16 +81,9 @@ publishing {
                     developerConnection = "git@github.com:Entze/strategy-game-engine.git"
                 }
             }
-            repositories {
-                maven {
-                    url = "https://jcenter.bintray.com/at/ac/tuwien/ifs/sge/sge/"
-                }
-            }
         }
     }
 }
-
-*/
 
 test {
 

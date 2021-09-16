@@ -55,7 +55,7 @@ It does not have to be installed in a classical sense.
 ** ~sge~
 
 The engine is a executable jar file which loads other jar files and the usage
-follows the POSIX principle (note ~java -jar sge-1.0.0-exe.jar~ is
+follows the POSIX principle (note ~java -jar sge-1.0.3-exe.jar~ is
 substituted by ~sge~):
 
 #+BEGIN_SRC sh
@@ -423,7 +423,7 @@ therefore turns on all logging.
  }
 
  dependencies {
-   compile group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.0'
+   compile group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.3'
    //also consider to add the game in the same manner
  }
 

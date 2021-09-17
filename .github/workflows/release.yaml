@@ -109,7 +109,9 @@ jobs:
   github_release:
     name: Release on github
     runs-on: ubuntu-20.04
-    needs: jars
+    needs:
+      - jars
+      - manual
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v2

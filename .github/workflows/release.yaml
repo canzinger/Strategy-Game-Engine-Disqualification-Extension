@@ -50,7 +50,9 @@ jobs:
         name: Upload jar
         with:
           name: jar
-          path: build/libs/sge-*.*.*.jar
+          path: |
+            build/libs/sge-*.*.*.jar
+            !build/libs/sge-*.*.*-*.jar
       - uses: actions/upload-artifact@v2
         name: Upload sources
         with:

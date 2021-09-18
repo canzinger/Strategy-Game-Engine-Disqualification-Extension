@@ -1,6 +1,7 @@
 package at.ac.tuwien.ifs.sge.engine.cli;
 
 import at.ac.tuwien.ifs.sge.agent.GameAgent;
+import at.ac.tuwien.ifs.sge.engine.Logger;
 import at.ac.tuwien.ifs.sge.game.Game;
 import at.ac.tuwien.ifs.sge.util.pair.ImmutablePair;
 import at.ac.tuwien.ifs.sge.util.pair.Pair;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,23 @@ public abstract class AbstractCommand {
   protected abstract void setNumberOfPlayers(int numberOfPlayers);
 
   protected abstract void setBoard(String board);
+
+  protected void loadLogger(){
+    int logLevel = getQuiet().length - (getVerbose().length + (isDebug() ? 1 : 0));
+    getSge().log = new Logger(logLevel, "[sge ", "",
+        "trace]: ", System.out, "",
+        "debug]: ", System.out, "",
+        "info]: ", System.out, "",
+        "warn]: ", System.err, "",
+        "error]: ", System.err, "");
+  }
+
+  protected  void loadThreadPool(){
+    int threads = Math.max(Runtime.getRuntime().availableProcessors(), 2);
+    getSge().log.traf_("Initialising ThreadPool with %d threads", threads);
+    getSge().pool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 2));
+    getSge().log._trace(", done.");
+  }
 
   protected void loadDebug() {
     getSge().debug = getSge().debug || isDebug();
@@ -94,6 +113,8 @@ public abstract class AbstractCommand {
   }
 
   protected void loadCommon() {
+    loadLogger();
+    loadThreadPool();
     loadDebug();
     loadLogLevel();
     loadArguments();

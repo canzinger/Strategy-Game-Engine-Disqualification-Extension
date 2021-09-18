@@ -39,7 +39,7 @@ import picocli.CommandLine.RunAll;
     TournamentCommand.class,
     //BatchCommand.class
 })
-public class SgeCommand implements Callable<Void> {
+public class SgeCommand implements Callable<Integer> {
 
   private static final long AWAIT_TERMINATION_TIME = 5;
   private static final TimeUnit AWAIT_TERMINATION_TIMEUNIT = TimeUnit.SECONDS;
@@ -106,21 +106,19 @@ public class SgeCommand implements Callable<Void> {
   }
 
   @Override
-  public Void call() {
+  public Integer call() {
+
     int logLevel = quiet.length - (verbose.length + (debug ? 1 : 0));
-    log = new Logger(logLevel, "[sge ", "",
+    this.log = new Logger(logLevel, "[sge ", "",
         "trace]: ", System.out, "",
         "debug]: ", System.out, "",
         "info]: ", System.out, "",
         "warn]: ", System.err, "",
         "error]: ", System.err, "");
 
-    int threads = Math.max(Runtime.getRuntime().availableProcessors(), 2);
-    log.traf_("Initialising ThreadPool with %d threads", threads);
-    pool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 2));
-    log._trace(", done.");
+    log.debug("No commands to run.");
 
-    return null;
+    return 0;
   }
 
   public int determineArguments(List<String> arguments, List<File> files, List<File> directories,

@@ -1,9 +1,8 @@
-#+MACRO: version 1.0.2
 #+TITLE: SGE {{{version}}} - Manual
 #+SUBTITLE: Draft
 #+AUTHOR: Lukas Grassauer
 #+EMAIL: entze@grassauer.eu
-#+DATE: last changed: 2021-01-22
+#+DATE: last changed: 2022-12-02
 
 * About
 
@@ -30,11 +29,11 @@ and sequential games.
 ** Engine Installation
 
 The engine itself is bundled with all it's dependencies in a fat-jar, usually
-named ~sge-1.0.2-exe.jar~ and can be executed with
+named ~sge-1.0.3-exe.jar~ and can be executed with
 
 #+BEGIN_SRC sh
 
-java -jar sge-1.0.2-exe.jar
+java -jar sge-1.0.3-exe.jar
 
 #+END_SRC
 

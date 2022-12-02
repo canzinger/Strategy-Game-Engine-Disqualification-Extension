@@ -24,7 +24,7 @@ jobs:
             --output SGE-MANUAL.pdf
             manual/SGE-MANUAL.org
       - name: Upload Manual
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: manual
           path: SGE-MANUAL.pdf
@@ -47,24 +47,24 @@ jobs:
       - name: Check version number
         run: 'diff -q <(java -jar build/libs/sge-*.*.*-exe.jar --version) <(./gradlew properties | grep -F "version" | grep -E "^version:[ \t]*[0-9]+\.[0-9]+\.[0-9]+$" | sed -E "s/^version:[ \t]*([0-9]+\.[0-9]+\.[0-9]+)$/sge \\1/")'
         continue-on-error: false
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         name: Upload jar
         with:
           name: jar
           path: |
             build/libs/sge-*.*.*.jar
             !build/libs/sge-*.*.*-*.jar
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         name: Upload sources
         with:
           name: sources
           path: build/libs/sge-*.*.*-sources.jar
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         name: Upload javadoc
         with:
           name: javadoc
           path: build/libs/sge-*.*.*-javadoc.jar
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         name: Upload shadow
         with:
           name: shadow
@@ -88,17 +88,17 @@ jobs:
       - name: Ensure build/libs/ exists
         run: mkdir -p build/libs/
       - name: Download jar
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: jar
           path: build/libs/
       - name: Download sources
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: sources
           path: build/libs/
       - name: Download javadoc
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: javadoc
           path: build/libs/
@@ -115,7 +115,7 @@ jobs:
       - manual
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
       - name: Release
         uses: softprops/action-gh-release@v1
         with:

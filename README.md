@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Entze:Strategy-Game-Engine:v1.0.3'
+    implementation("com.github.Entze:Strategy-Game-Engine:v1.0.3")
 }
 
 ```
@@ -44,7 +44,7 @@ dependencies {
 }
 
 dependencies {
-    implementation 'at.ac.tuwien.ifs.sge:sge:1.0.3'
+    implementation("at.ac.tuwien.ifs.sge:sge:1.0.3")
 }
 ```
 
@@ -88,6 +88,8 @@ If you want to let two agents `agent1.jar` and `agent2.jar` play a game of `game
 ```bash
 java -jar sge-1.0.3-exe.jar match game.jar agent1.jar agent2.jar
 ```
+
+There is also a [manual](https://github.com/Entze/Strategy-Game-Engine/releases/download/v1.0.3/SGE-MANUAL.pdf) available
 
 ## Available Games
 | Name | Latest Version |

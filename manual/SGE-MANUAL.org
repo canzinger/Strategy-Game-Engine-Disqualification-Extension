@@ -1,4 +1,4 @@
-#+TITLE: SGE 1.0.3 - Manual
+#+TITLE: SGE 1.0.4 - Manual
 #+SUBTITLE: Draft
 #+AUTHOR: Lukas Grassauer
 #+EMAIL: entze@grassauer.eu
@@ -14,7 +14,7 @@ and sequential games.
 
 ** Java Installation
 
- sge is written for Java 11 which is available under [[https://jdk.java.net/][https://jdk.java.net/]].
+ sge is written for Java 11 which is available under [[https://jdk.java.net/][jdk.java.net]].
  Verify the version with
 
  #+BEGIN_SRC sh
@@ -29,11 +29,11 @@ and sequential games.
 ** Engine Installation
 
 The engine itself is bundled with all it's dependencies in a fat-jar, usually
-named ~sge-1.0.3-exe.jar~ and can be executed with
+named ~sge-1.0.4-exe.jar~ and can be executed with
 
 #+BEGIN_SRC sh
 
-java -jar sge-1.0.3-exe.jar
+java -jar sge-1.0.4-exe.jar
 
 #+END_SRC
 
@@ -54,7 +54,7 @@ It does not have to be installed in a classical sense.
 ** ~sge~
 
 The engine is a executable jar file which loads other jar files and the usage
-follows the POSIX principle (note ~java -jar sge-1.0.3-exe.jar~ is
+follows the POSIX principle (note ~java -jar sge-1.0.4-exe.jar~ is
 substituted by ~sge~):
 
 #+BEGIN_SRC sh
@@ -66,7 +66,7 @@ sge [ENGINE-OPTIONS]... [COMMAND [COMMAND-OPTIONS...] [COMMAND-ARGUMENTS]...]
 It is important to note that straying from that principle might result in
 unexpected behaviour.
 
-The engine has, as of version 1.0.3, two working commands:
+The engine has, as of version 1.0.4, two working commands:
 
 1. match
 2. tournament
@@ -323,7 +323,7 @@ Gives an usage overview.
 
 This option has an arity of '1'.
 
-As of version 1.0.3 ~sge tournament~ supports the following tournament
+As of version 1.0.4 ~sge tournament~ supports the following tournament
 modes:
 
 
@@ -411,30 +411,81 @@ therefore turns on all logging.
  + Engine is in classpath
  + Recommended: Game is in classpath
 
- To achieve this in gradle:
+To achieve this in gradle you have two options:
 
- #+BEGIN_SRC build.gradle
+**** Jitpack (no GitHub Account required)
+Add the following to your `build.gradle`:
 
- sourceCompatibility = 1.11
+#+BEGIN_SRC build.gradle
 
- repositories {
-  jcenter()
- }
+sourceCompatibility = 1.11
 
- dependencies {
-   compile group: 'at.ac.tuwien.ifs.sge', name: 'sge', version: '1.0.3'
-   //also consider to add the game in the same manner
- }
+repositories {
+    maven { url 'https://jitpack.io' }
+}
 
- jar {
+dependencies {
+    implementation("com.github.Entze:Strategy-Game-Engine:v1.0.4")
+}
+
+jar {
   manifest {
-   attributes 'Sge-Type': 'agent'
-   attributes 'Agent-Class': 'path.to.actual.agent'
-   attributes 'Agent-Name': 'The name of the agent'
+   attributes("Sge-Type": "agent",
+              "Agent-Class": "path.to.actual.agent",
+              "Agent-Name": "The name of the agent")
   }
  }
 
- #+END_SRC
+
+#+END_SRC
+
+**** GitHub Packages (GitHub Account required)
+Add the following to your `build.gradle`:
+
+#+BEGIN_SRC build.gradle
+
+sourceCompatibility = 1.11
+
+dependencies {
+    maven {
+        url = uri("https://maven.pkg.github.com/Entze/Strategy-Game-Engine")
+        credentials {
+            username = project.findProperty("gpr.user")
+                        ?: findProperty("github.actor")
+                        ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.key")
+                        ?: findProperty("github.token")
+                        ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+    maven {
+        url = uri("https://maven.pkg.github.com/Entze/sge-risk")
+        credentials {
+            username = project.findProperty("gpr.user")
+                        ?: findProperty("github.actor")
+                        ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.key")
+                        ?: findProperty("github.token")
+                        ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation("at.ac.tuwien.ifs.sge:sge:1.0.4")
+}
+#+END_SRC
+
+This *requires* that either ~gpr.user~ or ~github.actor~ are set in the gradle config or the environment variable ~GITHUB_ACTOR~ is set (equivalently for the key/token).
+
+Usually this can be done by adding a ~gradle.properties~ with the (unquoted) key value pairs like so:
+
+#+BEGIN_SRC gradle.properties
+github.actor=MyUserName
+github.token=ghp_...
+#+END_SRC
+
+The token is a personal access token. Learn to set one up at [[https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token][docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token]]
 
 
 *** Development Environment
@@ -694,7 +745,7 @@ This can be double checked in the javadoc.
 
  #+END_SRC
 
- # * Comprehensive Guide
+# * Comprehensive Guide
 
 
 # ** Writing a Game

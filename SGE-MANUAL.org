@@ -1,4 +1,4 @@
-#+TITLE: SGE {{{version}}} - Manual
+#+TITLE: SGE 1.0.3 - Manual
 #+SUBTITLE: Draft
 #+AUTHOR: Lukas Grassauer
 #+EMAIL: entze@grassauer.eu
@@ -66,7 +66,7 @@ sge [ENGINE-OPTIONS]... [COMMAND [COMMAND-OPTIONS...] [COMMAND-ARGUMENTS]...]
 It is important to note that straying from that principle might result in
 unexpected behaviour.
 
-The engine has, as of version {{{version}}}, two working commands:
+The engine has, as of version 1.0.3, two working commands:
 
 1. match
 2. tournament
@@ -323,7 +323,7 @@ Gives an usage overview.
 
 This option has an arity of '1'.
 
-As of version {{{version}}} ~sge tournament~ supports the following tournament
+As of version 1.0.3 ~sge tournament~ supports the following tournament
 modes:
 
 

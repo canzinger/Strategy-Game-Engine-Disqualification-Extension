@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Entze:Strategy-Game-Engine:v1.0.4'
+    implementation 'com.github.Entze:Strategy-Game-Engine:v1.0.3'
 }
 
 ```
@@ -44,7 +44,7 @@ dependencies {
 }
 
 dependencies {
-    implementation 'at.ac.tuwien.ifs.sge:sge:1.0.4'
+    implementation 'at.ac.tuwien.ifs.sge:sge:1.0.3'
 }
 ```
 
@@ -69,24 +69,24 @@ This produces four jar files (in `build/libs/`):
 
 One executable
 
-- `sge-1.0.4-exe.jar` (Executable)
+- `sge-1.0.3-exe.jar` (Executable)
 
 And three jars usually used for development
 
-- `sge-1.0.4.jar` (Library)
-- `sge-1.0.4-sources.jar` (Sources)
-- `sge-1.0.4-javadoc.jar` (Documentation)
+- `sge-1.0.3.jar` (Library)
+- `sge-1.0.3-sources.jar` (Sources)
+- `sge-1.0.3-javadoc.jar` (Documentation)
 
 ## Usage
 For an extensive overview see:
 ```bash
-java -jar sge-1.0.4-exe.jar --help
+java -jar sge-1.0.3-exe.jar --help
 ```
 
 If you want to let two agents `agent1.jar` and `agent2.jar` play a game of `game.jar` against each other run the command:
 
 ```bash
-java -jar sge-1.0.4-exe.jar match game.jar agent1.jar agent2.jar
+java -jar sge-1.0.3-exe.jar match game.jar agent1.jar agent2.jar
 ```
 
 ## Available Games

@@ -3,11 +3,11 @@ plugins {
     id 'java-library'
     id 'idea'
     id "maven-publish"
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 group 'at.ac.tuwien.ifs.sge'
-version '1.0.3'
+version '1.0.3-SNAPSHOT'
 
 sourceCompatibility = 1.11
 

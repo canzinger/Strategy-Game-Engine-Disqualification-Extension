@@ -89,7 +89,7 @@ If you want to let two agents `agent1.jar` and `agent2.jar` play a game of `game
 java -jar sge-1.0.3-exe.jar match game.jar agent1.jar agent2.jar
 ```
 
-There is also a [manual](https://github.com/Entze/Strategy-Game-Engine/releases/download/v1.0.3/SGE-MANUAL.pdf) available
+There is also a [manual](https://github.com/Entze/Strategy-Game-Engine/releases/download/v1.0.3/SGE-MANUAL.pdf) available.
 
 ## Available Games
 | Name | Latest Version |

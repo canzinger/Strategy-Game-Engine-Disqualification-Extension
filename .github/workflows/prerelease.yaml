@@ -10,11 +10,11 @@ on:
 jobs:
   manual:
     name: Build manual
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - name: Build Org
-        uses: docker://pandoc/latex:2.14.0.1
+        uses: docker://pandoc/latex:2.19.2.0
         with:
           args: >-
             --from org
@@ -28,7 +28,7 @@ jobs:
           path: SGE-MANUAL.pdf
   jars:
     name: Build jar, shadowJar, javadoc and sources
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -72,7 +72,7 @@ jobs:
   github_packages:
     name: Release as github package
     needs: jars
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -107,7 +107,7 @@ jobs:
 
   github_release:
     name: Release on github
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - jars
       - manual

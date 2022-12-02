@@ -26,16 +26,9 @@ dependencies {
 Add the following to your `build.gradle`:
 
 ```build.gradle
-dependencies {
+repositories {
     maven {
         url = uri("https://maven.pkg.github.com/Entze/Strategy-Game-Engine")
-        credentials {
-            username = project.findProperty("gpr.user") ?: findProperty("github.actor") ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") ?: findProperty("github.token") ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
-    maven {
-        url = uri("https://maven.pkg.github.com/Entze/sge-risk")
         credentials {
             username = project.findProperty("gpr.user") ?: findProperty("github.actor") ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("gpr.key") ?: findProperty("github.token") ?: System.getenv("GITHUB_TOKEN")

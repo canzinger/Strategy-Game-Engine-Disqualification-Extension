@@ -24,7 +24,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'at.ac.tuwien.ifs.sge.engine.cli.SgeCommand'
+        attributes("Main-Class": "at.ac.tuwien.ifs.sge.engine.cli.SgeCommand")
     }
 }
 

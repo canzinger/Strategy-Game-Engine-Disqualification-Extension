@@ -3,9 +3,9 @@ name: Manual CI
 on:
   push:
     paths:
-      - "*.org"
-      - "*.png"
-      - "*.jpg"
+      - "manual/*.org"
+      - "manual/*.png"
+      - "manual/*.jpg"
       - ".github/workflows/Manual-CI.yaml"
 
 jobs:
@@ -18,7 +18,8 @@ jobs:
         uses: docker://pandoc/latex:2.19.2.0
         with:
           args: >-
+            --resource-path manual
             --from org
             --to latex
             --output SGE-MANUAL.pdf
-            SGE-MANUAL.org
+            manual/SGE-MANUAL.org

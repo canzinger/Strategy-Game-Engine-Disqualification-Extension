@@ -18,10 +18,11 @@ jobs:
         uses: docker://pandoc/latex:2.19.2.0
         with:
           args: >-
+            --resource-path manual
             --from org
             --to latex
             --output SGE-MANUAL.pdf
-            SGE-MANUAL.org
+            manual/SGE-MANUAL.org
       - name: Upload Manual
         uses: actions/upload-artifact@v2
         with:

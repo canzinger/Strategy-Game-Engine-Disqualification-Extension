@@ -474,6 +474,15 @@ dependencies {
 dependencies {
     implementation("at.ac.tuwien.ifs.sge:sge:1.0.4")
 }
+
+jar {
+  manifest {
+   attributes("Sge-Type": "agent",
+              "Agent-Class": "path.to.actual.agent",
+              "Agent-Name": "The name of the agent")
+  }
+ }
+
 #+END_SRC
 
 This *requires* that either ~gpr.user~ or ~github.actor~ are set in the gradle config or the environment variable ~GITHUB_ACTOR~ is set (equivalently for the key/token).

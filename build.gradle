@@ -86,7 +86,6 @@ publishing {
 }
 
 test {
-
     useJUnit()
     maxHeapSize = '1G'
 }

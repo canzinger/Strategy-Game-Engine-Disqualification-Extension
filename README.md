@@ -55,7 +55,7 @@ See the [GitHub packages](https://github.com/Entze/Strategy-Game-Engine/packages
 
 ### From Source
 ```bash
-./gradlew jar shadowJar sources javadocJar
+./gradlew jar shadowJar sourcesJar javadocJar
 ```
 
 This produces four jar files (in `build/libs/`):

@@ -73,6 +73,10 @@ public class MatchCommand extends AbstractCommand implements Runnable {
       description = "Maximum number of actions. Game is aborted after the Nth action. Per default (the maximum) 2^31-2.")
   private int maxActions = Integer.MAX_VALUE - 1;
 
+  @Option(names = {"-dq",
+    "--disqualify"}, description = "Disqualify agents that time out without stopping the game.")
+  private boolean disqualify = false;
+
   @Parameters(index = "0", arity = "0..*", description = {
       "Not explicitly specified files or configuration of agents."})
   private List<String> arguments = new ArrayList<>();
@@ -107,7 +111,7 @@ public class MatchCommand extends AbstractCommand implements Runnable {
 
     Match<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> match = new Match<>(
         sge.gameFactory.newInstance(board, numberOfPlayers),
-        agentList, computationTime, timeUnit, sge.debug, sge.log, sge.pool, maxActions);
+        agentList, computationTime, timeUnit, sge.debug, sge.log, sge.pool, maxActions, disqualify);
 
     MatchResult<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>> matchResult = match
         .call();

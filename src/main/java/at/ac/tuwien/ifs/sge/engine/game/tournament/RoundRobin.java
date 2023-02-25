@@ -33,9 +33,9 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
 
   public RoundRobin(GameFactory<G> gameFactory, int numberOfPlayers, String board,
       List<E> gameAgents,
-      long computationTime, TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool, int maxActions) {
+      long computationTime, TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool, int maxActions, boolean disqualify) {
     super(gameFactory, numberOfPlayers, board, gameAgents, computationTime, timeUnit, debug, log,
-        pool, maxActions);
+        pool, maxActions, disqualify);
     this.result = null;
     this.twoResult = null;
   }
@@ -170,7 +170,7 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
         E yAgent = gameAgents.get(y);
         List<E> agentList = List.of(xAgent, yAgent);
         Match<G, E, A> match = new Match<>(newInstanceOfGame(), agentList, computationTime,
-            timeUnit, debug, log, pool, maxActions);
+            timeUnit, debug, log, pool, maxActions, disqualify);
         MatchResult<G, E> matchResult = match.call();
         double[] evenResult = matchResult.getResult();
         twoResult.get(xAgent.toString()).put(yAgent.toString(), evenResult[0] - evenResult[1]);
@@ -191,7 +191,7 @@ public class RoundRobin<G extends Game<? extends A, ?>, E extends GameAgent<G, ?
       List<E> agentList = Arrays.stream(indices).mapToObj(gameAgents::get)
           .collect(Collectors.toUnmodifiableList());
       Match<G, E, A> match = new Match<>(newInstanceOfGame(), agentList, computationTime, timeUnit,
-          debug, log, pool, maxActions);
+          debug, log, pool, maxActions, disqualify);
       MatchResult<G, E> matchResult = match.call();
       double[] utilities = matchResult.getResult();
       double[] scores = Util.scoresOutOfUtilities(utilities);

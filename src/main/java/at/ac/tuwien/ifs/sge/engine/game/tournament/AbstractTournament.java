@@ -25,11 +25,12 @@ public abstract class AbstractTournament<G extends Game<? extends A, ?>, E exten
   protected final Logger log;
   protected final ExecutorService pool;
   protected final int maxActions;
+  protected final boolean disqualify;
 
 
   protected AbstractTournament(GameFactory<G> gameFactory, int numberOfPlayers, String board,
       List<E> gameAgents,
-      long computationTime, TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool, int maxActions) {
+      long computationTime, TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool, int maxActions, boolean disqualify) {
     this.tournamentResult = null;
     this.textRepresentation = null;
     this.gameFactory = gameFactory;
@@ -42,6 +43,7 @@ public abstract class AbstractTournament<G extends Game<? extends A, ?>, E exten
     this.log = log;
     this.pool = pool;
     this.maxActions = maxActions;
+    this.disqualify = disqualify;
   }
 
   @Override

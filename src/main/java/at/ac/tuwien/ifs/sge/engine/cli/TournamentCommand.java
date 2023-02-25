@@ -75,6 +75,10 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
       description = "Maximum number of actions. Game is aborted after the Nth action. Per default (the maximum) 2^31-2.")
   private int maxActions = Integer.MAX_VALUE - 1;
 
+  @Option(names = {"-dq",
+          "--disqualify"}, description = "Disqualify agents that time out without stopping the game.")
+  private boolean disqualify = false;
+
   @Parameters(index = "0", arity = "0..*", description = {
       "Not explicitly specified files or configuration of agents."})
   private List<String> arguments = new ArrayList<>();
@@ -114,7 +118,7 @@ public class TournamentCommand extends AbstractCommand implements Runnable {
 
     Tournament<Game<Object, Object>, GameAgent<Game<Object, Object>, Object>, Object> tournament = tournamentMode
         .getTournament(sge.gameFactory, numberOfPlayers, board, agentList, computationTime,
-            timeUnit, sge.debug, sge.log, sge.pool, maxActions);
+            timeUnit, sge.debug, sge.log, sge.pool, maxActions, disqualify);
 
     try {
       tournament.call();

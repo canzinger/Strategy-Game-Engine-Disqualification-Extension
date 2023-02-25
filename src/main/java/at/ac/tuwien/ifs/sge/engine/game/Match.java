@@ -34,9 +34,10 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
   private List<E> gameAgents;
   private String lastTextualRepresentation;
   private final int maxActions;
+  private final boolean disqualify;
 
   public Match(Game<A, ?> game, List<E> gameAgents, long computationTime,
-      TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool, int maxActions) {
+      TimeUnit timeUnit, boolean debug, Logger log, ExecutorService pool, int maxActions, boolean disqualify) {
     this.game = game;
     this.gameAgents = gameAgents;
     if (game.getNumberOfPlayers() != gameAgents.size()) {
@@ -54,6 +55,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
     this.pool = pool;
     this.matchResult = null;
     this.maxActions = maxActions;
+    this.disqualify = disqualify;
   }
 
 
@@ -141,6 +143,7 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
 
         A action = null;
 
+        boolean timedOut = false;
         try {
           action = actionFuture.get(computationTime, timeUnit);
         } catch (InterruptedException e) {
@@ -159,38 +162,67 @@ public class Match<G extends Game<? extends A, ?>, E extends GameAgent<G, ? exte
               log.printStackTrace(ex);
             }
           } else {
+            timedOut = true;
             log.warn("Agent timeout.");
           }
         }
 
-        if (action == null) {
-          log.warn("No action given.");
-          result[thisPlayer] = (-1D);
-          matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
-          log.debf_("%d actions: ", nrOfActions);
-          log._debug(ActionRecord.iterableToString(game.getActionRecords()));
-          return matchResult;
-        }
+        boolean timeOutOccurredAndHandled = false;
+        if (timedOut && disqualify && game.supportsDisqualification()) {
+          try  {
+            game = game.disqualifyCurrentPlayer();
+            log.info("Player with id: " + thisPlayer + " is disqualified because they timed out.");
+            timeOutOccurredAndHandled = true;
+          } catch (UnsupportedOperationException ex) {
+            log.error("Error while disqualifying agent, disqualifying not supported by the game.");
+          } catch (IllegalStateException ex) {
+            //no more players can be disqualified meaning the game must end
+            log.info("Player with id: " + thisPlayer + " is disqualified because it timed out.");
+            log.info("Too many players have been disqualified, the game ends.");
 
-        if (!isHuman) {
-          log._info_("> " + action.toString());
-        }
-
-        if (!game.isValidAction(action)) {
-          log.warn("Illegal action given.");
-          try {
-            game.doAction(action);
-          } catch (IllegalArgumentException e) {
-            log.printStackTrace(e);
+            double[] utility = game.getGameUtilityValue();
+            System.arraycopy(utility, 0, result, 0, result.length);
+            result[thisPlayer] = -1;
+            matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
+            log.debf_("%d actions: ", nrOfActions);
+            log._debug(ActionRecord.iterableToString(game.getActionRecords()));
+            return matchResult;
+          } catch (Exception ex) {
+            log.error("Error while disqualifying agent.");
+            log.error(ex.getStackTrace());
           }
-          result[thisPlayer] = (-1D);
-          matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
-          log.debf_("%d actions: ", nrOfActions);
-          log._debug(ActionRecord.iterableToString(game.getActionRecords()));
-          return matchResult;
         }
 
-        game = game.doAction(action);
+        if (!timeOutOccurredAndHandled) {
+          if (action == null) {
+            log.warn("No action given.");
+            result[thisPlayer] = (-1D);
+            matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
+            log.debf_("%d actions: ", nrOfActions);
+            log._debug(ActionRecord.iterableToString(game.getActionRecords()));
+            return matchResult;
+          }
+
+          if (!isHuman) {
+            log._info_("> " + action.toString());
+          }
+
+          if (!game.isValidAction(action)) {
+            log.warn("Illegal action given.");
+            try {
+              game.doAction(action);
+            } catch (IllegalArgumentException e) {
+              log.printStackTrace(e);
+            }
+            result[thisPlayer] = (-1D);
+            matchResult = new MatchResult<>(gameAgents, startTime, System.nanoTime(), result);
+            log.debf_("%d actions: ", nrOfActions);
+            log._debug(ActionRecord.iterableToString(game.getActionRecords()));
+            return matchResult;
+          }
+
+          game = game.doAction(action);
+        }
       } else {
 
         A action = game.determineNextAction();

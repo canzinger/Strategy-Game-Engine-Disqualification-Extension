@@ -303,19 +303,19 @@ public interface Game<A, B> {
   Game<A, B> getGame(int player);
 
   /**
-   * Disqualifies a player. Can be invoked after a player times out for example. The new game is "as identical
+   * Disqualifies the current player. Can be invoked after a player times out for example. The new game is "as identical
    * as possible" to this game, but with the player disqualified/removed. The state of the game changes
    * as little as possible (meaning the state of the game, board, other players are only changed if absolutely
-   * necessary).
+   * necessary). The utility of the disqualified player is -1 (when calling getUtility(playerId)). The player never becomes
+   * the currentPlayer again.
+   *
    * For some games this might not be possible/feasible, in this case an UnsupportedOperationException is thrown.
    *
-   * @param player - the player to disqualify
    * @return a new game with the given player disqualified
-   * @throws IllegalArgumentException if the player is not currently in the game
    * @throws IllegalStateException if the player cannot be disqualified because not enough players would remain
    * @throws UnsupportedOperationException if the game does not support disqualification
    */
-  default Game<A, B> disqualifyPlayer(int player) {
+  default Game<A, B> disqualifyCurrentPlayer() {
     throw new UnsupportedOperationException("Disqualifying a player is not supported.");
   }
 

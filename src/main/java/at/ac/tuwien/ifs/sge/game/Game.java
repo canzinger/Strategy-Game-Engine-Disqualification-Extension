@@ -304,7 +304,7 @@ public interface Game<A, B> {
 
   /**
    * Disqualifies the current player. Can be invoked after a player times out for example. The new game is "as identical
-   * as possible" to this game, but with the player disqualified/removed. The state of the game changes
+   * as possible" to this game, but with the player disqualified. The state of the game changes
    * as little as possible (meaning the state of the game, board, other players are only changed if absolutely
    * necessary). The utility of the disqualified player is -1 (when calling getUtility(playerId)). The player never becomes
    * the currentPlayer again.
